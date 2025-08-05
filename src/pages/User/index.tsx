@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useContext, useEffect, useState } from 'react';
 import Pagination from '../../components/User/Pagination';
@@ -14,19 +13,19 @@ import { AppContext } from '../../context/AppContext';
 
 const User = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize] = useState(10);
   const [active, setActive] = useState('User');
   const [roles, setRoles] = useState<{ id?: number; role_name: string; permissions: string[] }[]>(
     []
   );
-  const [users, setUsers] = useState([]);
+  // const [users, setUsers] = useState([]);
   const [editedUser, setEditedUser] = useState({});
   const [loading, setLoading] = useState(false);
 
   const { setShowAdminDetails, setAdminDetails } = useContext(AppContext);
 
   // const axiosInstance = useAxiosInstance();
-  const baseUrl = import.meta.env.VITE_BASE_URL;
+  // const baseUrl = import.meta.env.VITE_BASE_URL;
 
   const fetchUsers = async () => {
     setLoading(false);

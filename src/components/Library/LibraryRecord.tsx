@@ -3,7 +3,7 @@ import { useContext } from 'react';
 import MainTable from '../MainTable';
 
 import { AppContext } from '../../context/AppContext';
-import { sampleLibraryData, sampleMammyData } from '../../utils/constants';
+import { sampleLibraryData } from '../../utils/constants';
 import type { MainTableColumn, MainTableData } from '../../utils/types/department';
 
 const LibraryRecord = () => {

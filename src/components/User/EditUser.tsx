@@ -22,8 +22,7 @@ interface AddUserProps {
   data: User;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const EditUser = ({ roles, setActive, data }: AddUserProps) => {
+const EditUser = ({ roles, data }: AddUserProps) => {
   const [loading, setLoading] = useState(false);
   const [fullName, setFullName] = useState(data.name);
   const [email, setEmail] = useState(data.email);

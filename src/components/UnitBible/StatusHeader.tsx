@@ -2,7 +2,7 @@
 import React from 'react';
 
 interface User {
-  status: 'active' | 'inactive' | 'pending' | 'suspended';
+  status?: any;
   dateCreated?: string;
   lastEdited?: string;
   [key: string]: any; // Allow other properties for flexibility

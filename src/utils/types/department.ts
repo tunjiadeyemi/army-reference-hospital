@@ -21,7 +21,7 @@ export interface MainTableData {
 }
 
 export interface MainDataTableProps<T> {
-  data: T[];
+  data: any[];
   columns: MainTableColumn<T>[];
   itemsPerPageOptions?: number[];
   defaultItemsPerPage?: number;
