@@ -1,0 +1,40 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+export interface FormData {
+  image: string;
+  name: string;
+  pno: string;
+  rank: string;
+  corps: string;
+  qualification: string;
+  dateOfBirth: string;
+  directorate: string;
+  dateOfCommission: string;
+  sex: string;
+  bloodGroup: string;
+  genotype: string;
+  dateOfCommission2: string;
+  dateOfLastPromotion: string;
+  dateOfTakingStrength: string;
+  religion: string;
+  dateOfPostedIn: string;
+  maritalStatus: string;
+  phoneNumber: string;
+  placeOfBirth: string;
+  stateOfOrigin: string;
+  lga: string;
+  permanentAddress: string;
+  emailAddress: string;
+  numberOfChildren: string;
+  numberOfWives: string;
+  nameOfChildren: string[];
+  nameOfWives: string[];
+  nameOfNextOfKin: string;
+  relationshipWithNextOfKin: string;
+  addressOfNextOfKin: string;
+  phoneNumberOfNextOfKin: string;
+  honourAndAward: string;
+  operations: Array<{ operation: string; date: string; location: string }>;
+  lastThreeUnits: { a: string; b: string; c: string };
+  remarks: string;
+  [key: string]: any;
+}
