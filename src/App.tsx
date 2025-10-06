@@ -1,10 +1,10 @@
 import { useLocation } from 'react-router';
-import Rout from './components/Rout';
+import Rout from './components/router/Rout';
 import './global.css';
 
 import Header from './components/Header';
 import Navigation from './components/Navigation';
-import { useContext } from 'react';
+import { useContext} from 'react';
 import { AppContext } from './context/AppContext';
 import AddRecordModal from './components/DepartmentFile/AddRecordModal';
 import ViewDutyReportModal from './components/DutyReport/ViewDutyReportModal';
@@ -24,6 +24,9 @@ import EquipmentModal from './components/Equipment/EquipmentModal';
 import VehicleModal from './components/Vehicle/VehicleModal';
 import UnitModal from './components/Unit/UnitModal';
 import AdminDetails from './components/User/AdminDetails';
+import Providers from './provider/providers';
+import { Toaster } from 'react-hot-toast';
+
 
 const App = () => {
   const location = useLocation();
@@ -49,37 +52,65 @@ const App = () => {
     showAdminDetails
   } = useContext(AppContext);
 
+  
   return (
     <div className="flex items-start h-screen overflow-hidden overflow-y-auto">
-      <Navigation />
+      <Providers>
+        <>
+          {currentPath !== '/login' && currentPath !== '/' && <Navigation />}
 
-      {showAddRecordModal && <AddRecordModal />}
-      {showDutyReportModal && <ViewDutyReportModal />}
-      {showBiodataModal && <BiodataModal />}
-      {showRecordModal && <RecordModal />}
-      {showRecordModalTwo && <RecordModalTwo />}
-      {showLeaveModal && <LeaveModal />}
-      {showTrialModal && <TrialModal />}
-      {showDisciplineModal && <DisciplineModal />}
-      {showGuardModal && <GuardModal />}
-      {showStaffModal && <StaffModal />}
-      {showMailModal && <MailModal />}
-      {showAccommodationModal && <AccommodationModal />}
-      {showMammyModal && <MammyModal />}
-      {showLibraryModal && <LibraryModal />}
-      {showEquipmentModal && <EquipmentModal />}
-      {showVehicleModal && <VehicleModal />}
-      {showUnitModal && <UnitModal />}
-      {showAdminDetails && <AdminDetails />}
+          {showAddRecordModal && <AddRecordModal />}
+          {showDutyReportModal && <ViewDutyReportModal />}
+          {showBiodataModal && <BiodataModal />}
+          {showRecordModal && <RecordModal />}
+          {showRecordModalTwo && <RecordModalTwo />}
+          {showLeaveModal && <LeaveModal />}
+          {showTrialModal && <TrialModal />}
+          {showDisciplineModal && <DisciplineModal />}
+          {showGuardModal && <GuardModal />}
+          {showStaffModal && <StaffModal />}
+          {showMailModal && <MailModal />}
+          {showAccommodationModal && <AccommodationModal />}
+          {showMammyModal && <MammyModal />}
+          {showLibraryModal && <LibraryModal />}
+          {showEquipmentModal && <EquipmentModal />}
+          {showVehicleModal && <VehicleModal />}
+          {showUnitModal && <UnitModal />}
+          {showAdminDetails && <AdminDetails />}
 
-      <div
-        className={`overflow-hidden h-[100vh] overflow-y-auto ${
-          currentPath !== '/login' ? 'w-full lg:w-[95%]' : 'w-[75%]'
-        } `}
-      >
-        {currentPath !== '/login' && <Header />}
-        <Rout />
-      </div>
+          <div
+            className={`overflow-hidden h-[100vh] overflow-y-auto ${
+              currentPath !== '/login' && '' ? 'w-full lg:w-[95%]' : 'w-full'
+            } `}
+          >
+            {currentPath !== '/login' && '' && <Header />}
+
+            <Rout />
+          </div>
+        </>
+      </Providers>
+      <Toaster
+        position="top-center"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: '#333',
+            color: '#fff'
+          },
+          success: {
+            iconTheme: {
+              primary: '#4ade80',
+              secondary: '#fff'
+            }
+          },
+          error: {
+            style: {
+              background: '#f87171',
+              color: '#fff'
+            }
+          }
+        }}
+      />
     </div>
   );
 };

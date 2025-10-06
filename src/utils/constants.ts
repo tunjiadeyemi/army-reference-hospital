@@ -522,6 +522,43 @@ export const mockOfficerBioData = {
   lastThreeUnits: { a: 'Unit A', b: 'Unit B', c: 'Unit C' },
   remarks: 'Excellent service record.'
 };
+export const initialBiodataState: BiodataFormData = {
+  name: '',
+  pno: '',
+  rank: 'Major',
+  corps: '',
+  qualification: '',
+  dateOfBirth: '',
+  directorate: 'FCM',
+  dateOfCommission: '',
+  sex: 'Male',
+  bloodGroup: 'A+',
+  genotype: 'AA',
+  dateOfCommission2: '',
+  dateOfLastPromotion: '',
+  dateOfTakingStrength: '',
+  religion: 'Christian',
+  dateOfPostedIn: '',
+  maritalStatus: 'Single',
+  phoneNumber: '',
+  placeOfBirth: '',
+  stateOfOrigin: '',
+  lga: '',
+  permanentAddress: '',
+  emailAddress: '',
+  numberOfChildren: '0',
+  numberOfWives: '0',
+  nameOfChildren: [''],
+  nameOfWives: [''],
+  nameOfNextOfKin: '',
+  relationshipWithNextOfKin: 'Brother',
+  addressOfNextOfKin: '',
+  phoneNumberOfNextOfKin: '',
+  honourAndAward: '',
+  operations: [{ operation: '', date: '', location: '' }],
+  lastThreeUnits: { a: '', b: '', c: '' },
+  remarks: '',
+};
 
 export const mockOrderData = {
   header: {

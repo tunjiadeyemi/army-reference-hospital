@@ -53,12 +53,12 @@ export interface Accommodation {
 export interface SickLeave {
   name: string;
   rank: string;
-  expiredDate: string;
+  date_expired: string;
 }
 
 export interface SignalMember {
   name: string;
   rank: string;
-  maritalStatus: string;
-  armyNumber: string;
+  marital_status: string;
+  army_number: string;
 }

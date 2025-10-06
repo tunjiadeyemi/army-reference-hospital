@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from 'react';
+// import { useState } from 'react';
+import { useCreateOfficer } from '../../hooks/dashboardhooks/useDasboardData';
+import useFormChangeHandler from '../../hooks/useFormChangeHandler';
 
 // Mock data for view mode
 
@@ -9,7 +11,10 @@ interface UnitFormProps {
 }
 
 export default function UnitForm({ isEdit = true, mockData }: UnitFormProps) {
-  const [formData, setFormData] = useState(
+  const createMutation = useCreateOfficer();
+
+
+  const [formData, setFormData] = useFormChangeHandler(
     isEdit
       ? {
           ltrOfReq: '',
@@ -29,16 +34,11 @@ export default function UnitForm({ isEdit = true, mockData }: UnitFormProps) {
       : { ...mockData }
   );
 
-  const handleInputChange = (field: keyof typeof formData, value: string) => {
-    if (!isEdit) return;
-    setFormData((prev: any) => ({
-      ...prev,
-      [field]: value
-    }));
-  };
 
   const handleSave = () => {
     if (!isEdit) return;
+    console.log('Form:', formData);
+    createMutation.mutate(formData);
     console.log('Form submitted:', formData);
   };
 
@@ -79,8 +79,9 @@ export default function UnitForm({ isEdit = true, mockData }: UnitFormProps) {
             <input
               type="text"
               placeholder="Ltr of req"
+              name="ltrOfReq"
               value={formData.ltrOfReq}
-              onChange={(e) => handleInputChange('ltrOfReq', e.target.value)}
+              onChange={setFormData}
               disabled={!isEdit}
               className={`w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
                 !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
@@ -95,9 +96,10 @@ export default function UnitForm({ isEdit = true, mockData }: UnitFormProps) {
           <div className="md:col-span-2">
             <input
               type="text"
+              name="auth"
               placeholder="Auth"
               value={formData.auth}
-              onChange={(e) => handleInputChange('auth', e.target.value)}
+              onChange={setFormData}
               disabled={!isEdit}
               className={`w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
                 !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
@@ -113,8 +115,9 @@ export default function UnitForm({ isEdit = true, mockData }: UnitFormProps) {
             <input
               type="text"
               placeholder="Wpn Type"
+              name="wpnType"
               value={formData.wpnType}
-              onChange={(e) => handleInputChange('wpnType', e.target.value)}
+              onChange={setFormData}
               disabled={!isEdit}
               className={`w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
                 !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
@@ -130,8 +133,9 @@ export default function UnitForm({ isEdit = true, mockData }: UnitFormProps) {
             <input
               type="text"
               placeholder="Country of origin"
+              name="countryOfOrigin"
               value={formData.countryOfOrigin}
-              onChange={(e) => handleInputChange('countryOfOrigin', e.target.value)}
+              onChange={setFormData}
               disabled={!isEdit}
               className={`w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
                 !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
@@ -146,9 +150,10 @@ export default function UnitForm({ isEdit = true, mockData }: UnitFormProps) {
           <div className="md:col-span-2">
             <input
               type="text"
+              name="regNo"
               placeholder="Reg no"
               value={formData.regNo}
-              onChange={(e) => handleInputChange('regNo', e.target.value)}
+              onChange={setFormData}
               disabled={!isEdit}
               className={`w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
                 !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
@@ -163,9 +168,10 @@ export default function UnitForm({ isEdit = true, mockData }: UnitFormProps) {
           <div className="md:col-span-2">
             <input
               type="text"
+              name="buttNo"
               placeholder="Butt No"
               value={formData.buttNo}
-              onChange={(e) => handleInputChange('buttNo', e.target.value)}
+              onChange={setFormData}
               disabled={!isEdit}
               className={`w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
                 !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
@@ -180,9 +186,10 @@ export default function UnitForm({ isEdit = true, mockData }: UnitFormProps) {
           <div className="md:col-span-2">
             <input
               type="text"
+              name="assignedFmnUnit"
               placeholder="Assigned FMN/UNIT"
               value={formData.assignedFmnUnit}
-              onChange={(e) => handleInputChange('assignedFmnUnit', e.target.value)}
+              onChange={setFormData}
               disabled={!isEdit}
               className={`w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
                 !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
@@ -198,8 +205,9 @@ export default function UnitForm({ isEdit = true, mockData }: UnitFormProps) {
             <input
               type="text"
               placeholder="Armoury location"
+              name="armouryLocation"
               value={formData.armouryLocation}
-              onChange={(e) => handleInputChange('armouryLocation', e.target.value)}
+              onChange={setFormData}
               disabled={!isEdit}
               className={`w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
                 !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
@@ -215,8 +223,9 @@ export default function UnitForm({ isEdit = true, mockData }: UnitFormProps) {
             <input
               type="text"
               placeholder="Condition"
+              name="condition"
               value={formData.condition}
-              onChange={(e) => handleInputChange('condition', e.target.value)}
+              onChange={setFormData}
               disabled={!isEdit}
               className={`w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
                 !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
@@ -232,8 +241,9 @@ export default function UnitForm({ isEdit = true, mockData }: UnitFormProps) {
             <input
               type="text"
               placeholder="DD/MM/YY"
+              name="dateToc"
               value={formData.dateToc}
-              onChange={(e) => handleInputChange('dateToc', e.target.value)}
+              onChange={setFormData}
               disabled={!isEdit}
               className={`w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
                 !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
@@ -249,8 +259,9 @@ export default function UnitForm({ isEdit = true, mockData }: UnitFormProps) {
             <input
               type="text"
               placeholder="status"
+              name="status"
               value={formData.status}
-              onChange={(e) => handleInputChange('status', e.target.value)}
+              onChange={setFormData}
               disabled={!isEdit}
               className={`w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
                 !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
@@ -266,8 +277,9 @@ export default function UnitForm({ isEdit = true, mockData }: UnitFormProps) {
             <input
               type="text"
               placeholder="Purpose of issue"
+              name="purposeOfIssue"
               value={formData.purposeOfIssue}
-              onChange={(e) => handleInputChange('purposeOfIssue', e.target.value)}
+              onChange={setFormData}
               disabled={!isEdit}
               className={`w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
                 !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
@@ -282,8 +294,9 @@ export default function UnitForm({ isEdit = true, mockData }: UnitFormProps) {
           <div className="md:col-span-2">
             <textarea
               placeholder="Remark"
+              name="remark"
               value={formData.remark}
-              onChange={(e) => handleInputChange('remark', e.target.value)}
+              onChange={setFormData}
               rows={6}
               disabled={!isEdit}
               className={`w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent resize-vertical ${

@@ -5,6 +5,7 @@ import { createContext, useState } from 'react';
 export const AppContext = createContext<AppContextType>({} as AppContextType);
 
 interface AppContextType {
+
   showNav: boolean;
   setShowNav: React.Dispatch<React.SetStateAction<boolean>>;
   showAddRecordModal: boolean;
@@ -17,6 +18,8 @@ interface AppContextType {
   setShowDutyReportModal: React.Dispatch<React.SetStateAction<boolean>>;
   selectedBiodata: any;
   setSelectedBiodata: React.Dispatch<React.SetStateAction<any>>;
+  selectedBiodataObj: any;
+  setSelectedBiodataObj: React.Dispatch<React.SetStateAction<any>>;
   showBiodataModal: boolean;
   setShowBiodataModal: React.Dispatch<React.SetStateAction<boolean>>;
   selectedRecord: any;
@@ -109,6 +112,7 @@ export const AppContextProvider = ({ children }: any) => {
   const [showDutyReportModal, setShowDutyReportModal] = useState<boolean>(false);
 
   const [selectedBiodata, setSelectedBiodata] = useState<any>(null);
+  const [selectedBiodataObj, setSelectedBiodataObj] = useState<any>(null);
   const [showBiodataModal, setShowBiodataModal] = useState<boolean>(false);
 
   const [selectedRecord, setSelectedRecord] = useState<any>(null);
@@ -168,6 +172,8 @@ export const AppContextProvider = ({ children }: any) => {
   return (
     <AppContext.Provider
       value={{
+        selectedBiodataObj,
+        setSelectedBiodataObj,
         showNav,
         setShowNav,
         showAddRecordModal,

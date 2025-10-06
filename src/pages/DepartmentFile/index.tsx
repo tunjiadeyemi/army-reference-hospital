@@ -7,6 +7,7 @@ import Layout from '../../components/Layout';
 
 import RecordList from '../../components/DepartmentFile/RecordList';
 import DepartmentIcon from '../../assets/navIcons/DepartmentIcon';
+// import { useGetDeptFiles } from './hooks/useDeptFile';
 
 const DepartmentFile = () => {
   const [formData, setFormData] = useState<FileData>({
@@ -19,7 +20,8 @@ const DepartmentFile = () => {
 
   const { active } = useParams<{ active?: string }>();
   const [activeTab, setActiveTab] = useState(active || 'add');
-
+  
+  // const {data: deptFiles} = useGetDeptFiles()
   const tabs = [
     {
       title: 'Add New',

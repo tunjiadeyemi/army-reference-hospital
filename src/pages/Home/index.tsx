@@ -10,7 +10,12 @@ import Table from '../../components/Table';
 import Calendar from '../../components/Calendar';
 import Layout from '../../components/Layout';
 
+import { useOverviewData } from '../../hooks/dashboardhooks/useDasboardData';
+
 const Home = () => {
+
+   const { data: overviewData, isLoading: overviewLoading, refetch: refetchOverview } = useOverviewData();
+  //  console.log("OverviewData:", overviewData)
   const recentOfficers: Officer[] = [
     { name: 'Courtney Henry', rank: 'General', date: '5/19/2025' },
     { name: 'Arlene McCoy', rank: 'Private', date: '5/19/2025' },
@@ -34,25 +39,25 @@ const Home = () => {
   ];
 
   const expiredSickLeave: SickLeave[] = [
-    { name: 'Courtney Henry', rank: 'General', expiredDate: '2 days' },
-    { name: 'Arlene McCoy', rank: 'Private', expiredDate: '6 days ago' },
-    { name: 'Floyd Miles', rank: 'Major', expiredDate: '4 days ago' },
-    { name: 'Albert Flores', rank: 'Captain', expiredDate: '1 day ago' },
-    { name: 'Esther Howard', rank: 'Corporal', expiredDate: '2 days' },
-    { name: 'Robert Fox', rank: 'Major', expiredDate: '12 days' },
-    { name: 'Darrell Steward', rank: 'Major', expiredDate: '22 days' },
-    { name: 'Jacob Jones', rank: 'Major', expiredDate: '33 days' }
+    { name: 'Courtney Henry', rank: 'General', date_expired: '2 days' },
+    { name: 'Arlene McCoy', rank: 'Private', date_expired: '6 days ago' },
+    { name: 'Floyd Miles', rank: 'Major', date_expired: '4 days ago' },
+    { name: 'Albert Flores', rank: 'Captain', date_expired: '1 day ago' },
+    { name: 'Esther Howard', rank: 'Corporal', date_expired: '2 days' },
+    { name: 'Robert Fox', rank: 'Major', date_expired: '12 days' },
+    { name: 'Darrell Steward', rank: 'Major', date_expired: '22 days' },
+    { name: 'Jacob Jones', rank: 'Major', date_expired: '33 days' }
   ];
 
   const signalMembers: SignalMember[] = [
-    { name: 'Courtney Henry', rank: 'General', maritalStatus: 'Single', armyNumber: 'NA34567' },
-    { name: 'Courtney Henry', rank: 'General', maritalStatus: 'Single', armyNumber: 'NA34567' },
-    { name: 'Courtney Henry', rank: 'General', maritalStatus: 'Single', armyNumber: 'NA34567' },
-    { name: 'Courtney Henry', rank: 'General', maritalStatus: 'Single', armyNumber: 'NA34567' },
-    { name: 'Courtney Henry', rank: 'General', maritalStatus: 'Single', armyNumber: 'NA34567' },
-    { name: 'Courtney Henry', rank: 'General', maritalStatus: 'Single', armyNumber: 'NA34567' },
-    { name: 'Courtney Henry', rank: 'General', maritalStatus: 'Single', armyNumber: 'NA34567' },
-    { name: 'Courtney Henry', rank: 'General', maritalStatus: 'Single', armyNumber: 'NA34567' }
+    { name: 'Courtney Henry', rank: 'General', marital_status: 'Single', army_number: 'NA34567' },
+    { name: 'Courtney Henry', rank: 'General', marital_status: 'Single', army_number: 'NA34567' },
+    { name: 'Courtney Henry', rank: 'General', marital_status: 'Single', army_number: 'NA34567' },
+    { name: 'Courtney Henry', rank: 'General', marital_status: 'Single', army_number: 'NA34567' },
+    { name: 'Courtney Henry', rank: 'General', marital_status: 'Single', army_number: 'NA34567' },
+    { name: 'Courtney Henry', rank: 'General', marital_status: 'Single', army_number: 'NA34567' },
+    { name: 'Courtney Henry', rank: 'General', marital_status: 'Single', army_number: 'NA34567' },
+    { name: 'Courtney Henry', rank: 'General', marital_status: 'Single', army_number: 'NA34567' }
   ];
 
   const officerColumns: TableColumn<Officer>[] = [
@@ -69,14 +74,14 @@ const Home = () => {
   const sickLeaveColumns: TableColumn<SickLeave>[] = [
     { header: 'Name', accessKey: 'name' },
     { header: 'Rank', accessKey: 'rank' },
-    { header: 'Expired Date', accessKey: 'expiredDate' }
+    { header: 'Expired Date', accessKey: 'date_expired' }
   ];
 
   const signalMemberColumns: TableColumn<SignalMember>[] = [
     { header: 'Name', accessKey: 'name' },
     { header: 'Rank', accessKey: 'rank' },
-    { header: 'Marital status', accessKey: 'maritalStatus' },
-    { header: 'Army Number', accessKey: 'armyNumber' }
+    { header: 'Marital status', accessKey: 'marital_status' },
+    { header: 'Army Number', accessKey: 'army_number' }
   ];
 
   return (
@@ -85,25 +90,25 @@ const Home = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatsCard
           title="Overdue Leave"
-          value="900"
+          value={overviewData?.overdueLeave ?? "N/A"}
           subtitle="30 days"
           icon={<img src="/home/overdue-icon.svg" alt="overdue-icon" />}
         />
         <StatsCard
-          title="Released officers"
-          value="100"
+          title="Released Officers"
+          value={overviewData?.releasedOfficers ?? "N/A"}
           subtitle="30 days"
           icon={<img src="/home/release-icon.svg" alt="release-icon" />}
         />
         <StatsCard
           title="Total Shops"
-          value="900"
+          value={overviewData?.totalShops ?? "N/A"}
           subtitle=""
           icon={<img src="/home/total-shops.svg" alt="total-shops" />}
         />
         <StatsCard
-          title="Total approved Leave/Pas"
-          value="100"
+          title="Total approved Leave/Pass"
+          value={overviewData?.approvedLeave ?? "N/A"}
           subtitle=""
           icon={<img src="/home/total-leaves.svg" alt="total-leaves" />}
         />
@@ -118,7 +123,7 @@ const Home = () => {
             <h3 className="text-base font-semibold text-gray-900 px-3 py-4">
               Recently Released Officer from the guard dom
             </h3>
-            <Table data={recentOfficers} columns={officerColumns} />
+            <Table data={overviewData?.recently_released_officers ?? recentOfficers} columns={officerColumns} />
           </div>
 
           {/* Recently Returned Accommodation */}
@@ -126,7 +131,7 @@ const Home = () => {
             <h3 className="text-base font-semibold text-gray-900 px-3 py-4">
               Recently Returned accommodation
             </h3>
-            <Table data={accommodations} columns={accommodationColumns} />
+            <Table data={overviewData?.recently_returned_accomodation ?? accommodations} columns={accommodationColumns} />
           </div>
 
           <div className="h-full">
@@ -141,7 +146,7 @@ const Home = () => {
             <div className="px-6 py-4 border-b border-gray-200">
               <h3 className="text-lg font-semibold text-gray-900">Expired Sick leave</h3>
             </div>
-            <Table data={expiredSickLeave} columns={sickLeaveColumns} />
+            <Table data={overviewData?.expired_sick_leave ?? expiredSickLeave} columns={sickLeaveColumns} />
           </div>
 
           {/* Recent Added Members */}
@@ -151,7 +156,7 @@ const Home = () => {
                 Recent Added Member to the Signal list
               </h3>
             </div>
-            <Table data={signalMembers} columns={signalMemberColumns} />
+            <Table data={overviewData?.recently_added_to_signal_list ?? signalMembers} columns={signalMemberColumns} />
           </div>
         </div>
       </div>

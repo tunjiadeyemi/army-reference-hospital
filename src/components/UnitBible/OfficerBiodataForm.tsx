@@ -1,103 +1,74 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useEffect } from 'react';
-import type { FormData } from '../../utils/types/unitBible';
-import { mockOfficerBioData } from '../../utils/constants';
+import { useEffect, useRef, useState } from 'react';
+// import type { FormData } from '../../utils/types/unitBible';
+import { mockOfficerBioData, initialBiodataState } from '../../utils/constants';
 import StatusHeader from './StatusHeader';
+import {
+  useCreateOfficer,
+  useOfficersData,
+  useUpdateOfficer
+} from '../../hooks/dashboardhooks/useDasboardData';
+import useFormChangeHandler, {
+  transformBiodataForAPI,
+  type BiodataFormData
+} from '../../hooks/dashboardhooks/useLargeFormHandler';
+import type { CreateOfficerPayload } from '../../utils/types/unitBible';
+import { showError, showSuccess } from '../../utils/toast';
 
-// Mock data for view mode
+// Mock data for view mode'
 
-const OfficerBioDataForm = ({ viewMode }: { viewMode: boolean }) => {
+interface OfficerBioDataFormProps {
+  viewMode: boolean;
+  selectedData?: CreateOfficerPayload | null; // optional (can be null)
+}
+export const OfficerBioDataForm: React.FC<OfficerBioDataFormProps> = ({
+  viewMode,
+  selectedData
+}) => {
+  const getInitialFormData = (): BiodataFormData => {
+    if (selectedData) {
+      return {
+        photo: selectedData.photo || '',
+        name: selectedData.name || '',
+        pno: selectedData.serviceNumber || '',
+        rank: selectedData.rank || 'Major',
+        corps: selectedData.corps || '',
+        qualification: selectedData.qualificationTrade || '',
+        dateOfBirth: selectedData.dateOfBirth || '',
+        directorate: selectedData.directorate || 'FCM',
+        dateOfCommission: selectedData.dateOfCommission || '',
+        sex: selectedData.sex || 'Male',
+        bloodGroup: selectedData.bloodGroup || 'A+',
+        genotype: selectedData.genotype || 'AA',
+        dateOfCommission2: selectedData.dateOfCommission || '',
+        dateOfLastPromotion: selectedData.dateOfLastPromotion || '',
+        dateOfTakingStrength: selectedData.dateOfTakingOnStrength || '',
+        religion: selectedData.religion || 'Christian',
+        dateOfPostedIn: selectedData.dateOfPostedIn || '',
+        maritalStatus: selectedData.maritalStatus || 'Single',
+        phoneNumber: selectedData.phoneNumber || '',
+        placeOfBirth: selectedData.placeOfBirth || '',
+        stateOfOrigin: selectedData.stateOfOrigin || '',
+        lga: selectedData.lga || '',
+        permanentAddress: selectedData.permanentHomeAddress || '',
+        emailAddress: selectedData.emailAddress || '',
+        numberOfChildren: String(selectedData.numberOfChildren || '0'),
+        numberOfWives: String(selectedData.numberOfWives || '0'),
+        nameOfChildren: selectedData.nameOfChildren || [''],
+        nameOfWives: selectedData.nameOfWives || [''],
+        nameOfNextOfKin: selectedData.nextOfKinName || '',
+        relationshipWithNextOfKin: selectedData.nextOfKinRelationship || 'Brother',
+        addressOfNextOfKin: selectedData.nextOfKinAddress || '',
+        phoneNumberOfNextOfKin: selectedData.nextOfKinPhoneNumber || '',
+        honourAndAward: selectedData.honourAndAward || '',
+        operations: selectedData.operations || [{ operation: '', date: '', location: '' }],
+        lastThreeUnits: selectedData.lastThreeUnits || { a: '', b: '', c: '' },
+        remarks: selectedData.remarks || ''
+      };
+    }
+    return initialBiodataState;
+  };
   const [editMode, setEditMode] = useState(false);
-  const [formData, setFormData] = useState<FormData>(
-    viewMode
-      ? mockOfficerBioData
-      : {
-          status: 'active',
-          image: '',
-          name: '',
-          pno: '',
-          rank: 'Major',
-          corps: '',
-          qualification: '',
-          dateOfBirth: '',
-          directorate: 'FCM',
-          dateOfCommission: '',
-          sex: 'Male',
-          bloodGroup: 'A+',
-          genotype: 'AA',
-          dateOfCommission2: '',
-          dateOfLastPromotion: '',
-          dateOfTakingStrength: '',
-          religion: 'Christian',
-          dateOfPostedIn: '',
-          maritalStatus: 'Single',
-          phoneNumber: '',
-          placeOfBirth: '',
-          stateOfOrigin: '',
-          lga: '',
-          permanentAddress: '',
-          emailAddress: '',
-          numberOfChildren: '',
-          numberOfWives: '',
-          nameOfChildren: ['', ''],
-          nameOfWives: ['', ''],
-          nameOfNextOfKin: '',
-          relationshipWithNextOfKin: 'Brother',
-          addressOfNextOfKin: '',
-          phoneNumberOfNextOfKin: '',
-          honourAndAward: '',
-          operations: [{ operation: '', date: '', location: '' }],
-          lastThreeUnits: { a: '', b: '', c: '' },
-          remarks: ''
-        }
-  );
-
-  useEffect(() => {
-    if (viewMode && !editMode) setFormData(mockOfficerBioData);
-  }, [viewMode, editMode]);
-
-  const handleInputChange = (field: keyof FormData, value: any) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const addChild = () => {
-    setFormData((prev) => ({
-      ...prev,
-      nameOfChildren: [...prev.nameOfChildren, '']
-    }));
-  };
-
-  const addWife = () => {
-    setFormData((prev) => ({
-      ...prev,
-      nameOfWives: [...prev.nameOfWives, '']
-    }));
-  };
-
-  const addOperation = () => {
-    setFormData((prev) => ({
-      ...prev,
-      operations: [...prev.operations, { operation: '', date: '', location: '' }]
-    }));
-  };
-
-  const updateChildName = (index: number, value: string) => {
-    const newChildren = [...formData.nameOfChildren];
-    newChildren[index] = value;
-    setFormData((prev) => ({ ...prev, nameOfChildren: newChildren }));
-  };
-
-  const updateWifeName = (index: number, value: string) => {
-    const newWives = [...formData.nameOfWives];
-    newWives[index] = value;
-    setFormData((prev) => ({ ...prev, nameOfWives: newWives }));
-  };
-
-  const updateOperation = (index: number, field: string, value: string) => {
-    const newOperations = [...formData.operations];
-    newOperations[index] = { ...newOperations[index], [field]: value };
-    setFormData((prev) => ({ ...prev, operations: newOperations }));
-  };
 
   const handlePDF = () => {
     console.log('PDF clicked');
@@ -106,11 +77,115 @@ const OfficerBioDataForm = ({ viewMode }: { viewMode: boolean }) => {
   const handlePrint = () => {
     console.log('Print clicked');
   };
-
+  console.log('Heelo');
   const handleEdit = () => {
     setEditMode((prev) => !prev);
   };
 
+  const {
+    formData,
+    handleInputChange,
+    handleFileChange,
+    updateChildName,
+    updateWifeName,
+    addChild,
+    addWife,
+    updateOperation,
+    addOperation,
+    resetForm,
+    setFormData
+  } = useFormChangeHandler<BiodataFormData>(getInitialFormData());
+  const createMutation = useCreateOfficer();
+  const updateMutation = useUpdateOfficer();
+  const {
+    data: officers,
+    isLoading: officersLoading,
+    refetch: refetchOfficers
+  } = useOfficersData();
+  const { mutate, isPending, isSuccess, isError } = createMutation;
+  const { isPending: updating } = updateMutation;
+
+  const handleBiodataSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const transformedData = transformBiodataForAPI(formData);
+    console.log('Submitted formData:', formData);
+    console.log('Transformed data: Hi', transformedData);
+
+    try {
+      if (selectedData?.id) {
+        // Update existing officer
+        await updateMutation.mutateAsync({
+          id: selectedData.id,
+          ...transformedData
+        });
+        showSuccess('Officer updated successfully');
+        refetchOfficers();
+      } else {
+        // Create new officer
+        await createMutation.mutateAsync(transformedData);
+
+        showSuccess('Officer created successfully');
+        resetForm();
+      }
+    } catch (error) {
+      showError(`${error?.response.data?.message}`);
+    }
+  };
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handlePhotoClick = () => {
+    if (!viewMode || editMode) {
+      fileInputRef.current?.click();
+    }
+  };
+
+  const [imagePreview, setImagePreview] = useState<string>('');
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file');
+      e.target.value = ''; // Reset input
+      return;
+    }
+
+    // Validate file size (5MB limit)
+    if (file.size > 2 * 1024 * 1024) {
+      showError('Image size should be less than 1MB');
+      e.target.value = ''; // Reset input
+      return;
+    }
+
+    // Create object URL for preview (efficient, no base64)
+    const objectUrl = URL.createObjectURL(file);
+
+    // Cleanup previous preview URL if it exists
+    if (imagePreview && imagePreview.startsWith('blob:')) {
+      URL.revokeObjectURL(imagePreview);
+    }
+
+    setImagePreview(objectUrl);
+    console.log('Hi Object url:', objectUrl, file);
+    setFormData((prev) => ({
+      ...prev,
+      photo: {
+        preview: objectUrl,
+        file: file
+      }
+    }));
+  };
+
+  useEffect(() => {
+    return () => {
+      if (imagePreview && imagePreview.startsWith('blob:')) {
+        URL.revokeObjectURL(imagePreview);
+      }
+    };
+  }, [imagePreview]);
   return (
     <section className={`${viewMode ? 'mb-20' : ''}`}>
       {/* Show normal header if not in viewMode, or if in viewMode but editing */}
@@ -143,21 +218,46 @@ const OfficerBioDataForm = ({ viewMode }: { viewMode: boolean }) => {
         {/* Header */}
 
         {/* Photo Upload */}
+        {console.log(formData)}
+      
         <div className="flex justify-center mb-8">
-          <div className="w-44 h-44 bg-[#D9D9D9] rounded-full flex items-center justify-center">
-            {viewMode ? (
-              <img src={formData.image} alt="" className="w-full h-full" />
-            ) : (
+          <div
+            className="w-44 h-44 bg-[#D9D9D9] rounded-full flex items-center justify-center cursor-pointer relative overflow-hidden hover:opacity-80 transition-opacity"
+            onClick={handlePhotoClick}
+          >
+            {formData?.photo ? (
               <img
-                src="/unitBible/camera-icon.svg"
-                alt="camera-icon"
-                className="w-16 h-16 text-gray-400"
+                src={
+                  selectedData
+                    ? typeof formData.photo === 'object' ? formData?.photo?.preview : formData.photo
+                    : formData?.photo.preview
+                }
+                alt="Officer photo"
+                className="w-full h-full object-cover"
               />
+            ) : (
+              <div className="flex flex-col items-center">
+                <img
+                  src="/unitBible/camera-icon.svg"
+                  alt="camera-icon"
+                  className="w-16 h-16 text-gray-400"
+                />
+                <p className="text-xs text-gray-500 mt-2">Click to upload</p>
+              </div>
             )}
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handlePhotoChange}
+              className="hidden"
+              disabled={viewMode && !editMode}
+            />
           </div>
         </div>
 
-        <form className="space-y-6">
+        <form onSubmit={handleBiodataSubmit} className="space-y-6">
           {/* Row 1 */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -515,17 +615,30 @@ const OfficerBioDataForm = ({ viewMode }: { viewMode: boolean }) => {
             <div>
               <label className="block text-sm   text-gray-700 mb-1">NAME OF CHILDREN</label>
               <div className="space-y-2 border rounded-md border-[#B1B8B7]">
-                {formData.nameOfChildren.map((child, index) => (
+                {formData.nameOfChildren && formData.nameOfChildren.length > 0 ? (
+                  formData.nameOfChildren.map((child, index) => (
+                    <input
+                      key={index}
+                      type="text"
+                      placeholder={`${index + 1}.`}
+                      className="w-full px-3 py-2 rounded-md outline-none"
+                      value={child || ''} // Handle undefined values
+                      onChange={(e) => updateChildName(index, e.target.value)}
+                      disabled={viewMode && !editMode}
+                    />
+                  ))
+                ) : (
                   <input
-                    key={index}
                     type="text"
-                    placeholder={`${index + 1}.`}
+                    placeholder="1. Enter child's name"
                     className="w-full px-3 py-2 rounded-md outline-none"
-                    value={child}
-                    onChange={(e) => updateChildName(index, e.target.value)}
+                    value=""
+                    onChange={(e) => {
+                      handleInputChange('nameOfChildren', [e.target.value]);
+                    }}
                     disabled={viewMode && !editMode}
                   />
-                ))}
+                )}
                 {(!viewMode || editMode) && (
                   <button
                     type="button"
@@ -774,9 +887,10 @@ const OfficerBioDataForm = ({ viewMode }: { viewMode: boolean }) => {
               <button
                 type="submit"
                 className="px-8 py-2 text-white rounded-md   hover:opacity-90"
-                style={{ backgroundColor: '#67DFCE' }}
+                style={{ backgroundColor: '#009689' }}
               >
-                Save
+                {isPending || updating  ? 'Loading ....' : 'Save'}
+                
               </button>
             </div>
           )}

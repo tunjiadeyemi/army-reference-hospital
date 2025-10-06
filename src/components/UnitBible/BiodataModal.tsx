@@ -4,8 +4,8 @@ import { AppContext } from '../../context/AppContext';
 import OfficerBioDataForm from './OfficerBiodataForm';
 
 const BiodataModal = () => {
-  const { setShowBiodataModal, selectedBiodata } = useContext(AppContext);
-
+  const { setShowBiodataModal, selectedBiodata, selectedBiodataObj } = useContext(AppContext);
+  console.log("Object passed: ", selectedBiodataObj)
   return (
     <Modal>
       <div className="bg-white w-[85%] h-[90vh] rounded-md shadow-md overflow-hidden">
@@ -34,7 +34,7 @@ const BiodataModal = () => {
 
         {/* body */}
         <section className="overflow-y-auto overflow-hidden h-full">
-          <OfficerBioDataForm viewMode={true} />
+          <OfficerBioDataForm selectedData={selectedBiodataObj}   viewMode={true}  />
         </section>
       </div>
     </Modal>

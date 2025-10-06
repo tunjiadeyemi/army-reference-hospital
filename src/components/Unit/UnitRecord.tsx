@@ -4,9 +4,20 @@ import MainTable from '../MainTable';
 
 import { AppContext } from '../../context/AppContext';
 import type { MainTableColumn, MainTableData } from '../../utils/types/department';
-import { sampleUnitData } from '../../utils/constants';
+// import { sampleUnitData } from '../../utils/constants';
 
 const UnitRecord = () => {
+  const sampleUnitData: any[] = Array.from({ length: 50 }, (_, index) => ({
+  sn: index + 1,
+  ltrOfReg: 100,
+  auth: 'Major',
+  wynType: 500,
+  country: 'Nigeria',
+  regNo: `NA657880${index + 1}`,
+  buttNo: `${index + 1}775NB`
+}));
+
+  
   const columns: MainTableColumn<MainTableData>[] = [
     {
       key: 'sn',

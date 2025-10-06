@@ -84,85 +84,17 @@ const User = () => {
 
   const handleSaveRole = async (updatedRole: any, isEdit: any) => {
     console.log('Saving role:', updatedRole, isEdit);
-    // if (isEdit !== true) {
-    //   try {
-    //     const response = await axios.put(
-    //       `${baseUrl}/admin/roles/edit/${updatedRole.id}`,
-    //       updatedRole,
-    //       axiosInstance
-    //     );
-
-    //     if (response.status === 200) {
-    //       const serverRole = {
-    //         id: response.data.data.roleId,
-    //         role_name: response.data.data.role_name,
-    //         permissions: response.data.data.permissions
-    //       };
-
-    //       const updatedRoles = roles.map((role) => (role.id === serverRole.id ? serverRole : role));
-
-    //       setRoles(updatedRoles);
-    //     }
-    //   } catch (error) {
-    //     console.error('Error adding user:', error);
-    //   }
-    // } else {
-    //   try {
-    //     const response = await axios.post(
-    //       `${baseUrl}/admin/roles/create`,
-    //       updatedRole,
-    //       axiosInstance
-    //     );
-
-    //     if (response.status === 201) {
-    //       const serverRole = {
-    //         id: response.data.data.roleId,
-    //         role_name: response.data.data.role_name,
-    //         permissions: response.data.data.permissions
-    //       };
-
-    //       const updatedRoles = roles.map((role) => {
-    //         // If this role matches what we're trying to save and has no ID, replace it
-    //         if (!role.id && role.role_name === 'New Role') {
-    //           return serverRole;
-    //         }
-    //         return role;
-    //       });
-
-    //       setRoles(updatedRoles);
-    //     }
-    //   } catch (error) {
-    //     console.error('Error adding user:', error);
-    //   }
-    // }
+   
   };
 
   const handleDeleteRole = async (index: number) => {
     console.log('Deleting role with index:', index);
-    // try {
-    //   const response = await axios.delete(`${baseUrl}/admin/roles/delete/${index}`, axiosInstance);
-
-    //   if (response.status === 200) {
-    //     const updatedRoles = roles.filter((role) => role.id !== index);
-    //     setRoles(updatedRoles);
-    //   }
-    // } catch (error) {
-    //   console.error('Error deleting user:', error);
-    // }
+    
   };
 
   const handleDeleteUser = async (index: number) => {
     console.log('Deleting user with index:', index);
-    // try {
-    //   const response = await axios.delete(`${baseUrl}/admin/users/delete/${index}`, axiosInstance);
-
-    //   if (response.status === 200) {
-    //     const updatedUsers = users.filter((user: any) => user.id !== index);
-    //     setUsers(updatedUsers);
-    //   }
-    // } catch (error) {
-    //   console.error('Error deleting user:', error);
-    // }
+   
   };
 
   return (
