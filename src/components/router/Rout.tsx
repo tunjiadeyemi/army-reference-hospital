@@ -20,6 +20,7 @@ const Library = lazy(() => import('../../pages/Library'));
 const Equipment = lazy(() => import('../../pages/Equipment'));
 const Vehicle = lazy(() => import('../../pages/Vehicle'));
 const Unit = lazy(() => import('../../pages/Unit'));
+const UnitHolding = lazy(() => import('../../pages/UnitHoldingArms'));
 const User = lazy(() => import('../../pages/User'));
 const Login = lazy(() => import('../../pages/Login'));
 import ProtectedRoute from './ProtectedRoutes';
@@ -52,7 +53,8 @@ const Rout = () => {
           <Route path="/library/:active?" element={<Library />} />
           <Route path="/equipment/:active?" element={<Equipment />} />
           <Route path="/vehicle/:active?" element={<Vehicle />} />
-          <Route path="/unit/:active?" element={<Unit />} />
+          <Route path="/ammunitions/:active?" element={<Unit />} />
+          <Route path="/unit-holding-arms/:active?" element={<UnitHolding />} />
           <Route path="/user" element={<User />} />
         </Route>
       </Routes>

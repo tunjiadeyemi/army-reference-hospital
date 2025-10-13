@@ -3,18 +3,19 @@ import { useContext } from 'react';
 import MainTable from '../MainTable';
 
 import { AppContext } from '../../context/AppContext';
-import { sampleLibraryData } from '../../utils/constants';
+// import { sampleLibraryData } from '../../utils/constants';
 import type { MainTableColumn, MainTableData } from '../../utils/types/department';
+import { useGetBooks } from '../../hooks/dashboardhooks/useDasboardData';
 
 const LibraryRecord = () => {
   const columns: MainTableColumn<MainTableData>[] = [
     {
-      key: 'sn',
+      key: 'id',
       header: 'S/N',
       className: 'w-[10%]'
     },
     {
-      key: 'bookTitle',
+      key: 'title',
       header: 'Book Title',
       className: 'w-[10%]'
     },
@@ -24,27 +25,29 @@ const LibraryRecord = () => {
       className: 'w-[10%]'
     },
     {
-      key: 'genre',
+      key: 'cateogory',
       header: 'Genre',
       className: 'w-[20%]'
     },
     {
-      key: 'noCopies',
+      key: 'copies',
       header: 'No. copies',
       className: 'w-[10%]'
     },
     {
-      key: 'date',
-      header: 'Dated uploaded',
+      key: 'language',
+      header: 'Language',
       className: 'w-[10%]'
     }
   ];
 
   const { setSelectedLibraryRecord, setShowLibraryModal } = useContext(AppContext);
-
+  
+  const { data: Books } = useGetBooks();
+    
   return (
     <MainTable
-      data={sampleLibraryData}
+      data={Books}
       columns={columns}
       itemsPerPageOptions={[10, 25, 50, 100]}
       defaultItemsPerPage={11}
@@ -53,7 +56,7 @@ const LibraryRecord = () => {
       onCellClick={(params) => {
         console.log('Cell clicked:', params);
         setShowLibraryModal(true);
-        setSelectedLibraryRecord(params.row.name);
+        setSelectedLibraryRecord(params.row);
       }}
     />
   );

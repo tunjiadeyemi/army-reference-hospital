@@ -1,7 +1,9 @@
 import { useContext, useState } from 'react';
 import Modal from '../Modal';
 import { AppContext } from '../../context/AppContext';
-import { mockOrderData, mockSickFormData } from '../../utils/constants';
+import { mockOrderData, 
+  // mockSickFormData 
+} from '../../utils/constants';
 import SickForm from './SickForm';
 
 const SickModal = () => {
@@ -25,12 +27,12 @@ const SickModal = () => {
     setEditDraft(orderData);
     setEditMode(false);
   };
-
+  console.log("SickReportObj:", selectedSickRecord)
   return (
     <Modal>
       <div className="bg-white w-[85%] h-[90vh] rounded-md shadow-md overflow-y-scroll overflow-hidden">
         {/* header */}
-        <div className="flex items-center justify-between border-b p-6 border-[#D9D9D9]">
+        <div className="flex items-centr justify-between border-b p-6 border-[#D9D9D9]">
           <div className="flex items-center gap-7">
             <button
               className="hover:scale-95 duration-300 transition-all cursor-pointer"
@@ -40,7 +42,7 @@ const SickModal = () => {
               <img src="/department/chevron-left.svg" alt="chevron-left" />
             </button>
 
-            <h1>{selectedSickRecord}</h1>
+            {<h1>{selectedSickRecord?.name ?? selectedSickRecord?.armyNumber ?? 'Sick Report'}</h1>}
           </div>
 
           <button
@@ -84,7 +86,7 @@ const SickModal = () => {
         </div>
 
         {/* body */}
-        <SickForm isEdit={editMode} mockData={mockSickFormData} />
+        <SickForm isEdit={editMode} mockData={selectedSickRecord} />
       </div>
     </Modal>
   );

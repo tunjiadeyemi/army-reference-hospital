@@ -1,7 +1,7 @@
 import { useContext, useState } from 'react';
 import Modal from '../Modal';
 import { AppContext } from '../../context/AppContext';
-import { mockOrderData, mockVehicleFormData } from '../../utils/constants';
+import { mockOrderData } from '../../utils/constants';
 
 import UnitForm from './UnitForm';
 
@@ -11,7 +11,7 @@ const UnitModal = () => {
   const [editDraft, setEditDraft] = useState(orderData);
 
   const { setShowUnitModal, selectedUnitRecord } = useContext(AppContext);
-
+  console.log("Selected Arm:", selectedUnitRecord)
   const handleEditClick = () => {
     setEditDraft(orderData);
     setEditMode(true);
@@ -27,6 +27,7 @@ const UnitModal = () => {
     setEditMode(false);
   };
 
+
   return (
     <Modal>
       <div className="bg-white w-[85%] h-[90vh] rounded-md shadow-md overflow-y-scroll overflow-hidden">
@@ -41,7 +42,7 @@ const UnitModal = () => {
               <img src="/department/chevron-left.svg" alt="chevron-left" />
             </button>
 
-            <h1>{selectedUnitRecord}</h1>
+            <h1>{selectedUnitRecord?.ltrOfReq ?? "Arm Report"}</h1>
           </div>
 
           <button
@@ -85,7 +86,7 @@ const UnitModal = () => {
         </div>
 
         {/* body */}
-        <UnitForm isEdit={editMode} mockData={mockVehicleFormData} />
+        <UnitForm isEdit={editMode} mockData={selectedUnitRecord} />
       </div>
     </Modal>
   );

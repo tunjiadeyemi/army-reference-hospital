@@ -85,7 +85,7 @@ export const OfficerBioDataForm: React.FC<OfficerBioDataFormProps> = ({
   const {
     formData,
     handleInputChange,
-    handleFileChange,
+   
     updateChildName,
     updateWifeName,
     addChild,
@@ -98,11 +98,10 @@ export const OfficerBioDataForm: React.FC<OfficerBioDataFormProps> = ({
   const createMutation = useCreateOfficer();
   const updateMutation = useUpdateOfficer();
   const {
-    data: officers,
-    isLoading: officersLoading,
+    
     refetch: refetchOfficers
   } = useOfficersData();
-  const { mutate, isPending, isSuccess, isError } = createMutation;
+  const { isPending } = createMutation;
   const { isPending: updating } = updateMutation;
 
   const handleBiodataSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -128,7 +127,7 @@ export const OfficerBioDataForm: React.FC<OfficerBioDataFormProps> = ({
         showSuccess('Officer created successfully');
         resetForm();
       }
-    } catch (error) {
+    } catch (error: any) {
       showError(`${error?.response.data?.message}`);
     }
   };
@@ -218,7 +217,7 @@ export const OfficerBioDataForm: React.FC<OfficerBioDataFormProps> = ({
         {/* Header */}
 
         {/* Photo Upload */}
-        {console.log(formData)}
+  
       
         <div className="flex justify-center mb-8">
           <div

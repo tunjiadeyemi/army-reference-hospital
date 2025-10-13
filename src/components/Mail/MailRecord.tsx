@@ -1,15 +1,16 @@
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 
 import MainTable from '../MainTable';
 
 import { AppContext } from '../../context/AppContext';
-import { sampleMailData } from '../../utils/constants';
+
 import type { MainTableColumn, MainTableData } from '../../utils/types/department';
+import { useGetMailArchives } from '../../hooks/dashboardhooks/useDasboardData';
 
 const MailRecord = () => {
   const columns: MainTableColumn<MainTableData>[] = [
     {
-      key: 'sn',
+      key: 'id',
       header: 'S/N',
       className: 'w-[10%]'
     },
@@ -19,24 +20,25 @@ const MailRecord = () => {
       className: 'w-[10%]'
     },
     {
-      key: 'toFrom',
+      key: 'to_from',
       header: 'To/From',
-      className: 'w-[20%]'
+      className: 'w-[10%]'
     },
     {
-      key: 'ref',
+      key: 'ref_no',
       header: 'File Ref No.',
       className: 'w-[10%]'
     },
     {
-      key: 'date',
+      key: 'date_sent',
       header: 'Date Sent/Received',
       className: 'w-[5%]'
     },
     {
-      key: 'file',
+      // key: 'attached_file',
+      key: '',
       header: 'Trade Class',
-      className: 'w-[23%]',
+      className: 'w-[13%]',
       render: (_value) => (
         <div>{_value && <img src="/department/paper-clip-icon.svg" alt="" className="w-6" />}</div>
       )
@@ -44,10 +46,14 @@ const MailRecord = () => {
   ];
 
   const { setSelectedMailRecord, setShowMailModal } = useContext(AppContext);
-
+  const { data: mailRecords, refetch: refetchMailArchives } = useGetMailArchives();
+    
+   useEffect(() => {
+        refetchMailArchives();
+      }, [refetchMailArchives]);
   return (
     <MainTable
-      data={sampleMailData}
+      data={mailRecords}
       columns={columns}
       itemsPerPageOptions={[10, 25, 50, 100]}
       defaultItemsPerPage={11}
@@ -56,7 +62,7 @@ const MailRecord = () => {
       onCellClick={(params) => {
         console.log('Cell clicked:', params);
         setShowMailModal(true);
-        setSelectedMailRecord(params.row.name);
+        setSelectedMailRecord(params.row);
       }}
     />
   );

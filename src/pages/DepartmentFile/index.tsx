@@ -7,13 +7,16 @@ import Layout from '../../components/Layout';
 
 import RecordList from '../../components/DepartmentFile/RecordList';
 import DepartmentIcon from '../../assets/navIcons/DepartmentIcon';
+import { useCreateDepartmentFile, useDeptFilesData } from '../../hooks/dashboardhooks/useDasboardData';
+import { showError, showSuccess } from '../../utils/toast';
+import Loader from '../../components/ui/Loader';
 // import { useGetDeptFiles } from './hooks/useDeptFile';
 
 const DepartmentFile = () => {
   const [formData, setFormData] = useState<FileData>({
-    cellNumber: '',
-    fileTitle: '',
-    uploadedFile: null
+    file_number: '',
+    file_title: '',
+    uploads: null
   });
   const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -60,7 +63,7 @@ const DepartmentFile = () => {
   const handleFileSelect = (file: File) => {
     setFormData((prev) => ({
       ...prev,
-      uploadedFile: file
+      uploads: file
     }));
   };
 
@@ -109,10 +112,31 @@ const DepartmentFile = () => {
     ];
     return validTypes.includes(file.type) || file.type.startsWith('image/');
   };
+//API CALL
 
-  const handleSave = () => {
-    console.log('Form Data:', formData);
-    alert('Form saved successfully!');
+const createMutation = useCreateDepartmentFile()
+const { refetch} = useDeptFilesData()
+
+
+
+
+const {isPending} = createMutation;
+
+
+  const handleSave = async (e: React.FormEvent<HTMLFormElement | HTMLButtonElement | MouseEvent> ) => {
+    e.preventDefault()
+    console.log("Department File PAyload:", formData)
+    try{
+      await createMutation.mutateAsync(formData)
+      showSuccess("Department File Created Successfully!!")
+      refetch()
+    }catch (err :any){
+      showError(err?.response?.data?.message)
+      console.error(err)
+    }
+    
+  
+   
   };
 
   return (
@@ -153,8 +177,8 @@ const DepartmentFile = () => {
                 <input
                   type="text"
                   placeholder="E.g G Cell"
-                  value={formData.cellNumber}
-                  onChange={(e) => handleInputChange('cellNumber', e.target.value)}
+                  value={formData.file_number}
+                  onChange={(e) => handleInputChange('file_number', e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 rounded-md text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-transparent"
                 />
               </div>
@@ -165,8 +189,8 @@ const DepartmentFile = () => {
                 <input
                   type="text"
                   placeholder="Enter file name"
-                  value={formData.fileTitle}
-                  onChange={(e) => handleInputChange('fileTitle', e.target.value)}
+                  value={formData.file_title}
+                  onChange={(e) => handleInputChange('file_title', e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 rounded-md text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-transparent"
                 />
               </div>
@@ -192,8 +216,8 @@ const DepartmentFile = () => {
 
                   <div className="space-y-4">
                     <p className="text-lg text-gray-600">
-                      {formData.uploadedFile
-                        ? formData.uploadedFile.name
+                      {formData.uploads
+                        ? formData.uploads.name
                         : 'Drag and Drop file here'}
                     </p>
                     <p className="text-sm text-gray-400">File supported: PDF, Image, Scanner</p>
@@ -211,9 +235,10 @@ const DepartmentFile = () => {
               {/* Save Button */}
               <button
                 onClick={handleSave}
-                className="w-full py-4 bg-teal-600 text-white text-lg font-medium rounded-md hover:bg-teal-700 transition-colors focus:outline-none focus:ring-1 focus:ring-teal-500 focus:ring-offset-2"
+                className="w-full flex justify-center items-center py-4 bg-teal-600 text-white text-lg font-medium rounded-md hover:bg-teal-700 transition-colors focus:outline-none focus:ring-1 focus:ring-teal-500 focus:ring-offset-2"
               >
-                Save
+                {isPending ? <Loader /> : " Save"}
+               
               </button>
             </div>
           </div>

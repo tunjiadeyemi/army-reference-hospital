@@ -1,5 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useRef } from 'react';
+import { useState, useRef, useContext } from 'react';
+import {
+  useCreateMailArchive,
+  useGetMailArchives,
+
+  useUpdateMailArchive
+} from '../../hooks/dashboardhooks/useDasboardData';
+import { showError, showSuccess } from '../../utils/toast';
+import { AppContext } from '../../context/AppContext';
 
 interface MailFormProps {
   isEdit?: boolean;
@@ -7,23 +15,27 @@ interface MailFormProps {
 }
 
 export default function MailForm({ isEdit = true, mockData }: MailFormProps) {
+  const [uploadedFile, setUploadedFile] = useState<any>(isEdit ? null : mockData?.uploadedFile);
   const [formData, setFormData] = useState<any>(
     isEdit
-      ? {
-          toFrom: '56 Nigeria army reference',
-          subject: 'Deployment of troops',
-          date: '27/08/2024',
-          fileRef: 'B2335899'
+      ? { 
+          id: "",
+          to_from: '',
+          file_title: '',
+          upload: uploadedFile ?? null,
+          subject: '',
+          ref_no: ' ',
+          date_sent: ''
         }
-      : {
-          toFrom: mockData?.toFrom,
+      : { 
+          id: mockData?.id,
+          to_from: mockData?.to_from,
           subject: mockData?.subject,
-          date: mockData?.date,
-          fileRef: mockData?.fileRef
+          date_sent: mockData?.date_sent,
+          ref_no: mockData?.ref_no
         }
   );
 
-  const [uploadedFile, setUploadedFile] = useState<any>(isEdit ? null : mockData?.uploadedFile);
   const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -35,15 +47,28 @@ export default function MailForm({ isEdit = true, mockData }: MailFormProps) {
     }));
   };
 
-  const handleFileUpload = (file: { name: any; size: any; type: any }) => {
-    if (file) {
+  const handleFileUpload = (file: File) => {
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const result = reader.result as string;
+      const base64Binary = result.split(',')[1] || '';
+      const shortBase = base64Binary.slice(0, 100);
+      setFormData((prev: any) => ({
+        ...prev,
+        upload: shortBase // Binary string only
+      }));
+
       setUploadedFile({
         name: file.name,
         size: file.size,
         type: file.type,
-        file: file
+        preview: base64Binary.slice(0, 100) // optional short preview
       });
-    }
+    };
+
+    reader.readAsDataURL(file); // Convert to base64
   };
 
   const handleDragOver = (e: { preventDefault: () => void }) => {
@@ -82,15 +107,46 @@ export default function MailForm({ isEdit = true, mockData }: MailFormProps) {
       fileInputRef.current.value = '';
     }
   };
+  const createMutation = useCreateMailArchive();
+  const {refetch } = useGetMailArchives()
+  const {isPending} = createMutation
+  const updateMutation = useUpdateMailArchive();
+  const {isPending: updating} = updateMutation
 
-  // const formatFileSize = (bytes: number) => {
-  //   if (bytes === 0) return '0 Bytes';
-  //   const k = 1024;
-  //   const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-  //   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  //   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  // };
+  const { showMailModal } = useContext(AppContext);
 
+  const handleSave = async () => {
+    console.log('Form Data:', formData);
+ if (showMailModal) {
+    try {
+    
+      const payload = {
+        ...formData,
+        id: mockData?.id, // inject ID
+      };
+
+      console.log('Final Payload:', payload);
+
+      await updateMutation.mutateAsync(payload);
+      showSuccess('Successfully Updated Mail Archive');
+      await refetch();
+    } catch (error) {
+      showError('Failed to Update Mail Archive');
+    }
+    return;
+  }
+
+    
+    try {
+      await createMutation.mutateAsync({ ...formData });
+      showSuccess(
+        'Successfully Created Mail Archive'
+      );
+      await refetch();
+    } catch (error) {
+      showError('Failed to  Create Mail Archive');
+    }
+  };
   return (
     <div className="max-w-4xl mx-auto p-8 bg-white">
       <div className="space-y-8">
@@ -99,8 +155,8 @@ export default function MailForm({ isEdit = true, mockData }: MailFormProps) {
           <label className="text-gray-700 font-medium text-right">TO/FROM</label>
           <div className="lg:col-span-3">
             <textarea
-              value={formData.toFrom}
-              onChange={(e) => handleInputChange('toFrom', e.target.value)}
+              value={formData.to_from}
+              onChange={(e) => handleInputChange('to_from', e.target.value)}
               disabled={!isEdit}
               rows={2}
               className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-colors resize-none ${
@@ -110,6 +166,21 @@ export default function MailForm({ isEdit = true, mockData }: MailFormProps) {
           </div>
         </div>
 
+        {/* title Field */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 items-center">
+          <label className="text-gray-700 font-medium text-right">FILE TITLE</label>
+          <div className="lg:col-span-3">
+            <input
+              type="text"
+              value={formData.file_title}
+              onChange={(e) => handleInputChange('file_title', e.target.value)}
+              disabled={!isEdit}
+              className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-colors ${
+                !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+              }`}
+            />
+          </div>
+        </div>
         {/* SUBJECT Field */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 items-center">
           <label className="text-gray-700 font-medium text-right">SUBJECT</label>
@@ -131,9 +202,9 @@ export default function MailForm({ isEdit = true, mockData }: MailFormProps) {
           <label className="text-gray-700 font-medium text-right">DATE SENT/RECEIVED</label>
           <div className="lg:col-span-3 relative">
             <input
-              type="text"
-              value={formData.date}
-              onChange={(e) => handleInputChange('date', e.target.value)}
+              type="date"
+              value={formData.date_sent}
+              onChange={(e) => handleInputChange('date_sent', e.target.value)}
               disabled={!isEdit}
               className={`w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-colors ${
                 !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
@@ -153,8 +224,8 @@ export default function MailForm({ isEdit = true, mockData }: MailFormProps) {
           <div className="lg:col-span-3">
             <input
               type="text"
-              value={formData.fileRef}
-              onChange={(e) => handleInputChange('fileRef', e.target.value)}
+              value={formData.ref_no}
+              onChange={(e) => handleInputChange('ref_no', e.target.value)}
               disabled={!isEdit}
               className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-colors ${
                 !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
@@ -259,13 +330,15 @@ export default function MailForm({ isEdit = true, mockData }: MailFormProps) {
         <div className="flex justify-center pt-8">
           <button
             disabled={!isEdit}
+            onClick={handleSave}
             className={`px-12 py-3 font-medium rounded-lg transition-colors ${
               !isEdit
                 ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                 : 'bg-teal-600 hover:bg-teal-700 text-white'
             }`}
           >
-            Save
+            {isPending || updating ? "Loading..." : "Save"}
+        
           </button>
         </div>
       </div>

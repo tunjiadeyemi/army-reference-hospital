@@ -3,8 +3,9 @@ import { useParams } from 'react-router';
 import Layout from '../../components/Layout';
 
 import UnitIcon from '../../assets/navIcons/UnitIcon';
-import UnitForm from '../../components/Unit/UnitForm';
-import UnitRecord from '../../components/Unit/UnitRecord';
+import UnitHoldingForm from '../../components/UnitHolding/UnitHoldingForm';
+
+import UnitHoldingRecord from '../../components/UnitHolding/UnitHoldingRecord';
 
 const Unit = () => {
   const { active } = useParams<{ active?: string }>();
@@ -22,7 +23,7 @@ const Unit = () => {
         )
     },
     {
-      title: 'Ammunitions list',
+      title: 'Arms and Ammunitions list',
       slug: 'list',
       icon: activeTab === 'list' ? <UnitIcon color="white" /> : <UnitIcon color="gray" />
     }
@@ -43,7 +44,7 @@ const Unit = () => {
   return (
     <Layout className="h-full">
       <section className="bg-white rounded-md p-6 pb-2">
-        <h1 className="text-base font-semibold uppercase">AMMUNITIONS</h1>
+        <h1 className="text-base font-semibold uppercase">UNIT HOLDING OF ARMS</h1>
 
         <section className="bg-[#F5F5F5] p-2 rounded-md mt-4 flex items-center gap-4">
           {tabs.map((tab, index) => (
@@ -65,8 +66,8 @@ const Unit = () => {
       </section>
 
       <section className="bg-white p-4">
-        {activeTab === 'add' && <UnitForm />}
-        {activeTab === 'list' && <UnitRecord />}
+        {activeTab === 'add' && <UnitHoldingForm />}
+        {activeTab === 'list' && <UnitHoldingRecord />}
       </section>
     </Layout>
   );

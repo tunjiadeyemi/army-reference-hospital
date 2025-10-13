@@ -6,6 +6,9 @@ export interface BiodataFormData {
   pno: string;
   rank: string;
   corps: string;
+  image?: string;
+  
+
   qualification: string;
   dateOfBirth: string;
   directorate: string;
@@ -51,6 +54,8 @@ export interface BiodataFormData {
 interface UseFormChangeHandlerReturn<T> {
   formData: T;
   handleInputChange: (field: string, value: any) => void;
+  handleFileChange: (field: string, value: any) => void;
+  handleSimpleFileChange: (field: string, value: any,  onFileProcessed?: (data: { base64: string; name: string }) => void) => void;
 
   updateChildName: (index: number, value: string) => void;
   updateWifeName: (index: number, value: string) => void;
@@ -94,10 +99,30 @@ function useFormChangeHandler<T extends Record<string, any>>(
     reader.readAsDataURL(file);
   };
 
+ const handleSimpleFileChange = (
+  field: string,
+  file: File,
+  onFileProcessed?: (data: { base64: string; name: string }) => void
+) => {
+  const reader = new FileReader();
+  reader.onloadend = () => {
+    const result = reader.result as string;
 
+    const base64String = result.split(',')[1];
 
+   const shortBase64 = base64String.slice(0, 100);
 
+    setFormData((prev) => ({
+      ...prev,
+      [field]: shortBase64,
+    }));
 
+    if (onFileProcessed) {
+      onFileProcessed({ base64: base64String, name: file.name });
+    }
+  };
+  reader.readAsDataURL(file);
+};
 
   // Array handlers for children names
   const updateChildName = (index: number, value: string) => {
@@ -162,6 +187,7 @@ function useFormChangeHandler<T extends Record<string, any>>(
   return {
     formData,
     handleInputChange,
+    handleSimpleFileChange,
     handleChange,
     updateChildName,
     handleFileChange,

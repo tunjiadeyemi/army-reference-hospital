@@ -26,6 +26,8 @@ import UnitModal from './components/Unit/UnitModal';
 import AdminDetails from './components/User/AdminDetails';
 import Providers from './provider/providers';
 import { Toaster } from 'react-hot-toast';
+import SickModal from './components/SickReport/SickModal';
+import UnitHoldingModal from './components/UnitHolding/UnitHoldingModal';
 
 
 const App = () => {
@@ -34,6 +36,7 @@ const App = () => {
   const {
     showAddRecordModal,
     showDutyReportModal,
+    showSickModal,
     showBiodataModal,
     showRecordModal,
     showRecordModalTwo,
@@ -49,7 +52,8 @@ const App = () => {
     showEquipmentModal,
     showVehicleModal,
     showUnitModal,
-    showAdminDetails
+    showAdminDetails,
+    showUnitHoldingModal
   } = useContext(AppContext);
 
   
@@ -60,6 +64,7 @@ const App = () => {
           {currentPath !== '/login' && currentPath !== '/' && <Navigation />}
 
           {showAddRecordModal && <AddRecordModal />}
+          {showSickModal && <SickModal />}
           {showDutyReportModal && <ViewDutyReportModal />}
           {showBiodataModal && <BiodataModal />}
           {showRecordModal && <RecordModal />}
@@ -76,6 +81,7 @@ const App = () => {
           {showEquipmentModal && <EquipmentModal />}
           {showVehicleModal && <VehicleModal />}
           {showUnitModal && <UnitModal />}
+          {showUnitHoldingModal && <UnitHoldingModal />}
           {showAdminDetails && <AdminDetails />}
 
           <div

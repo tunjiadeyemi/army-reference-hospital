@@ -1,17 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useState } from 'react';
+import type { MainTableData } from '../utils/types/department';
 
 export const AppContext = createContext<AppContextType>({} as AppContextType);
 
 interface AppContextType {
-
   showNav: boolean;
   setShowNav: React.Dispatch<React.SetStateAction<boolean>>;
   showAddRecordModal: boolean;
   setShowAddRecordModal: React.Dispatch<React.SetStateAction<boolean>>;
-  selectedDepartmentRecord: string;
-  setSelectedDepartmentRecord: React.Dispatch<React.SetStateAction<string>>;
+  selectedDepartmentRecord: MainTableData | null;
+  setSelectedDepartmentRecord: React.Dispatch<React.SetStateAction<MainTableData | null>>;
   selectedDutyReport: any;
   setSelectedDutyReport: React.Dispatch<React.SetStateAction<any>>;
   showDutyReportModal: boolean;
@@ -19,7 +19,13 @@ interface AppContextType {
   selectedBiodata: any;
   setSelectedBiodata: React.Dispatch<React.SetStateAction<any>>;
   selectedBiodataObj: any;
+
+  showUnitHoldingModal: any;
+  setShowUnitHoldingModal: React.Dispatch<React.SetStateAction<any>>;
+
   setSelectedBiodataObj: React.Dispatch<React.SetStateAction<any>>;
+  selectedSickReportObj: any;
+  setSelectedSickReportObj: React.Dispatch<React.SetStateAction<any>>;
   showBiodataModal: boolean;
   setShowBiodataModal: React.Dispatch<React.SetStateAction<boolean>>;
   selectedRecord: any;
@@ -105,7 +111,9 @@ interface AppContextType {
 
 export const AppContextProvider = ({ children }: any) => {
   const [showNav, setShowNav] = useState<boolean>(false);
-  const [selectedDepartmentRecord, setSelectedDepartmentRecord] = useState<string>('');
+  const [selectedDepartmentRecord, setSelectedDepartmentRecord] = useState<MainTableData | null>(
+    null
+  );
   const [showAddRecordModal, setShowAddRecordModal] = useState<boolean>(false);
 
   const [selectedDutyReport, setSelectedDutyReport] = useState<any>(null);
@@ -113,10 +121,14 @@ export const AppContextProvider = ({ children }: any) => {
 
   const [selectedBiodata, setSelectedBiodata] = useState<any>(null);
   const [selectedBiodataObj, setSelectedBiodataObj] = useState<any>(null);
+  const [selectedSickReportObj, setSelectedSickReportObj] = useState<any>(null);
+
   const [showBiodataModal, setShowBiodataModal] = useState<boolean>(false);
 
   const [selectedRecord, setSelectedRecord] = useState<any>(null);
   const [showRecordModal, setShowRecordModal] = useState<boolean>(false);
+
+  const [showUnitHoldingModal, setShowUnitHoldingModal] = useState<any>(null);
 
   const [selectedRecordTwo, setSelectedRecordTwo] = useState<any>(null);
   const [showRecordModalTwo, setShowRecordModalTwo] = useState<boolean>(false);
@@ -174,6 +186,12 @@ export const AppContextProvider = ({ children }: any) => {
       value={{
         selectedBiodataObj,
         setSelectedBiodataObj,
+        selectedSickReportObj,
+        setSelectedSickReportObj,
+
+        showUnitHoldingModal,
+        setShowUnitHoldingModal,
+
         showNav,
         setShowNav,
         showAddRecordModal,

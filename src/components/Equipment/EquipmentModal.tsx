@@ -1,7 +1,7 @@
 import { useContext, useState } from 'react';
 import Modal from '../Modal';
 import { AppContext } from '../../context/AppContext';
-import { mockEquipmentFormData, mockOrderData } from '../../utils/constants';
+import {  mockOrderData } from '../../utils/constants';
 
 import EquipmentForm from './EquipmentForm';
 
@@ -41,7 +41,7 @@ const EquipmentModal = () => {
               <img src="/department/chevron-left.svg" alt="chevron-left" />
             </button>
 
-            <h1>{selectedEquipmentRecord}</h1>
+            <h1>{selectedEquipmentRecord?.eq_name}</h1>
           </div>
 
           <button
@@ -85,7 +85,7 @@ const EquipmentModal = () => {
         </div>
 
         {/* body */}
-        <EquipmentForm isEdit={editMode} mockData={mockEquipmentFormData} />
+        <EquipmentForm isEdit={editMode} mockData={selectedEquipmentRecord} />
       </div>
     </Modal>
   );

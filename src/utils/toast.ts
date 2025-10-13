@@ -1,5 +1,9 @@
 import toast from "react-hot-toast";
 
+export interface successMessage {
+  
+
+}
 export const showSuccess = (message: string) => {
   toast.success(message);
 };

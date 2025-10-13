@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export interface FileData {
-  cellNumber: string;
-  fileTitle: string;
-  uploadedFile: File | null;
+  file_number: string;
+  file_title: string;
+  uploads: File | null;
 }
 
 export interface MainTableColumn<T> {
@@ -53,8 +53,10 @@ export interface FileAttachment {
 }
 
 export interface AttachedFileData {
-  cellNumber: string;
-  fileTitle: string;
+  id: number | undefined;
+  file_number: string;
+  file_title: string;
+  uploads: string[];
   dateCreated: string;
   timeCreated: string;
   attachments: FileAttachment[];

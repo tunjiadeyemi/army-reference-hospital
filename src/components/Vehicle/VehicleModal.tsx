@@ -1,7 +1,7 @@
 import { useContext, useState } from 'react';
 import Modal from '../Modal';
 import { AppContext } from '../../context/AppContext';
-import { mockOrderData, mockUnitFormData } from '../../utils/constants';
+import { mockOrderData } from '../../utils/constants';
 
 import VehicleForm from './VehicleForm';
 
@@ -10,7 +10,7 @@ const VehicleModal = () => {
   const [editMode, setEditMode] = useState(false);
   const [editDraft, setEditDraft] = useState(orderData);
 
-  const { setShowUnitModal, selectedUnitRecord } = useContext(AppContext);
+  const { setShowVehicleModal, selectedVehicleRecord } = useContext(AppContext);
 
   const handleEditClick = () => {
     setEditDraft(orderData);
@@ -36,18 +36,18 @@ const VehicleModal = () => {
             <button
               className="hover:scale-95 duration-300 transition-all cursor-pointer"
               type="button"
-              onClick={() => setShowUnitModal(false)}
+              onClick={() => setShowVehicleModal(false)}
             >
               <img src="/department/chevron-left.svg" alt="chevron-left" />
             </button>
 
-            <h1>{selectedUnitRecord}</h1>
+            <h1>{selectedVehicleRecord?.type_model ?? "Vehicle Info"}</h1>
           </div>
 
           <button
             className="hover:scale-95 duration-300 transition-all cursor-pointer"
             type="button"
-            onClick={() => setShowUnitModal(false)}
+            onClick={() => setShowVehicleModal(false)}
           >
             <img src="/department/x-close-icon.svg" alt="x-close-icon" />
           </button>
@@ -85,7 +85,7 @@ const VehicleModal = () => {
         </div>
 
         {/* body */}
-        <VehicleForm isEdit={editMode} mockData={mockUnitFormData} />
+        <VehicleForm isEdit={editMode} mockData={selectedVehicleRecord} />
       </div>
     </Modal>
   );

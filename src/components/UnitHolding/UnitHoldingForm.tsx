@@ -2,9 +2,12 @@
 // import { useState } from 'react';
 import { useContext } from 'react';
 import {
-  useCreateAmmunition,
-  useGetArmsData,
-  useUpdateAmmunition
+ 
+  useCreateUnitHoldingArms,
+
+  useGetUnitHoldingArms,
+  useUnitHoldingArms,
+
 } from '../../hooks/dashboardhooks/useDasboardData';
 import useFormChangeHandler from '../../hooks/useFormChangeHandler';
 import { showError, showSuccess } from '../../utils/toast';
@@ -18,57 +21,55 @@ interface UnitFormProps {
   mockData?: any;
 }
 
-export default function UnitForm({ isEdit = true, mockData }: UnitFormProps) {
-  const createMutation = useCreateAmmunition();
+export default function UnitHoldingForm({ isEdit = true, mockData }: UnitFormProps) {
+  const createMutation = useCreateUnitHoldingArms();
   const { isPending } = createMutation;
-  const { refetch } = useGetArmsData();
-  
- 
+  const { refetch } = useGetUnitHoldingArms();
 
   const { showUnitModal } = useContext(AppContext);
 
- 
   const [formData, setFormData] = useFormChangeHandler(
     isEdit
       ? {
-          ltrOfReq: '',
+          ltr_of_req: '',
           auth: '',
-          purposeOfIssue: '',
-          ammoConNo: '',
-          designation: '',
-          assignedFmnUnit: '',
-          magazineLocation: '',
-          qtySvc: 0,
-          qtyUnsvc: 0,
-          date: '',
-          qtyExpended: 0,
-          reason: '',
-          dataToc: '',
+          wpn_type: '',
+          country_of_origin: '',
+          reg_no: '',
+          butt_no: '',
+          assigned_fmn_unit: '',
+          armoury_location: '',
+          condition: '',
+          date_toc: '',
+          status: '',
+          purpose_of_issue: '',
           remark: ''
         }
       : { ...mockData }
   );
-  const updateMutation = useUpdateAmmunition();
-  // const { isPending: updateArmData } = updateMutation;
-
+  const updateMutation = useUnitHoldingArms();
+  const { isPending: update } = updateMutation;
+  const { showUnitHoldingModal} = useContext(AppContext);
   const handleSave = async () => {
-    if (!isEdit) {
+    if (showUnitHoldingModal) {
       try {
         await updateMutation.mutateAsync({ ...formData });
-        showSuccess('Successfully Added Updated Arms');
+        showSuccess('Successfully Updated Unit Holding Arms');
         await refetch();
       } catch (error) {
-        showError('Failed to add Sick Report');
+        showError('Failed to  Update Unit Holding Arms');
       }
-      return
+      return;
     }
     console.log('Form:', formData);
     try {
       await createMutation.mutateAsync({ ...formData });
-      showSuccess(showUnitModal ? "Successfully Added Updated Arms" : 'Successfully Added New Ammunition');
+      showSuccess(
+        showUnitModal ? 'Successfully Updated Unit Holding Arms' : 'Successfully Created Unit Holding Arms'
+      );
       await refetch();
     } catch (error) {
-      showError('Failed to add Sick Report');
+      showError('Failed to  Update Unit Holding Arms');
     }
   };
 
@@ -109,8 +110,8 @@ export default function UnitForm({ isEdit = true, mockData }: UnitFormProps) {
             <input
               type="text"
               placeholder="Ltr of req"
-              name="ltrOfReq"
-              value={formData.ltrOfReq}
+              name="ltr_of_req"
+              value={formData.ltr_of_req}
               onChange={setFormData}
               disabled={!isEdit}
               className={`w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
@@ -139,14 +140,14 @@ export default function UnitForm({ isEdit = true, mockData }: UnitFormProps) {
         </div>
 
         {/* WPN TYPE */}
-        {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
           <label className="text-gray-700 font-medium">WPN TYPE</label>
           <div className="md:col-span-2">
             <input
               type="text"
               placeholder="Wpn Type"
-              name="wpnType"
-              value={formData.wpnType}
+              name="wpn_type"
+              value={formData.wpn_type}
               onChange={setFormData}
               disabled={!isEdit}
               className={`w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
@@ -154,17 +155,17 @@ export default function UnitForm({ isEdit = true, mockData }: UnitFormProps) {
               }`}
             />
           </div>
-        </div> */}
+        </div>
 
         {/* DESIGNATION */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-          <label className="text-gray-700 font-medium">DESIGNATION</label>
+          <label className="text-gray-700 font-medium">COUNTRY OF ORIGIN</label>
           <div className="md:col-span-2">
             <input
               type="text"
               placeholder="Designation"
-              name="designation"
-              value={formData.designation}
+              name="country_of_origin"
+              value={formData.country_of_origin}
               onChange={setFormData}
               disabled={!isEdit}
               className={`w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
@@ -176,13 +177,13 @@ export default function UnitForm({ isEdit = true, mockData }: UnitFormProps) {
 
         {/* AMMO CON NO */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-          <label className="text-gray-700 font-medium">AMMO CON NO</label>
+          <label className="text-gray-700 font-medium">REG_NO</label>
           <div className="md:col-span-2">
             <input
               type="text"
-              name="ammoConNo"
-              placeholder="Ammo Con No"
-              value={formData.ammoConNo}
+              name="reg_no"
+              placeholder="Reg No"
+              value={formData.reg_no}
               onChange={setFormData}
               disabled={!isEdit}
               className={`w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
@@ -194,13 +195,13 @@ export default function UnitForm({ isEdit = true, mockData }: UnitFormProps) {
 
         {/* MAGAZINE LOCATION */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-          <label className="text-gray-700 font-medium">MAGAZINE LOCATION</label>
+          <label className="text-gray-700 font-medium">BUTT NO</label>
           <div className="md:col-span-2">
             <input
               type="text"
-              name="magazineLocation"
-              placeholder="Magazine Location"
-              value={formData.magazineLocation}
+              name="butt_no"
+              placeholder="Butt No"
+              value={formData.butt_no}
               onChange={setFormData}
               disabled={!isEdit}
               className={`w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
@@ -216,9 +217,9 @@ export default function UnitForm({ isEdit = true, mockData }: UnitFormProps) {
           <div className="md:col-span-2">
             <input
               type="text"
-              name="assignedFmnUnit"
+              name="assigned_fmn_unit"
               placeholder="Assigned FMN/UNIT"
-              value={formData.assignedFmnUnit}
+              value={formData.assigned_fmn_unit}
               onChange={setFormData}
               disabled={!isEdit}
               className={`w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
@@ -230,13 +231,13 @@ export default function UnitForm({ isEdit = true, mockData }: UnitFormProps) {
 
         {/* QTY SVC */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-          <label className="text-gray-700 font-medium">QTY SVC</label>
+          <label className="text-gray-700 font-medium">ARMOURY LOCATION</label>
           <div className="md:col-span-2">
             <input
-              type="number"
-              placeholder="Quantity Service"
-              name="qtySvc"
-              value={formData.qtySvc}
+              type="text"
+              placeholder="Armoury Location"
+              name="armoury_location"
+              value={formData.armoury_location}
               onChange={setFormData}
               disabled={!isEdit}
               className={`w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent`}
@@ -245,13 +246,13 @@ export default function UnitForm({ isEdit = true, mockData }: UnitFormProps) {
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-          <label className="text-gray-700 font-medium">QTY UNSVC</label>
+          <label className="text-gray-700 font-medium">CONDITION</label>
           <div className="md:col-span-2">
             <input
-              type="number"
-              placeholder="Quantity Unserviced"
-              name="qtyUnsvc"
-              value={formData.qtyUnsvc}
+              type="text"
+              placeholder="Condition"
+              name="condition"
+              value={formData.condition}
               onChange={setFormData}
               disabled={!isEdit}
               className={`w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
@@ -263,13 +264,13 @@ export default function UnitForm({ isEdit = true, mockData }: UnitFormProps) {
 
         {/* DATE*/}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-          <label className="text-gray-700 font-medium">DATE </label>
+          <label className="text-gray-700 font-medium">DATE OF TOC</label>
           <div className="md:col-span-2">
             <input
               type="date"
               placeholder="DD/MM/YY"
-              name="date"
-              value={formData.date}
+              name="date_toc"
+              value={formData.date_toc}
               onChange={setFormData}
               disabled={!isEdit}
               className={`w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
@@ -280,13 +281,13 @@ export default function UnitForm({ isEdit = true, mockData }: UnitFormProps) {
         </div>
         {/* DATE OF TOC*/}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-          <label className="text-gray-700 font-medium">DATE OF TOC</label>
+          <label className="text-gray-700 font-medium">STATUS</label>
           <div className="md:col-span-2">
             <input
-              type="date"
-              placeholder="DD/MM/YY"
-              name="dateToc"
-              value={formData.dateToc}
+              type="text"
+              placeholder="Status"
+              name="status"
+              value={formData.status}
               onChange={setFormData}
               disabled={!isEdit}
               className={`w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
@@ -298,49 +299,13 @@ export default function UnitForm({ isEdit = true, mockData }: UnitFormProps) {
 
         {/* QTY EXPENDED*/}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-          <label className="text-gray-700 font-medium">QTY EXPENDED</label>
-          <div className="md:col-span-2">
-            <input
-              type="number"
-              placeholder="Quantity Expended"
-              name="qtyExpended"
-              value={formData.qtyExpended}
-              onChange={setFormData}
-              disabled={!isEdit}
-              className={`w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
-                !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-              }`}
-            />
-          </div>
-        </div>
-
-        {/* STATUS */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-          <label className="text-gray-700 font-medium">REASON</label>
-          <div className="md:col-span-2">
-            <input
-              type="text"
-              placeholder="Reason"
-              name="reason"
-              value={formData.reason}
-              onChange={setFormData}
-              disabled={!isEdit}
-              className={`w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
-                !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-              }`}
-            />
-          </div>
-        </div>
-
-        {/* PURPOSE OF ISSUE */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
           <label className="text-gray-700 font-medium">PURPOSE OF ISSUE</label>
           <div className="md:col-span-2">
             <input
               type="text"
-              placeholder="Purpose of issue"
-              name="purposeOfIssue"
-              value={formData.purposeOfIssue}
+              placeholder="Purpose of Issue"
+              name="purpose_of_issue"
+              value={formData.purpose_of_issue}
               onChange={setFormData}
               disabled={!isEdit}
               className={`w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
@@ -349,6 +314,9 @@ export default function UnitForm({ isEdit = true, mockData }: UnitFormProps) {
             />
           </div>
         </div>
+
+
+      
 
         {/* REMARK */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
@@ -380,7 +348,7 @@ export default function UnitForm({ isEdit = true, mockData }: UnitFormProps) {
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
             }`}
           >
-            {isPending ? <Loader /> : ' Save'}
+            {(isPending || update) ? <Loader /> : ' Save'}
           </button>
         </div>
       </div>

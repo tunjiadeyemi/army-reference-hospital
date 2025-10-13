@@ -1,7 +1,7 @@
 import { useContext, useState } from 'react';
 import Modal from '../Modal';
 import { AppContext } from '../../context/AppContext';
-import { mockMailFormData, mockOrderData } from '../../utils/constants';
+import {  mockOrderData } from '../../utils/constants';
 
 import MailForm from './MailForm';
 
@@ -27,6 +27,8 @@ const MailModal = () => {
     setEditMode(false);
   };
 
+  
+
   return (
     <Modal>
       <div className="bg-white w-[85%] h-[90vh] rounded-md shadow-md overflow-y-scroll overflow-hidden">
@@ -41,7 +43,7 @@ const MailModal = () => {
               <img src="/department/chevron-left.svg" alt="chevron-left" />
             </button>
 
-            <h1>{selectedMailRecord}</h1>
+            <h1>{selectedMailRecord.subject ?? "File Info"}</h1>
           </div>
 
           <button
@@ -85,7 +87,7 @@ const MailModal = () => {
         </div>
 
         {/* body */}
-        <MailForm isEdit={editMode} mockData={mockMailFormData} />
+        <MailForm isEdit={editMode} mockData={selectedMailRecord} />
       </div>
     </Modal>
   );

@@ -1,5 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useRef } from 'react';
+import { useState, useRef, useContext } from 'react';
+import useFormChangeHandler from '../../hooks/dashboardhooks/useLargeFormHandler';
+import {
+  useCreateBooks,
+  useGetBooks,
+  useUpdateBooks
+} from '../../hooks/dashboardhooks/useDasboardData';
+import { showError, showSuccess } from '../../utils/toast';
+import { AppContext } from '../../context/AppContext';
 
 interface LibraryFormProps {
   isEdit?: boolean;
@@ -8,16 +16,19 @@ interface LibraryFormProps {
 }
 
 export default function LibraryForm({ isEdit = true, mockData }: LibraryFormProps) {
-  const [formData, setFormData] = useState(() =>
+  const { formData, handleInputChange, handleSimpleFileChange } = useFormChangeHandler(
     isEdit
       ? {
-          bookTitle: '',
+          id: null,
+          title: '',
           author: '',
           isbn: '',
-          genre: 'Fiction',
-          language: 'English',
-          issuedDate: '',
-          numberOfCopies: '1'
+          cateogory: '',
+          language: '',
+          copies: null,
+          issued_date: '',
+          front_cover: '',
+          upload: ' '
         }
       : { ...mockData }
   );
@@ -74,53 +85,49 @@ export default function LibraryForm({ isEdit = true, mockData }: LibraryFormProp
 
   const numberOfCopies = Array.from({ length: 50 }, (_, i) => (i + 1).toString());
 
-  const handleInputChange = (field: string, value: string) => {
-    if (!isEdit) return;
-    setFormData((prev: any) => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
-  const handleGenreSelect = (genre: string) => {
-    if (!isEdit) return;
-    handleInputChange('genre', genre);
-    setIsGenreDropdownOpen(false);
-  };
-
-  const handleLanguageSelect = (language: string) => {
-    if (!isEdit) return;
-    handleInputChange('language', language);
-    setIsLanguageDropdownOpen(false);
-  };
-
-  const handleCopiesSelect = (copies: string) => {
-    if (!isEdit) return;
-    handleInputChange('numberOfCopies', copies);
-    setIsCopiesDropdownOpen(false);
-  };
-
   const handleBookCoverUpload = () => {
     if (!isEdit) return;
     fileInputRef.current?.click();
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!isEdit) return;
-    const file = e.target.files && e.target.files[0];
-    if (file && file.type.startsWith('image/')) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        if (typeof event.target?.result === 'string') setBookCover(event.target.result);
-      };
-      reader.readAsDataURL(file);
+    const file = e.target.files?.[0];
+    if (file) {
+      handleSimpleFileChange('upload', file, ({ base64}) => {
+        setBookCover(`data:image/png;base64, ${base64}`);
+      });
     }
   };
 
-  const handleSave = () => {
-    if (!isEdit) return;
-    console.log('Form data:', formData);
-    console.log('Book cover:', bookCover);
+  const createMutation = useCreateBooks();
+  const updateMutation = useUpdateBooks();
+  const {isPending} = createMutation
+  const {isPending: updating} = updateMutation
+  const { showLibraryModal } = useContext(AppContext);
+    
+
+  const { refetch} = useGetBooks();
+  const handleSave = async () => {
+    if(showLibraryModal){
+      try {
+        await updateMutation.mutateAsync({ ...formData });
+        showSuccess('Successfully updated Books');
+        await refetch();
+      } catch (error) {
+        showError('Failed to  update Books');
+      }
+      return;
+
+    }
+    try {
+      await createMutation.mutateAsync({ ...formData });
+      showSuccess(
+    'Successfully Added A Book'
+      );
+      await refetch();
+    } catch (error) {
+      showError('Failed to  Add A Book');
+    }
   };
 
   return (
@@ -138,8 +145,8 @@ export default function LibraryForm({ isEdit = true, mockData }: LibraryFormProp
             <input
               type="text"
               placeholder="Book Title"
-              value={formData.bookTitle}
-              onChange={(e) => handleInputChange('bookTitle', e.target.value)}
+              value={formData.title}
+              onChange={(e) => handleInputChange('title', e.target.value)}
               disabled={!isEdit}
               className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-colors ${
                 !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : 'placeholder-gray-400'
@@ -200,10 +207,10 @@ export default function LibraryForm({ isEdit = true, mockData }: LibraryFormProp
             >
               <span
                 className={
-                  formData.genre ? (isEdit ? 'text-gray-900' : 'text-gray-600') : 'text-gray-400'
+                  formData.cateogory ? (isEdit ? 'text-gray-900' : 'text-gray-600') : 'text-gray-400'
                 }
               >
-                {formData.genre}
+                {formData.cateogory}
               </span>
               <img
                 src="/chevron-down.svg"
@@ -219,9 +226,9 @@ export default function LibraryForm({ isEdit = true, mockData }: LibraryFormProp
                   <button
                     key={genre}
                     type="button"
-                    onClick={() => handleGenreSelect(genre)}
+                    onClick={() => handleInputChange('cateogory', genre)}
                     className={`w-full px-4 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none ${
-                      formData.genre === genre ? 'bg-teal-50 text-teal-700' : ''
+                      formData.cateogory === genre ? 'bg-teal-50 text-teal-700' : ''
                     }`}
                   >
                     {genre}
@@ -265,7 +272,7 @@ export default function LibraryForm({ isEdit = true, mockData }: LibraryFormProp
                   <button
                     key={language}
                     type="button"
-                    onClick={() => handleLanguageSelect(language)}
+                    onClick={() => handleInputChange('language', language)}
                     className={`w-full px-4 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none ${
                       formData.language === language ? 'bg-teal-50 text-teal-700' : ''
                     }`}
@@ -318,8 +325,8 @@ export default function LibraryForm({ isEdit = true, mockData }: LibraryFormProp
           <div className="lg:col-span-3 relative">
             <input
               type="date"
-              value={formData.issuedDate}
-              onChange={(e) => handleInputChange('issuedDate', e.target.value)}
+              value={formData.issued_date}
+              onChange={(e) => handleInputChange('issued_date', e.target.value)}
               disabled={!isEdit}
               className={`w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-colors ${
                 !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
@@ -351,14 +358,10 @@ export default function LibraryForm({ isEdit = true, mockData }: LibraryFormProp
             >
               <span
                 className={
-                  formData.numberOfCopies
-                    ? isEdit
-                      ? 'text-gray-900'
-                      : 'text-gray-600'
-                    : 'text-gray-400'
+                  formData.copies ? (isEdit ? 'text-gray-900' : 'text-gray-600') : 'text-gray-400'
                 }
               >
-                {formData.numberOfCopies}
+                {formData.copies}
               </span>
               <img
                 src="/chevron-down.svg"
@@ -374,9 +377,9 @@ export default function LibraryForm({ isEdit = true, mockData }: LibraryFormProp
                   <button
                     key={copies}
                     type="button"
-                    onClick={() => handleCopiesSelect(copies)}
+                    onClick={() => handleInputChange('copies', copies)}
                     className={`w-full px-4 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none ${
-                      formData.numberOfCopies === copies ? 'bg-teal-50 text-teal-700' : ''
+                      formData.copies === copies ? 'bg-teal-50 text-teal-700' : ''
                     }`}
                   >
                     {copies}
@@ -398,7 +401,8 @@ export default function LibraryForm({ isEdit = true, mockData }: LibraryFormProp
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
             }`}
           >
-            Save
+            {(isPending || updating) ? "Loading..." : "Save"}
+          
           </button>
         </div>
       </div>

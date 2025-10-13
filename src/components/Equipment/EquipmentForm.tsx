@@ -1,5 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from 'react';
+import { useContext, useState } from 'react';
+import useFormChangeHandler from '../../hooks/dashboardhooks/useLargeFormHandler';
+import {
+  useCreateEquipmentInventory,
+  useGetEquipmentInventorys,
+  useUpdateEquipmentInventory
+  // useUpdateEquipmentInventory
+} from '../../hooks/dashboardhooks/useDasboardData';
+import { showError, showSuccess } from '../../utils/toast';
+import { AppContext } from '../../context/AppContext';
 
 // Mock data for view mode
 
@@ -9,14 +18,14 @@ interface EquipmentFormProps {
 }
 
 export default function AddEquipmentForm({ isEdit = true, mockData }: EquipmentFormProps) {
-  const [formData, setFormData] = useState(
+  const { formData, handleInputChange } = useFormChangeHandler(
     isEdit
       ? {
-          equipmentName: '',
-          functionStatus: 'Serviceable',
-          yearPurchased: '',
-          lastServiceDate: '',
-          serviceDetails: '',
+          eq_name: '',
+          function_status: '',
+          maintenance_details: '',
+          year_of_purchase: '',
+          last_service_date: '',
           remark: ''
         }
       : { ...mockData }
@@ -26,24 +35,37 @@ export default function AddEquipmentForm({ isEdit = true, mockData }: EquipmentF
 
   const functionStatuses = ['Serviceable', 'Unserviceable'];
 
-  const handleInputChange = (field: keyof typeof formData, value: string) => {
-    if (!isEdit) return;
-    setFormData((prev: any) => ({
-      ...prev,
-      [field]: value
-    }));
-  };
+  const createMutation = useCreateEquipmentInventory();
 
-  const handleFunctionStatusSelect = (status: string) => {
-    if (!isEdit) return;
-    handleInputChange('functionStatus', status);
-    setIsFunctionStatusDropdownOpen(false);
-  };
+  const { showEquipmentModal } = useContext(AppContext);
 
-  const handleSave = () => {
+  const updateMutation = useUpdateEquipmentInventory();
+  const { refetch } = useGetEquipmentInventorys();
+  const { isPending } = createMutation;
+  const { isPending: updatingEq } = updateMutation;
+
+
+  const handleSave = async () => {
     if (!isEdit) return;
-    console.log('Form data:', formData);
-    // Handle form submission here
+
+    if (showEquipmentModal) {
+      try {
+        await updateMutation.mutateAsync({ ...formData });
+        showSuccess('Successfully Updated Equipment Inventory');
+        await refetch();
+      } catch (error) {
+        showError('Failed to Updated Equipment Inventory');
+      }
+      return;
+    }
+    console.log('Form:', formData);
+    try {
+      await createMutation.mutateAsync({ ...formData });
+      showSuccess('Successfully Added New Equipment Inventory');
+      await refetch();
+    } catch (error) {
+      showError('Failed to update Equipment Inventory');
+    }
   };
 
   return (
@@ -61,8 +83,8 @@ export default function AddEquipmentForm({ isEdit = true, mockData }: EquipmentF
             <input
               type="text"
               placeholder="Equipment name"
-              value={formData.equipmentName}
-              onChange={(e) => handleInputChange('equipmentName', e.target.value)}
+              value={formData.eq_name}
+              onChange={(e) => handleInputChange('eq_name', e.target.value)}
               disabled={!isEdit}
               className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-colors placeholder-gray-400 ${
                 !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
@@ -87,14 +109,14 @@ export default function AddEquipmentForm({ isEdit = true, mockData }: EquipmentF
             >
               <span
                 className={
-                  formData.functionStatus
+                  formData.function_status
                     ? isEdit
                       ? 'text-gray-900'
                       : 'text-gray-600'
                     : 'text-gray-400'
                 }
               >
-                {formData.functionStatus}
+                {formData.function_status}
               </span>
               <img
                 src="/chevron-down.svg"
@@ -111,9 +133,9 @@ export default function AddEquipmentForm({ isEdit = true, mockData }: EquipmentF
                   <button
                     key={status}
                     type="button"
-                    onClick={() => handleFunctionStatusSelect(status)}
+                    onClick={() => handleInputChange('function_status', status)}
                     className={`w-full px-4 py-3 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none first:rounded-t-lg last:rounded-b-lg ${
-                      formData.functionStatus === status
+                      formData.function_status === status
                         ? 'bg-teal-600 text-white hover:bg-teal-700'
                         : ''
                     }`}
@@ -135,10 +157,10 @@ export default function AddEquipmentForm({ isEdit = true, mockData }: EquipmentF
           </label>
           <div className="lg:col-span-3">
             <input
-              type="text"
+              type="date"
               placeholder="YYYY"
-              value={formData.yearPurchased}
-              onChange={(e) => handleInputChange('yearPurchased', e.target.value)}
+              value={formData.year_of_purchase}
+              onChange={(e) => handleInputChange('year_of_purchase', e.target.value)}
               disabled={!isEdit}
               className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-colors placeholder-gray-400 ${
                 !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
@@ -156,10 +178,10 @@ export default function AddEquipmentForm({ isEdit = true, mockData }: EquipmentF
           </label>
           <div className="lg:col-span-3">
             <input
-              type="text"
+              type="date"
               placeholder="YYYY-MM-DD"
-              value={formData.lastServiceDate}
-              onChange={(e) => handleInputChange('lastServiceDate', e.target.value)}
+              value={formData.last_service_date}
+              onChange={(e) => handleInputChange('last_service_date', e.target.value)}
               disabled={!isEdit}
               className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-colors placeholder-gray-400 ${
                 !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
@@ -178,8 +200,8 @@ export default function AddEquipmentForm({ isEdit = true, mockData }: EquipmentF
           <div className="lg:col-span-3">
             <textarea
               placeholder="Service details"
-              value={formData.serviceDetails}
-              onChange={(e) => handleInputChange('serviceDetails', e.target.value)}
+              value={formData.maintenance_details}
+              onChange={(e) => handleInputChange('maintenance_details', e.target.value)}
               rows={4}
               disabled={!isEdit}
               className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-colors placeholder-gray-400 resize-vertical ${
@@ -217,7 +239,7 @@ export default function AddEquipmentForm({ isEdit = true, mockData }: EquipmentF
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
             }`}
           >
-            Save
+            {(isPending || updatingEq) ? 'Loading...' : 'Save'}
           </button>
         </div>
       </div>

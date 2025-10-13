@@ -14,7 +14,7 @@ import { useOverviewData } from '../../hooks/dashboardhooks/useDasboardData';
 
 const Home = () => {
 
-   const { data: overviewData, isLoading: overviewLoading, refetch: refetchOverview } = useOverviewData();
+   const { data: overviewData } = useOverviewData();
   //  console.log("OverviewData:", overviewData)
   const recentOfficers: Officer[] = [
     { name: 'Courtney Henry', rank: 'General', date: '5/19/2025' },

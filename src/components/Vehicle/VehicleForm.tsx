@@ -1,5 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from 'react';
+import { useContext, useState } from 'react';
+import useFormChangeHandler from '../../hooks/dashboardhooks/useLargeFormHandler';
+import {
+  useCreateVehicleInventory,
+  useGetVehicleInventorys,
+  useUpdateVehicleInventory
+} from '../../hooks/dashboardhooks/useDasboardData';
+import { showError, showSuccess } from '../../utils/toast';
+import { AppContext } from '../../context/AppContext';
+// import useFormChangeHandler from '../../hooks/useFormChangeHandler';
 
 // Mock data for view mode
 
@@ -9,18 +18,18 @@ interface VehicleFormProps {
 }
 
 export default function VehicleForm({ isEdit = true, mockData }: VehicleFormProps) {
-  const [formData, setFormData] = useState(
+  const { formData, handleInputChange } = useFormChangeHandler(
     isEdit
       ? {
-          typeModel: '',
-          chassisNumber: '',
-          engineNumber: '',
-          yearOfMake: '',
-          yearIssued: '',
-          serviceabilityState: 'Yes',
-          howDeployed: 'Ambulance',
-          dateOfLastService: '',
-          serviceDetails: '',
+          type_model: '',
+          chassis_number: '',
+          engine_number: '',
+          year_of_make: '',
+          year_issued: '',
+          serviceability_state: 'Yes',
+          how_deployed: 'Ambulance',
+          date_of_last_service: '',
+          service_details: '',
           remark: ''
         }
       : { ...mockData }
@@ -40,14 +49,6 @@ export default function VehicleForm({ isEdit = true, mockData }: VehicleFormProp
     'Logistics'
   ];
 
-  const handleInputChange = (field: keyof typeof formData, value: string) => {
-    if (!isEdit) return;
-    setFormData((prev: any) => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
   const toggleDropdown = (dropdown: 'serviceability' | 'deployment') => {
     if (!isEdit) return;
     setDropdowns((prev) => ({
@@ -55,24 +56,33 @@ export default function VehicleForm({ isEdit = true, mockData }: VehicleFormProp
       [dropdown]: !prev[dropdown]
     }));
   };
+  const { showVehicleModal } = useContext(AppContext);
 
-  const selectOption = (
-    field: keyof typeof formData,
-    value: string,
-    dropdown: 'serviceability' | 'deployment'
-  ) => {
-    if (!isEdit) return;
-    handleInputChange(field, value);
-    setDropdowns((prev) => ({
-      ...prev,
-      [dropdown]: false
-    }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const createMutation = useCreateVehicleInventory();
+  const updateMutation = useUpdateVehicleInventory();
+  const { refetch } = useGetVehicleInventorys();
+  const { isPending } = createMutation;
+  const {isPending: updatingInventory} = updateMutation
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isEdit) return;
-    console.log('Form submitted:', formData);
+    if (showVehicleModal) {
+      try {
+        await updateMutation.mutateAsync({ ...formData });
+        showSuccess('Successfully Updated Vehicle Inventory');
+        await refetch();
+      } catch (error) {
+        showError('Failed to Updated Vehicle Inventory');
+      }
+      return;
+    }
+    console.log('Form:', formData);
+    try {
+      await createMutation.mutateAsync({ ...formData });
+      showSuccess('Successfully Added New Ammunition');
+      await refetch();
+    } catch (error) {
+      showError('Failed to update ammunition');
+    }
   };
 
   return (
@@ -113,8 +123,8 @@ export default function VehicleForm({ isEdit = true, mockData }: VehicleFormProp
               <input
                 type="text"
                 placeholder="Type/model"
-                value={formData.typeModel}
-                onChange={(e) => handleInputChange('typeModel', e.target.value)}
+                value={formData.type_model}
+                onChange={(e) => handleInputChange('type_model', e.target.value)}
                 disabled={!isEdit}
                 className={`w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
                   !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
@@ -130,8 +140,8 @@ export default function VehicleForm({ isEdit = true, mockData }: VehicleFormProp
               <input
                 type="text"
                 placeholder="Chassis number"
-                value={formData.chassisNumber}
-                onChange={(e) => handleInputChange('chassisNumber', e.target.value)}
+                value={formData.chassis_number}
+                onChange={(e) => handleInputChange('chassis_number', e.target.value)}
                 disabled={!isEdit}
                 className={`w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
                   !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
@@ -147,8 +157,8 @@ export default function VehicleForm({ isEdit = true, mockData }: VehicleFormProp
               <input
                 type="text"
                 placeholder="Engine number"
-                value={formData.engineNumber}
-                onChange={(e) => handleInputChange('engineNumber', e.target.value)}
+                value={formData.engine_number}
+                onChange={(e) => handleInputChange('engine_number', e.target.value)}
                 disabled={!isEdit}
                 className={`w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
                   !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
@@ -164,8 +174,8 @@ export default function VehicleForm({ isEdit = true, mockData }: VehicleFormProp
               <input
                 type="text"
                 placeholder="Year of make"
-                value={formData.yearOfMake}
-                onChange={(e) => handleInputChange('yearOfMake', e.target.value)}
+                value={formData.year_of_make}
+                onChange={(e) => handleInputChange('year_of_make', e.target.value)}
                 disabled={!isEdit}
                 className={`w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
                   !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
@@ -181,8 +191,8 @@ export default function VehicleForm({ isEdit = true, mockData }: VehicleFormProp
               <input
                 type="text"
                 placeholder="Year issued"
-                value={formData.yearIssued}
-                onChange={(e) => handleInputChange('yearIssued', e.target.value)}
+                value={formData.year_issued}
+                onChange={(e) => handleInputChange('year_issued', e.target.value)}
                 disabled={!isEdit}
                 className={`w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
                   !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
@@ -203,7 +213,7 @@ export default function VehicleForm({ isEdit = true, mockData }: VehicleFormProp
                   !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
                 }`}
               >
-                <span className="text-gray-700">{formData.serviceabilityState}</span>
+                <span className="text-gray-700">{formData.serviceability_state}</span>
                 <img src="/chevron-down.svg" alt="" className="w-5 h-5 text-gray-400" />
               </button>
               {dropdowns.serviceability && isEdit && (
@@ -212,7 +222,9 @@ export default function VehicleForm({ isEdit = true, mockData }: VehicleFormProp
                     <button
                       key={option}
                       type="button"
-                      onClick={() => selectOption('serviceabilityState', option, 'serviceability')}
+                      onClick={() =>
+                        handleInputChange('serviceability_state', option)
+                      }
                       className={`w-full px-4 py-3 text-left hover:bg-gray-50 ${
                         formData.serviceabilityState === option
                           ? 'bg-teal-500 text-white'
@@ -239,7 +251,7 @@ export default function VehicleForm({ isEdit = true, mockData }: VehicleFormProp
                   !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
                 }`}
               >
-                <span className="text-gray-700">{formData.howDeployed}</span>
+                <span className="text-gray-700">{formData.how_deployed}</span>
                 <img src="/chevron-down.svg" alt="" className="w-5 h-5 text-gray-400" />
               </button>
               {dropdowns.deployment && isEdit && (
@@ -248,7 +260,7 @@ export default function VehicleForm({ isEdit = true, mockData }: VehicleFormProp
                     <button
                       key={option}
                       type="button"
-                      onClick={() => selectOption('howDeployed', option, 'deployment')}
+                      onClick={() => handleInputChange('how_deployed', option)}
                       className={`w-full px-4 py-3 text-left hover:bg-gray-50 ${
                         formData.howDeployed === option ? 'bg-teal-500 text-white' : 'text-gray-700'
                       }`}
@@ -270,10 +282,10 @@ export default function VehicleForm({ isEdit = true, mockData }: VehicleFormProp
             </label>
             <div className="md:col-span-2">
               <input
-                type="text"
+                type="date"
                 placeholder="DD/MM/YY"
-                value={formData.dateOfLastService}
-                onChange={(e) => handleInputChange('dateOfLastService', e.target.value)}
+                value={formData.date_Of_last_service}
+                onChange={(e) => handleInputChange('date_of_last_service', e.target.value)}
                 disabled={!isEdit}
                 className={`w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
                   !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
@@ -294,8 +306,8 @@ export default function VehicleForm({ isEdit = true, mockData }: VehicleFormProp
             <div className="md:col-span-2">
               <textarea
                 placeholder="Service details"
-                value={formData.serviceDetails}
-                onChange={(e) => handleInputChange('serviceDetails', e.target.value)}
+                value={formData.service_details}
+                onChange={(e) => handleInputChange('service_details', e.target.value)}
                 rows={4}
                 disabled={!isEdit}
                 className={`w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent resize-vertical ${
@@ -333,7 +345,7 @@ export default function VehicleForm({ isEdit = true, mockData }: VehicleFormProp
                   : 'bg-gray-300 text-gray-500 cursor-not-allowed'
               }`}
             >
-              Save
+              {(isPending || updatingInventory) ? 'Loading...' : 'Save'}
             </button>
           </div>
         </div>

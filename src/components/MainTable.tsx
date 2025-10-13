@@ -2,7 +2,9 @@
 import React, { useState, useMemo } from 'react';
 import type { MainDataTableProps } from '../utils/types/department';
 import Pagination from './Pagination';
-
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import { LOGO_BASE64 } from '../utils/constants';
 interface FilterableOption {
   label: string;
   value: string;
@@ -59,11 +61,109 @@ const MainTable = <T extends Record<string, any>>({
     setCurrentPage(1);
   }, [searchTerm, itemsPerPage]);
 
-  const handleExport = (format: string) => {
-    console.log(`Exporting to ${format}...`);
-    // Implement export logic here
-  };
 
+  
+
+// const handleExport = async (format: string) => {
+//   if (format === 'PDF') {
+//     const doc = new jsPDF('p', 'pt', 'a4');
+
+    
+    
+   
+//     doc.addImage(LOGO_BASE64, 'PNG', 40, 20, 100, 50);
+
+    
+//     doc.setFontSize(16);
+//     doc.text(' ', 40, 100);
+
+//     // ✅ Prepare table content
+//     const tableColumn = columns.map((col) => col.header);
+//     const tableRows = data.map((row) => columns.map((col) => row[col.key]));
+
+//     // ✅ Render table
+//     autoTable(doc, {
+//       head: [tableColumn],
+//       body: tableRows,
+//       startY: 120,
+//       theme: 'grid',
+//       styles: { fontSize: 10, cellPadding: 5 },
+//       headStyles: { fillColor: [34, 160, 142] },
+//     });
+
+//     // ✅ Save file
+//     doc.save('table_export.pdf');
+//   } else if (format === 'CSV') {
+//     // Implement CSV export here
+//   } else if (format === 'Excel') {
+//     // Implement Excel export here
+//   } else if (format === 'Print') {
+//     window.print();
+//   }
+// };
+
+const handleExport = async (format: string) => {
+  if (format === 'PDF') {
+    const doc = new jsPDF('p', 'pt', 'a4');
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+
+    // ✅ Centered logo
+    const logoWidth = 100;
+    const logoHeight = 50;
+    const logoX = (pageWidth - logoWidth) / 2;
+    const logoY = 20;
+    doc.addImage(LOGO_BASE64, 'PNG', logoX, logoY, logoWidth, logoHeight);
+
+    // ✅ Centered title below logo
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    const title = '';
+    const textWidth = doc.getTextWidth(title);
+    const textX = (pageWidth - textWidth) / 2;
+    doc.text(title, textX, logoY + logoHeight + 30);
+
+    // ✅ Prepare table content
+    const tableColumn = columns.map((col) => col.header);
+    const tableRows = data.map((row) => columns.map((col) => row[col.key]));
+
+    // ✅ Render table with autoTable
+    autoTable(doc, {
+      head: [tableColumn],
+      body: tableRows,
+      startY: logoY + logoHeight + 50,
+      theme: 'grid',
+      styles: { fontSize: 10, cellPadding: 5 },
+      headStyles: { fillColor: [34, 160, 142] },
+      didDrawPage: () => {
+        // ✅ Footer with date + page numbers
+        const pageCount = doc.getNumberOfPages();
+       const currentPage = (doc.internal as any).getCurrentPageInfo().pageNumber;
+        // Date (left)
+        doc.setFontSize(9);
+        doc.setTextColor(100);
+        const date = new Date().toLocaleDateString();
+        doc.text(`Generated on: ${date}`, 40, pageHeight - 20);
+
+        // Page number (right)
+        doc.text(
+          `Page ${currentPage} of ${pageCount}`,
+          pageWidth - 100,
+          pageHeight - 20
+        );
+      },
+    });
+
+    // ✅ Save PDF file
+    doc.save('table_export.pdf');
+  } else if (format === 'CSV') {
+    // Implement CSV export here
+  } else if (format === 'Excel') {
+    // Implement Excel export here
+  } else if (format === 'Print') {
+    window.print();
+  }
+};
   return (
     <div className={`bg-white ${className}`}>
       {/* Top Controls */}

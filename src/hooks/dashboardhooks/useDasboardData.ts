@@ -1,24 +1,39 @@
 import {
-    createAmmunition,
+  createAmmunition,
+  createBooks,
   createDepartmentFile,
+  createEquipmentInventory,
+  createMailArchive,
   createOfficers,
   createSickReport,
+  createUnitHoldingArms,
   createVehicleInventory,
   getArm,
   getArms,
+  getBooks,
+  getBooksById,
   getDepartmentFile,
   getDepartmentFiles,
+  getEquipmentInventorys,
+ 
+  getMailArchives,
   getOfficerById,
   getOfficers,
   getOverview,
   getSickReport,
   getSickReports,
-  getVehicleInventory,
+  // getUnitHoldingArm,
+  getUnitHoldingArms,
+  // getVehicleInventory,
   getVehicleInventorys,
   updateAmmunition,
+  updateBooks,
   updateDepartmentFile,
+  updateEquipmentInventory,
+  updateMailArchive,
   updateOfficer,
   updateSickReport,
+  updateUnitHoldingArms,
   updateVehicleInventory
 } from '../../services/dashboardApi/dashboardServices';
 
@@ -79,9 +94,9 @@ export const useGetSickReport = () => {
   return usePersistedQuery('sickReport', getSickReport, setSickReport, sickReport);
 };
 
-//ARMS
+//AMMUNITIONS
 
-export const useArmsData = () => {
+export const useGetArmsData = () => {
   const { arms, setArms } = useDashboardStore();
   return usePersistedQuery('arms', getArms, setArms, arms);
 };
@@ -89,6 +104,16 @@ export const useGetArmData = () => {
   const { arm, setArm } = useDashboardStore();
   return usePersistedQuery('arm', getArm, setArm, arm);
 };
+//UNIT HOLDING ARMS 
+
+export const useGetUnitHoldingArms = () => {
+  const { unitHoldingArms, setUnitHoldingArms } = useDashboardStore();
+  return usePersistedQuery('unitHoldingArms', getUnitHoldingArms, setUnitHoldingArms, unitHoldingArms);
+};
+// export const useGetUnitHoldingArm = () => {
+//   const { arm, setArm } = useDashboardStore();
+//   return usePersistedQuery('unitHoldingArm', getUnitHoldingArm, setArm, arm);
+// };
 
 //OFFICERS (unitBible/list)
 export const useOfficersData = () => {
@@ -98,6 +123,28 @@ export const useOfficersData = () => {
 export const useOfficerData = () => {
   const { officer, setOfficer } = useDashboardStore();
   return usePersistedQuery('officer', getOfficerById, setOfficer, officer);
+};
+
+
+//MAIL ARCHIVE (unitBible/list)
+export const useGetMailArchives = () => {
+  const { mailArchives, setMailArchives } = useDashboardStore();
+  return usePersistedQuery('mailArchives',  getMailArchives , setMailArchives, mailArchives);
+};
+export const useGetMailArchive = () => {
+  const { mailArchive, setMailArchive } = useDashboardStore();
+  return usePersistedQuery('mailArchive', getOfficerById, setMailArchive, mailArchive);
+};
+
+// LIBRARY BOOKS
+
+export const useGetBooks = () => {
+  const { books, setBooks } = useDashboardStore();
+  return usePersistedQuery('books',  getBooks , setBooks, books);
+};
+export const useGetBook = () => {
+  const { book, setBook } = useDashboardStore();
+  return usePersistedQuery('book', getBooksById, setBook, book);
 };
 
 //VEHICLE INVENTORY
@@ -115,19 +162,26 @@ export const useGetVehicleInventorys = () => {
   const { vehicleInventory, setVehicleInventory } = useDashboardStore();
   return usePersistedQuery(
     'vehicleInventory',
-    getVehicleInventory,
+    getVehicleInventorys,
     setVehicleInventory,
     vehicleInventory
+  );
+};
+export const useGetEquipmentInventorys = () => {
+  const { equipmentInventory, setEquipmentInventory } = useDashboardStore();
+  return usePersistedQuery(
+    'equipmentInventory',
+    getEquipmentInventorys,
+    setEquipmentInventory,
+    equipmentInventory
   );
 };
 
 // POST HOOKS ====================================================>>>>>>>>
 
-
-
 //OFFICERS (unitBible/list)
 export const useCreateOfficer = () => {
-  return usePersistedMutation<Officer, Error, CreateOfficerPayload>(
+  return usePersistedMutation<Officer, Error, any>(
     createOfficers, // mutationFn - receives the payload
     'officers', // invalidateKeys - refetches officers query
     (data) => {
@@ -159,8 +213,79 @@ export const useUpdateOfficer = () => {
   );
 };
 
+
+//LIBRARY BOOKS 
+
+export const useCreateBooks = () => {
+  return usePersistedMutation<Officer, Error, CreateOfficerPayload>(
+    createBooks, // mutationFn - receives the payload
+    'books', // invalidateKeys - refetches officers query
+    (data) => {
+      // onSuccess callback
+      console.log('Books created:', data);
+      // Optional: toast.success('Officer created successfully');
+    },
+    (error) => {
+      // onError callback
+      console.error('Failed to create officer:', error);
+      // Optional: toast.error('Failed to create officer');
+    }
+  );
+};
+export const useUpdateBooks = () => {
+  return usePersistedMutation<Officer, Error, any>(
+    updateBooks, // mutationFn - receives the payload
+    'book', // invalidateKeys - refetches officers query
+    (data) => {
+      // onSuccess callback
+      console.log('Officer created:', data);
+      // Optional: toast.success('Officer created successfully');
+    },
+    (error) => {
+      // onError callback
+      console.error('Failed to create officer:', error);
+      // Optional: toast.error('Failed to create officer');
+    }
+  );
+};
+
+
+export const useCreateMailArchive = () => {
+  return usePersistedMutation<Officer, Error, CreateOfficerPayload>(
+    createMailArchive, // mutationFn - receives the payload
+    'books', // invalidateKeys - refetches officers query
+    (data) => {
+      // onSuccess callback
+      console.log('Books created:', data);
+      // Optional: toast.success('Officer created successfully');
+    },
+    (error) => {
+      // onError callback
+      console.error('Failed to create officer:', error);
+      // Optional: toast.error('Failed to create officer');
+    }
+  );
+};
+export const useUpdateMailArchive = () => {
+  return usePersistedMutation<Officer, Error, any>(
+    updateMailArchive, // mutationFn - receives the payload
+    'book', // invalidateKeys - refetches officers query
+    (data) => {
+      // onSuccess callback
+      console.log('Officer created:', data);
+      // Optional: toast.success('Officer created successfully');
+    },
+    (error) => {
+      // onError callback
+      console.error('Failed to create officer:', error);
+      // Optional: toast.error('Failed to create officer');
+    }
+  );
+};
+
 //DEPARTMENT
 //-----POST
+
 export const useCreateDepartmentFile = () => {
   return usePersistedMutation<Officer, Error, any>(
     createDepartmentFile, // mutationFn - receives the payload
@@ -177,7 +302,7 @@ export const useCreateDepartmentFile = () => {
 export const useUpdateDepartmentFile = () => {
   return usePersistedMutation<Officer, Error, any>(
     updateDepartmentFile, // mutationFn - receives the payload
-    'deptFiles', // invalidateKeys - refetches officers query
+    'deptFile', // invalidateKeys - refetches officers query
     (data) => {
       console.log('Department created:', data);
     },
@@ -243,6 +368,34 @@ export const useUpdateAmmunition = () => {
   );
 };
 
+//ARMS
+//-----POST
+export const useCreateUnitHoldingArms= () => {
+  return usePersistedMutation<Officer, Error, any>(
+    createUnitHoldingArms, // mutationFn - receives the payload
+    'unitHoldingArms', // invalidateKeys - refetches officers query
+    (data) => {
+      console.log('Ammunition created:', data);
+    },
+    (error) => {
+      console.error('Failed to create ammunition:', error);
+    }
+  );
+};
+//-----PATCH
+export const useUnitHoldingArms = () => {
+  return usePersistedMutation<Officer, Error, any>(
+    updateUnitHoldingArms, // mutationFn - receives the payload
+    'unitHoldingArms', // invalidateKeys - refetches officers query
+    (data) => {
+      console.log('Sick Report created:', data);
+    },
+    (error) => {
+      console.error('Failed to create sick reports:', error);
+    }
+  );
+};
+
 //VEHICLE INVENTORY
 //-----POST
 export const useCreateVehicleInventory = () => {
@@ -271,6 +424,31 @@ export const useUpdateVehicleInventory = () => {
   );
 };
 
+//EQUIPMENT INVENTORY
 
-
-
+//-----POST
+export const useCreateEquipmentInventory = () => {
+  return usePersistedMutation<Officer, Error, any>(
+    createEquipmentInventory, // mutationFn - receives the payload
+    'EquipmentInventorys', // invalidateKeys - refetches officers query
+    (data) => {
+      console.log('Equipment Inventory created:', data);
+    },
+    (error) => {
+      console.error('Failed to create ammunition:', error);
+    }
+  );
+};
+//-----PATCH
+export const useUpdateEquipmentInventory = () => {
+  return usePersistedMutation<Officer, Error, any>(
+    updateEquipmentInventory, // mutationFn - receives the payload
+    'EquipmentInventorys', // invalidateKeys - refetches officers query
+    (data) => {
+      console.log('Equipment Inventory created:', data);
+    },
+    (error) => {
+      console.error('Failed to create Equipment Inventory  reports:', error);
+    }
+  );
+};

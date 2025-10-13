@@ -96,10 +96,10 @@ const Bible: React.FC = () => {
     }
   ];
 
-  console.log("My officers:", officers);
-  console.log("Is Array?", Array.isArray(officers));
-  console.log("Length:", officers?.length);
-  console.log("Loading:", officersLoading);
+  // console.log("My officers:", officers);
+  // console.log("Is Array?", Array.isArray(officers));
+  // console.log("Length:", officers?.length);
+  // console.log("Loading:", officersLoading);
 
   // Show loading state
   if (officersLoading) {

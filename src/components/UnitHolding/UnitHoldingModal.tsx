@@ -3,15 +3,17 @@ import Modal from '../Modal';
 import { AppContext } from '../../context/AppContext';
 import { mockOrderData } from '../../utils/constants';
 
-import LibraryForm from './LibraryForm';
+import UnitForm from './UnitHoldingForm';
 
-const LibraryModal = () => {
+const UnitHoldingModal = () => {
   const [orderData, setOrderData] = useState(mockOrderData);
   const [editMode, setEditMode] = useState(false);
   const [editDraft, setEditDraft] = useState(orderData);
 
-  const { setShowLibraryModal, selectedLibraryRecord } = useContext(AppContext);
 
+
+  const { setShowUnitHoldingModal, selectedUnitRecord } = useContext(AppContext);
+  console.log("Selected Arm is confused:", selectedUnitRecord)
   const handleEditClick = () => {
     setEditDraft(orderData);
     setEditMode(true);
@@ -27,6 +29,7 @@ const LibraryModal = () => {
     setEditMode(false);
   };
 
+
   return (
     <Modal>
       <div className="bg-white w-[85%] h-[90vh] rounded-md shadow-md overflow-y-scroll overflow-hidden">
@@ -36,18 +39,18 @@ const LibraryModal = () => {
             <button
               className="hover:scale-95 duration-300 transition-all cursor-pointer"
               type="button"
-              onClick={() => setShowLibraryModal(false)}
+              onClick={() => setShowUnitHoldingModal(false)}
             >
               <img src="/department/chevron-left.svg" alt="chevron-left" />
             </button>
 
-            <h1>{selectedLibraryRecord?.title ?? "Book Info"}</h1>
+            <h1>{selectedUnitRecord?.ltr_of_req ?? "Arm Report"}</h1>
           </div>
 
           <button
             className="hover:scale-95 duration-300 transition-all cursor-pointer"
             type="button"
-            onClick={() => setShowLibraryModal(false)}
+            onClick={() => setShowUnitHoldingModal(false)}
           >
             <img src="/department/x-close-icon.svg" alt="x-close-icon" />
           </button>
@@ -85,10 +88,10 @@ const LibraryModal = () => {
         </div>
 
         {/* body */}
-        <LibraryForm isEdit={editMode} mockData={selectedLibraryRecord} />
+        <UnitForm isEdit={editMode} mockData={selectedUnitRecord} />
       </div>
     </Modal>
   );
 };
 
-export default LibraryModal;
+export default UnitHoldingModal;
