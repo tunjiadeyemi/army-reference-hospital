@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import SignatureCanvas from 'react-signature-canvas';
 import { useGetOfficers } from '../UnitBible/hooks/useUnitBible';
-import { showError } from '../../utils/toast';
+import { showError, showSuccess } from '../../utils/toast';
 
 interface TrialFormProps {
   isEdit?: boolean;
@@ -19,6 +20,10 @@ export default function TrialForm({
   const { data: officers } = useGetOfficers();
   const [openOfficerNames, setOpenOfficerNames] = useState(false);
   const [filteredArmy, setFilteredArmy] = useState([]);
+  const [showSignaturePad, setShowSignaturePad] = useState(false);
+  const signatureRef = useRef<SignatureCanvas>(null);
+  const canvasContainerRef = useRef<HTMLDivElement>(null);
+  const [canvasDimensions, setCanvasDimensions] = useState({ width: 500, height: 200 });
   const emptyFormData = {
     officer_id: '',
     serviceNumber: '',
@@ -49,6 +54,27 @@ export default function TrialForm({
       setFormData(mockData);
     }
   }, [mockData]);
+
+  // Dynamically set canvas dimensions when modal opens
+  useEffect(() => {
+    if (showSignaturePad && canvasContainerRef.current) {
+      const updateCanvasSize = () => {
+        const container = canvasContainerRef.current;
+        if (container) {
+          const width = container.clientWidth;
+          const height = Math.min(200, width * 0.4); // Maintain aspect ratio
+          setCanvasDimensions({ width, height });
+        }
+      };
+
+      // Initial size
+      updateCanvasSize();
+
+      // Update on resize
+      window.addEventListener('resize', updateCanvasSize);
+      return () => window.removeEventListener('resize', updateCanvasSize);
+    }
+  }, [showSignaturePad]);
 
   const handleInputChange = (field: string, value: string) => {
     if (!isEdit) return;
@@ -517,33 +543,182 @@ export default function TrialForm({
             {/* File Upload */}
             <div className="grid grid-cols-12 gap-4 items-start">
               <label className="col-span-3 text-sm font-medium text-gray-700 uppercase">
-               Signature
+                Signature
               </label>
               <div className="col-span-9 space-y-2">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => handleFileChange('upload', e.target.files?.[0] || null)}
-                  disabled={!isEdit || isLoading}
-                  className={`w-full px-3 py-2.5 border border-gray-300 rounded-md ${
-                    !isEdit || isLoading
-                      ? 'bg-gray-50 text-gray-400 cursor-not-allowed'
-                      : 'bg-white text-gray-700'
-                  }`}
-                />
-                {formData.upload && (
-                  <div className="flex items-center gap-2">
-                    <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <p className="text-xs text-green-600">File selected</p>
-                  </div>
+                {/* Show existing signature URL from server */}
+                {formData.signature &&
+                  typeof formData.signature === 'string' &&
+                  !formData.upload && (
+                    <div className="space-y-2">
+                      <img
+                        src={formData.signature}
+                        alt="Signature"
+                        className="max-h-24 border border-gray-300 rounded bg-white p-2"
+                      />
+                      {isEdit && !isLoading && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setFormData((prev: any) => ({ ...prev, signature: null }));
+                            setShowSignaturePad(true);
+                          }}
+                          className="text-sm text-teal-600 hover:text-teal-700 font-medium"
+                        >
+                          Draw Signature
+                        </button>
+                      )}
+                    </div>
+                  )}
+
+                {/* Show draw button when no signature exists or has new upload */}
+                {(!formData.signature || formData.upload) && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => setShowSignaturePad(true)}
+                      disabled={!isEdit || isLoading}
+                      className={`w-full px-3 py-2.5 border border-gray-300 rounded-md font-medium transition-colors ${
+                        !isEdit || isLoading
+                          ? 'bg-gray-50 text-gray-400 cursor-not-allowed'
+                          : 'bg-white text-gray-700 hover:bg-gray-50'
+                      }`}
+                    >
+                      {formData.upload ? 'Update Signature' : 'Draw Signature'}
+                    </button>
+                    {formData.upload && (
+                      <div className="flex items-center gap-2">
+                        <svg
+                          className="w-5 h-5 text-green-600"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                        <p className="text-xs text-green-600">New signature captured</p>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             </div>
           </div>
 
+          {/* Signature Pad Modal */}
+          {showSignaturePad && (
+            <div
+              className="fixed inset-0 flex items-center justify-center"
+              style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: -50,
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                zIndex: 9999
+              }}
+            >
+              <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full mx-4">
+                {/* Header */}
+                <div className="border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+                  <h2 className="text-lg font-medium text-gray-900">Draw Signature</h2>
+                  <button
+                    onClick={() => setShowSignaturePad(false)}
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
+                </div>
 
+                {/* Canvas */}
+                <div className="p-6">
+                  <p className="text-sm text-gray-600 mb-4">Sign in the box below</p>
+                  <div
+                    ref={canvasContainerRef}
+                    className="border-2 border-gray-300 rounded bg-white"
+                  >
+                    <SignatureCanvas
+                      ref={signatureRef}
+                      canvasProps={{
+                        width: canvasDimensions.width,
+                        height: canvasDimensions.height,
+                        style: {
+                          touchAction: 'none',
+                          cursor: 'crosshair',
+                          display: 'block',
+                          width: `${canvasDimensions.width}px`,
+                          height: `${canvasDimensions.height}px`
+                        }
+                      }}
+                      backgroundColor="rgb(255, 255, 255)"
+                      penColor="rgb(0, 0, 0)"
+                    />
+                  </div>
+                </div>
+
+                {/* Footer */}
+                <div className="border-t border-gray-200 px-6 py-4 flex justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      signatureRef.current?.clear();
+                    }}
+                    className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 font-medium"
+                  >
+                    Clear
+                  </button>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      if (signatureRef.current?.isEmpty()) {
+                        showError('Please draw a signature');
+                        return;
+                      }
+
+                      try {
+                        // Step 1: Get dataURL from canvas
+                        const dataUrl = signatureRef.current?.toDataURL('image/png');
+                        if (!dataUrl) {
+                          showError('Failed to capture signature');
+                          return;
+                        }
+
+                        // Step 2: Convert dataURL to Blob
+                        const response = await fetch(dataUrl);
+                        const blob = await response.blob();
+
+                        // Step 3: Convert Blob to File
+                        const file = new File([blob], 'signature.png', { type: 'image/png' });
+
+                        // Step 4: Pass File to form handler
+                        handleFileChange('upload', file);
+
+                        showSuccess('Signature saved successfully');
+                        setShowSignaturePad(false);
+                      } catch (error) {
+                        console.error('Signature conversion error:', error);
+                        showError('Failed to save signature');
+                      }
+                    }}
+                    className="px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700 font-medium"
+                  >
+                    Save Signature
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Save Button */}
           <div className="flex justify-center pt-8">

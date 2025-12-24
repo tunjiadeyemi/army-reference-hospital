@@ -46,7 +46,7 @@ const TrialRecord = () => {
     },
     {
       key: 'actions',
-      header: 'Actions',
+      header: '',
       className: 'w-[5%]',
       render: (_value: any, row: any) => (
         <button
