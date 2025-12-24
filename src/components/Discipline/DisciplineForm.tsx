@@ -1,118 +1,219 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from 'react';
-
-// Mock data for view mode
+import { useState, useEffect } from 'react';
+import { useGetOfficers } from '../UnitBible/hooks/useUnitBible';
+import { showError } from '../../utils/toast';
+import {
+  useCreateChargeSheet,
+  useUpdateChargeSheet
+} from '../../hooks/dashboardhooks/useDasboardData';
 
 interface DisciplineFormProps {
   isEdit?: boolean;
   mockData?: any;
+  onSave?: (data: any) => void;
+  isLoading?: boolean;
 }
 
-export default function DisciplineForm({ isEdit = true, mockData }: DisciplineFormProps) {
-  const [formData, setFormData] = useState({
-    // The Accused
-    accusedRank: isEdit ? '' : mockData?.accusedRank,
-    accusedName: isEdit ? '' : mockData?.accusedName,
-    accusedArmyNo: isEdit ? '' : mockData?.accusedArmyNo,
-    accusedUnit: isEdit ? '' : mockData?.accusedUnit,
-    statementOfOffence: isEdit ? '' : mockData?.statementOfOffence,
-    punishableUnderSection: isEdit ? '' : mockData?.punishableUnderSection,
-    particularsOfOffence: isEdit ? '' : mockData?.particularsOfOffence,
+const emptyFormData = {
+  // Accused Officer
+  accused_officer_id: '',
+  accused_officer_number: '',
+  accused_officer_unit: '',
+  // Statement
+  statement_of_offence: '',
+  punishable_under_section: '',
+  particulars_of_offence: '',
+  // Reporting Officer
+  reporting_officer_id: '',
+  reporting_officer_number: '',
+  reporting_officer_unit: '',
+  // Witnessing Officer
+  witnessing_officer_id: '',
+  witnessing_officer_number: '',
+  witnessing_officer_unit: '',
+  // Tried By Officer
+  tried_by_officer_id: '',
+  tried_by_officer_number: '',
+  tried_by_officer_unit: '',
+  // Commander Section
+  commander_officer_id: '',
+  commander_officer_number: '',
+  commander_findings: '',
+  commander_award: '',
+  commander_recommendations: '',
+  commander_date: '',
+  commander_signature: '',
+  // Battalion Commander Section
+  bn_commander_officer_id: '',
+  bn_commander_officer_number: '',
+  bn_commander_findings: '',
+  bn_commander_award: '',
+  bn_commander_recommendations: '',
+  bn_commander_date: '',
+  bn_commander_signature: '',
+  // Brigade Commander Section
+  bde_commander_officer_id: '',
+  bde_commander_officer_number: '',
+  bde_commander_findings: '',
+  bde_commander_award: '',
+  bde_commander_recommendations: '',
+  bde_commander_date: '',
+  bde_commander_signature: '',
+  // General Commander Section
+  gen_commander_officer_id: '',
+  gen_commander_officer_number: '',
+  gen_commander_findings: '',
+  gen_commander_award: '',
+  gen_commander_recommendations: '',
+  gen_commander_date: '',
+  gen_commander_signature: ''
+};
 
-    // Offence Reported By
-    reporterRank: isEdit ? '' : mockData?.reporterRank,
-    reporterName: isEdit ? '' : mockData?.reporterName,
-    reporterArmyNo: isEdit ? '' : mockData?.reporterArmyNo,
-    reporterUnit: isEdit ? '' : mockData?.reporterUnit,
+export default function DisciplineForm({
+  isEdit = true,
+  mockData,
+  onSave,
+  isLoading = false
+}: DisciplineFormProps) {
+  const { data: officers } = useGetOfficers();
+  const createMutation = useCreateChargeSheet();
+  const updateMutation = useUpdateChargeSheet();
 
-    // Witness
-    witnessRank: isEdit ? '' : mockData?.witnessRank,
-    witnessName: isEdit ? '' : mockData?.witnessName,
-    witnessArmyNo: isEdit ? '' : mockData?.witnessArmyNo,
-    witnessUnit: isEdit ? '' : mockData?.witnessUnit,
+  const [formData, setFormData] = useState(mockData || emptyFormData);
+  const [openOfficerDropdown, setOpenOfficerDropdown] = useState<string | null>(null);
+  const [filteredOfficers, setFilteredOfficers] = useState<Record<string, any[]>>({});
+  const [officerIds, setOfficerIds] = useState<Record<string, number | string>>({});
 
-    // To Be Tried By
-    trialRank: isEdit ? '' : mockData?.trialRank,
-    trialName: isEdit ? '' : mockData?.trialName,
-    trialArmyNo: isEdit ? '' : mockData?.trialArmyNo,
-    trialUnit: isEdit ? '' : mockData?.trialUnit,
+  // Update formData when mockData changes
+  useEffect(() => {
+    if (mockData) {
+      console.log('[Charge Sheet Form] Syncing formData from mockData:', mockData);
+      setFormData(mockData);
+    }
+  }, [mockData]);
 
-    // Company or Equivalent Commander
-    coFindings: isEdit ? '' : mockData?.coFindings,
-    coAward: isEdit ? '' : mockData?.coAward,
-    coRecommendations: isEdit ? '' : mockData?.coRecommendations,
-    coDate: isEdit ? '' : mockData?.coDate,
-    coRank: isEdit ? '' : mockData?.coRank,
-    coName: isEdit ? '' : mockData?.coName,
-    coNumber: isEdit ? '' : mockData?.coNumber,
-    coSignature: isEdit ? '' : mockData?.coSignature,
-
-    // BN Commander or Equivalent
-    bnFinding: isEdit ? '' : mockData?.bnFinding,
-    bnAward: isEdit ? '' : mockData?.bnAward,
-    bnRecommendations: isEdit ? '' : mockData?.bnRecommendations,
-    bnDate: isEdit ? '' : mockData?.bnDate,
-    bnRank: isEdit ? '' : mockData?.bnRank,
-    bnName: isEdit ? '' : mockData?.bnName,
-    bnNumber: isEdit ? '' : mockData?.bnNumber,
-    bnSignature: isEdit ? '' : mockData?.bnSignature,
-
-    // BDE/GAR Commander or Equivalent
-    bdeFindings: isEdit ? '' : mockData?.bdeFindings,
-    bdeAward: isEdit ? '' : mockData?.bdeAward,
-    bdeRecommendations: isEdit ? '' : mockData?.bdeRecommendations,
-    bdeDate: isEdit ? '' : mockData?.bdeDate,
-    bdeRank: isEdit ? '' : mockData?.bdeRank,
-    bdeName: isEdit ? '' : mockData?.bdeName,
-    bdeNumber: isEdit ? '' : mockData?.bdeNumber,
-    bdeSignature: isEdit ? '' : mockData?.bdeSignature,
-
-    // General Officer Commanding or Equivalent
-    gocFindings: isEdit ? '' : mockData?.gocFindings,
-    gocAward: isEdit ? '' : mockData?.gocAward,
-    gocRecommendations: isEdit ? '' : mockData?.gocRecommendations,
-    gocDate: isEdit ? '' : mockData?.gocDate,
-    gocRank: isEdit ? '' : mockData?.gocRank,
-    gocName: isEdit ? '' : mockData?.gocName,
-    gocNumber: isEdit ? '' : mockData?.gocNumber,
-    gocSignature: isEdit ? '' : mockData?.gocSignature
-  });
-
-  const handleInputChange = (e: any) => {
-    if (!isEdit) return; // Only allow changes when in edit mode
-
-    const { name, value } = e.target;
-    setFormData((prev) => ({
+  const handleInputChange = (field: string, value: string) => {
+    if (!isEdit) return;
+    setFormData((prev: any) => ({
       ...prev,
-      [name]: value
+      [field]: value
     }));
   };
 
-  const handleSubmit = (e: any) => {
-    e.preventDefault();
-    console.log('Form Data:', formData);
-    alert('Form saved successfully!');
+  const handleFileChange = (field: string, file: File | null) => {
+    if (!isEdit) return;
+    setFormData((prev: any) => ({
+      ...prev,
+      [field]: file ? file.name : ''
+    }));
   };
 
-  const rankOptions = [
-    'Rank',
-    'General',
-    'Lieutenant General',
-    'Major General',
-    'Brigadier',
-    'Colonel',
-    'Lieutenant Colonel',
-    'Major',
-    'Captain',
-    'Lieutenant',
-    '2nd Lieutenant',
-    'Warrant Officer',
-    'Staff Sergeant',
-    'Sergeant',
-    'Corporal',
-    'Lance Corporal',
-    'Private'
-  ];
+  const handleOfficerSearch = (field: string, searchTerm: string) => {
+    if (!isEdit) return;
+
+    const numberFieldName = field.replace('_id', '_number');
+
+    setFormData((prev: any) => ({
+      ...prev,
+      [numberFieldName]: searchTerm
+    }));
+
+    setOpenOfficerDropdown(field);
+
+    if (searchTerm.trim() === '') {
+      setFilteredOfficers((prev) => ({ ...prev, [field]: [] }));
+      return;
+    }
+
+    const filtered =
+      officers?.filter(
+        (officer: any) =>
+          officer.serviceNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          officer.name.toLowerCase().includes(searchTerm.toLowerCase())
+      ) || [];
+
+    setFilteredOfficers((prev) => ({ ...prev, [field]: filtered }));
+  };
+
+  const handleOfficerSelect = (field: string, officer: any) => {
+    const numberFieldName = field.replace('_id', '_number');
+
+    setFormData((prev: any) => ({
+      ...prev,
+      [numberFieldName]: officer.serviceNumber // Store officer number for display
+    }));
+    setOfficerIds((prev) => ({
+      ...prev,
+      [field]: officer.id // Store officer ID separately for submission
+    }));
+    setOpenOfficerDropdown(null);
+    setFilteredOfficers((prev) => ({ ...prev, [field]: [] }));
+  };
+
+  const handleSave = async () => {
+    try {
+      // Validate required fields
+      if (!formData.accused_officer_number?.toString().trim()) {
+        showError('Accused Officer is required');
+        return;
+      }
+      if (!formData.accused_officer_unit?.trim()) {
+        showError('Accused Officer Unit is required');
+        return;
+      }
+      if (!formData.statement_of_offence?.trim()) {
+        showError('Statement of Offence is required');
+        return;
+      }
+
+      // Helper function to find officer ID by service number
+      const findOfficerIdByNumber = (serviceNumber: string) => {
+        if (!serviceNumber) return '';
+        const officer = officers?.find((o: any) => o.serviceNumber === serviceNumber);
+        return officer?.id || '';
+      };
+
+      // Build submission data with officer IDs
+      const submissionData = {
+        ...formData,
+        accused_officer_id:
+          officerIds.accused_officer_id || findOfficerIdByNumber(formData.accused_officer_number),
+        reporting_officer_id:
+          officerIds.reporting_officer_id ||
+          findOfficerIdByNumber(formData.reporting_officer_number),
+        witnessing_officer_id:
+          officerIds.witnessing_officer_id ||
+          findOfficerIdByNumber(formData.witnessing_officer_number),
+        tried_by_officer_id:
+          officerIds.tried_by_officer_id || findOfficerIdByNumber(formData.tried_by_officer_number),
+        commander_officer_id:
+          officerIds.commander_officer_id ||
+          findOfficerIdByNumber(formData.commander_officer_number),
+        bn_commander_officer_id:
+          officerIds.bn_commander_officer_id ||
+          findOfficerIdByNumber(formData.bn_commander_officer_number),
+        bde_commander_officer_id:
+          officerIds.bde_commander_officer_id ||
+          findOfficerIdByNumber(formData.bde_commander_officer_number),
+        gen_commander_officer_id:
+          officerIds.gen_commander_officer_id ||
+          findOfficerIdByNumber(formData.gen_commander_officer_number)
+      };
+
+      console.log('[Charge Sheet Form] Submitting form data:', submissionData);
+
+      if (onSave) {
+        await onSave(submissionData);
+      } else {
+        // Direct save if no onSave callback
+        const isUpdate = submissionData.id;
+        const mutation = isUpdate ? updateMutation : createMutation;
+        await mutation.mutateAsync(submissionData);
+      }
+    } catch (error) {
+      console.error('[Charge Sheet Form] Save failed:', error);
+    }
+  };
 
   return (
     <div className="p-6 bg-white">
@@ -125,17 +226,21 @@ export default function DisciplineForm({ isEdit = true, mockData }: DisciplineFo
           </div>
           <div className="flex gap-2">
             <button
-              disabled={!isEdit}
+              disabled={!isEdit || isLoading}
               className={`px-4 py-1 text-sm border border-gray-300 rounded ${
-                !isEdit ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'hover:bg-gray-50'
+                !isEdit || isLoading
+                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  : 'hover:bg-gray-50'
               }`}
             >
               PDF
             </button>
             <button
-              disabled={!isEdit}
+              disabled={!isEdit || isLoading}
               className={`px-4 py-1 text-sm border border-gray-300 rounded ${
-                !isEdit ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'hover:bg-gray-50'
+                !isEdit || isLoading
+                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  : 'hover:bg-gray-50'
               }`}
             >
               Print
@@ -147,74 +252,55 @@ export default function DisciplineForm({ isEdit = true, mockData }: DisciplineFo
         <p className="text-center text-gray-700 mb-8">MADE UNDER AFA CAP A20 LFN 2004</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-8">
+      <div className="space-y-8">
         {/* Section 1: The Accused */}
         <div>
           <h2 className="text-lg font-semibold mb-4 underline">1 THE ACCUSED</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            <div>
-              <label className="block text-sm font-medium mb-2">RANK</label>
-              <select
-                name="accusedRank"
-                value={formData.accusedRank}
-                onChange={handleInputChange}
-                disabled={!isEdit}
-                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                }`}
-              >
-                {rankOptions.map((rank) => (
-                  <option key={rank} value={rank === 'Rank' ? '' : rank}>
-                    {rank}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">NAME</label>
+            <div className="relative">
+              <label className="block text-sm font-medium mb-2">OFFICER</label>
               <input
                 type="text"
-                name="accusedName"
-                value={formData.accusedName}
-                onChange={handleInputChange}
-                placeholder="Full name"
-                disabled={!isEdit}
+                value={formData.accused_officer_number || ''}
+                onChange={(e) => handleOfficerSearch('accused_officer_id', e.target.value)}
+                placeholder="Search by name or service number"
+                disabled={!isEdit || isLoading}
                 className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
                 }`}
               />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            <div>
-              <label className="block text-sm font-medium mb-2">ARMY NO.</label>
-              <input
-                type="text"
-                name="accusedArmyNo"
-                value={formData.accusedArmyNo}
-                onChange={handleInputChange}
-                placeholder="Army no"
-                disabled={!isEdit}
-                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                }`}
-              />
+              {openOfficerDropdown === 'accused_officer_id' &&
+                formData.accused_officer_number &&
+                filteredOfficers['accused_officer_id']?.length > 0 && (
+                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                    {filteredOfficers['accused_officer_id'].map((officer: any) => (
+                      <button
+                        key={officer.id}
+                        type="button"
+                        onClick={() => handleOfficerSelect('accused_officer_id', officer)}
+                        className="w-full px-4 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
+                      >
+                        <div className="flex justify-between">
+                          <p>{officer.name}</p>
+                          <p className="text-gray-600">{officer.serviceNumber}</p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-2">UNIT</label>
               <input
                 type="text"
-                name="accusedUnit"
-                value={formData.accusedUnit}
-                onChange={handleInputChange}
-                placeholder="Army no"
-                disabled={!isEdit}
+                value={formData.accused_officer_unit}
+                onChange={(e) => handleInputChange('accused_officer_unit', e.target.value)}
+                placeholder="Unit"
+                disabled={!isEdit || isLoading}
                 className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
                 }`}
               />
             </div>
@@ -228,14 +314,13 @@ export default function DisciplineForm({ isEdit = true, mockData }: DisciplineFo
               <div className="flex-1">
                 <label className="block text-sm font-medium mb-2">A STATEMENT OF OFFENCE</label>
                 <textarea
-                  name="statementOfOffence"
-                  value={formData.statementOfOffence}
-                  onChange={handleInputChange}
+                  value={formData.statement_of_offence}
+                  onChange={(e) => handleInputChange('statement_of_offence', e.target.value)}
                   placeholder="write here"
                   rows={4}
-                  disabled={!isEdit}
+                  disabled={!isEdit || isLoading}
                   className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                    !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
                   }`}
                 />
               </div>
@@ -245,13 +330,12 @@ export default function DisciplineForm({ isEdit = true, mockData }: DisciplineFo
               <label className="block text-sm font-medium mb-2">PUNISHABLE UNDER SECTION</label>
               <input
                 type="text"
-                name="punishableUnderSection"
-                value={formData.punishableUnderSection}
-                onChange={handleInputChange}
+                value={formData.punishable_under_section}
+                onChange={(e) => handleInputChange('punishable_under_section', e.target.value)}
                 placeholder="Punishable under section"
-                disabled={!isEdit}
+                disabled={!isEdit || isLoading}
                 className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
                 }`}
               />
             </div>
@@ -262,14 +346,13 @@ export default function DisciplineForm({ isEdit = true, mockData }: DisciplineFo
             <div className="flex-1">
               <label className="block text-sm font-medium mb-2">PARTICULARS OF OFFENCE</label>
               <textarea
-                name="particularsOfOffence"
-                value={formData.particularsOfOffence}
-                onChange={handleInputChange}
+                value={formData.particulars_of_offence}
+                onChange={(e) => handleInputChange('particulars_of_offence', e.target.value)}
                 placeholder="Write here"
                 rows={4}
-                disabled={!isEdit}
+                disabled={!isEdit || isLoading}
                 className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
                 }`}
               />
             </div>
@@ -281,66 +364,49 @@ export default function DisciplineForm({ isEdit = true, mockData }: DisciplineFo
           <h2 className="text-lg font-semibold mb-4 underline">2 OFFENCE REPORTED BY</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">RANK</label>
-              <select
-                name="reporterRank"
-                value={formData.reporterRank}
-                onChange={handleInputChange}
-                disabled={!isEdit}
-                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                }`}
-              >
-                {rankOptions.map((rank) => (
-                  <option key={rank} value={rank === 'Rank' ? '' : rank}>
-                    {rank}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">NAME</label>
+            <div className="relative">
+              <label className="block text-sm font-medium mb-2">OFFICER</label>
               <input
                 type="text"
-                name="reporterName"
-                value={formData.reporterName}
-                onChange={handleInputChange}
-                placeholder="Full name"
-                disabled={!isEdit}
+                value={formData.reporting_officer_number || ''}
+                onChange={(e) => handleOfficerSearch('reporting_officer_id', e.target.value)}
+                placeholder="Search by name or service number"
+                disabled={!isEdit || isLoading}
                 className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
                 }`}
               />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">ARMY NO.</label>
-              <input
-                type="text"
-                name="reporterArmyNo"
-                value={formData.reporterArmyNo}
-                onChange={handleInputChange}
-                placeholder="Army no"
-                disabled={!isEdit}
-                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                }`}
-              />
+              {openOfficerDropdown === 'reporting_officer_id' &&
+                formData.reporting_officer_number &&
+                filteredOfficers['reporting_officer_id']?.length > 0 && (
+                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                    {filteredOfficers['reporting_officer_id'].map((officer: any) => (
+                      <button
+                        key={officer.id}
+                        type="button"
+                        onClick={() => handleOfficerSelect('reporting_officer_id', officer)}
+                        className="w-full px-4 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
+                      >
+                        <div className="flex justify-between">
+                          <p>{officer.name}</p>
+                          <p className="text-gray-600">{officer.serviceNumber}</p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-2">UNIT</label>
               <input
                 type="text"
-                name="reporterUnit"
-                value={formData.reporterUnit}
-                onChange={handleInputChange}
-                placeholder="Army no"
-                disabled={!isEdit}
+                value={formData.reporting_officer_unit}
+                onChange={(e) => handleInputChange('reporting_officer_unit', e.target.value)}
+                placeholder="Unit"
+                disabled={!isEdit || isLoading}
                 className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
                 }`}
               />
             </div>
@@ -352,66 +418,49 @@ export default function DisciplineForm({ isEdit = true, mockData }: DisciplineFo
           <h2 className="text-lg font-semibold mb-4 underline">3 WITNESS</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">RANK</label>
-              <select
-                name="witnessRank"
-                value={formData.witnessRank}
-                onChange={handleInputChange}
-                disabled={!isEdit}
-                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                }`}
-              >
-                {rankOptions.map((rank) => (
-                  <option key={rank} value={rank === 'Rank' ? '' : rank}>
-                    {rank}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">NAME</label>
+            <div className="relative">
+              <label className="block text-sm font-medium mb-2">OFFICER</label>
               <input
                 type="text"
-                name="witnessName"
-                value={formData.witnessName}
-                onChange={handleInputChange}
-                placeholder="Full name"
-                disabled={!isEdit}
+                value={formData.witnessing_officer_number || ''}
+                onChange={(e) => handleOfficerSearch('witnessing_officer_id', e.target.value)}
+                placeholder="Search by name or service number"
+                disabled={!isEdit || isLoading}
                 className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
                 }`}
               />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">ARMY NO.</label>
-              <input
-                type="text"
-                name="witnessArmyNo"
-                value={formData.witnessArmyNo}
-                onChange={handleInputChange}
-                placeholder="Army no"
-                disabled={!isEdit}
-                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                }`}
-              />
+              {openOfficerDropdown === 'witnessing_officer_id' &&
+                formData.witnessing_officer_number &&
+                filteredOfficers['witnessing_officer_id']?.length > 0 && (
+                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                    {filteredOfficers['witnessing_officer_id'].map((officer: any) => (
+                      <button
+                        key={officer.id}
+                        type="button"
+                        onClick={() => handleOfficerSelect('witnessing_officer_id', officer)}
+                        className="w-full px-4 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
+                      >
+                        <div className="flex justify-between">
+                          <p>{officer.name}</p>
+                          <p className="text-gray-600">{officer.serviceNumber}</p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-2">UNIT</label>
               <input
                 type="text"
-                name="witnessUnit"
-                value={formData.witnessUnit}
-                onChange={handleInputChange}
-                placeholder="Army no"
-                disabled={!isEdit}
+                value={formData.witnessing_officer_unit}
+                onChange={(e) => handleInputChange('witnessing_officer_unit', e.target.value)}
+                placeholder="Unit"
+                disabled={!isEdit || isLoading}
                 className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
                 }`}
               />
             </div>
@@ -421,91 +470,106 @@ export default function DisciplineForm({ isEdit = true, mockData }: DisciplineFo
         {/* Section 4: To Be Tried By */}
         <div>
           <h2 className="text-lg font-semibold mb-4 underline">4 TO BE TRIED BY</h2>
-          <p className="text-sm mb-4">IN CASE OF OF COURT MARTIAL ONLY, STATE TYPE</p>
+          <p className="text-sm mb-4">IN CASE OF COURT MARTIAL ONLY, STATE TYPE</p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">RANK</label>
-              <select
-                name="trialRank"
-                value={formData.trialRank}
-                onChange={handleInputChange}
-                disabled={!isEdit}
-                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                }`}
-              >
-                {rankOptions.map((rank) => (
-                  <option key={rank} value={rank === 'Rank' ? '' : rank}>
-                    {rank}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">NAME</label>
+            <div className="relative">
+              <label className="block text-sm font-medium mb-2">OFFICER</label>
               <input
                 type="text"
-                name="trialName"
-                value={formData.trialName}
-                onChange={handleInputChange}
-                placeholder="Full name"
-                disabled={!isEdit}
+                value={formData.tried_by_officer_number || ''}
+                onChange={(e) => handleOfficerSearch('tried_by_officer_id', e.target.value)}
+                placeholder="Search by name or service number"
+                disabled={!isEdit || isLoading}
                 className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
                 }`}
               />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">ARMY NO.</label>
-              <input
-                type="text"
-                name="trialArmyNo"
-                value={formData.trialArmyNo}
-                onChange={handleInputChange}
-                placeholder="Army no"
-                disabled={!isEdit}
-                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                }`}
-              />
+              {openOfficerDropdown === 'tried_by_officer_id' &&
+                formData.tried_by_officer_number &&
+                filteredOfficers['tried_by_officer_id']?.length > 0 && (
+                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                    {filteredOfficers['tried_by_officer_id'].map((officer: any) => (
+                      <button
+                        key={officer.id}
+                        type="button"
+                        onClick={() => handleOfficerSelect('tried_by_officer_id', officer)}
+                        className="w-full px-4 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
+                      >
+                        <div className="flex justify-between">
+                          <p>{officer.name}</p>
+                          <p className="text-gray-600">{officer.serviceNumber}</p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-2">UNIT</label>
               <input
                 type="text"
-                name="trialUnit"
-                value={formData.trialUnit}
-                onChange={handleInputChange}
-                placeholder="Army no"
-                disabled={!isEdit}
+                value={formData.tried_by_officer_unit}
+                onChange={(e) => handleInputChange('tried_by_officer_unit', e.target.value)}
+                placeholder="Unit"
+                disabled={!isEdit || isLoading}
                 className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
                 }`}
               />
             </div>
           </div>
         </div>
 
-        {/* Company or Equivalent Commander */}
+        {/* Section 5: Commander */}
         <div>
-          <h3 className="text-base font-semibold mb-4">a. COMPANY OR EQUIVALENT COMMANDER</h3>
+          <h2 className="text-lg font-semibold mb-4 underline">5 COMMANDER</h2>
 
           <div className="space-y-4">
+            <div className="relative">
+              <label className="block text-sm font-medium mb-2">OFFICER</label>
+              <input
+                type="text"
+                value={formData.commander_officer_number || ''}
+                onChange={(e) => handleOfficerSearch('commander_officer_id', e.target.value)}
+                placeholder="Search by name or service number"
+                disabled={!isEdit || isLoading}
+                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                }`}
+              />
+              {openOfficerDropdown === 'commander_officer_id' &&
+                formData.commander_officer_number &&
+                filteredOfficers['commander_officer_id']?.length > 0 && (
+                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                    {filteredOfficers['commander_officer_id'].map((officer: any) => (
+                      <button
+                        key={officer.id}
+                        type="button"
+                        onClick={() => handleOfficerSelect('commander_officer_id', officer)}
+                        className="w-full px-4 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
+                      >
+                        <div className="flex justify-between">
+                          <p>{officer.name}</p>
+                          <p className="text-gray-600">{officer.serviceNumber}</p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+            </div>
+
             <div>
               <label className="block text-sm font-medium mb-2">FINDINGS</label>
               <textarea
-                name="coFindings"
-                value={formData.coFindings}
-                onChange={handleInputChange}
-                placeholder="findings"
+                value={formData.commander_findings}
+                onChange={(e) => handleInputChange('commander_findings', e.target.value)}
+                placeholder="Findings"
                 rows={3}
-                disabled={!isEdit}
+                disabled={!isEdit || isLoading}
                 className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
                 }`}
               />
             </div>
@@ -514,238 +578,114 @@ export default function DisciplineForm({ isEdit = true, mockData }: DisciplineFo
               <label className="block text-sm font-medium mb-2">AWARD</label>
               <input
                 type="text"
-                name="coAward"
-                value={formData.coAward}
-                onChange={handleInputChange}
-                placeholder="Punishable under section"
-                disabled={!isEdit}
+                value={formData.commander_award}
+                onChange={(e) => handleInputChange('commander_award', e.target.value)}
+                placeholder="Award"
+                disabled={!isEdit || isLoading}
                 className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
                 }`}
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-2">RECOMMENDATIONS</label>
-              <input
-                type="text"
-                name="coRecommendations"
-                value={formData.coRecommendations}
-                onChange={handleInputChange}
-                placeholder="Punishable under section"
-                disabled={!isEdit}
+              <textarea
+                value={formData.commander_recommendations}
+                onChange={(e) => handleInputChange('commander_recommendations', e.target.value)}
+                placeholder="Recommendations"
+                rows={3}
+                disabled={!isEdit || isLoading}
                 className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
                 }`}
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">DATE</label>
-                <input
-                  type="text"
-                  name="coDate"
-                  value={formData.coDate}
-                  onChange={handleInputChange}
-                  placeholder="DD/MM/YY"
-                  disabled={!isEdit}
-                  className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                  }`}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">RANK</label>
-                <select
-                  name="coRank"
-                  value={formData.coRank}
-                  onChange={handleInputChange}
-                  disabled={!isEdit}
-                  className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                  }`}
-                >
-                  {rankOptions.map((rank) => (
-                    <option key={rank} value={rank === 'Rank' ? '' : rank}>
-                      {rank}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">NAME</label>
-                <input
-                  type="text"
-                  name="coName"
-                  value={formData.coName}
-                  onChange={handleInputChange}
-                  placeholder="Full name"
-                  disabled={!isEdit}
-                  className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                  }`}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">NUMBER</label>
-                <input
-                  type="text"
-                  name="coNumber"
-                  value={formData.coNumber}
-                  onChange={handleInputChange}
-                  placeholder="Number"
-                  disabled={!isEdit}
-                  className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                  }`}
-                />
-              </div>
-            </div>
-
             <div>
-              <label className="block text-sm font-medium mb-2">SIGNATURE</label>
-              <textarea
-                name="coSignature"
-                value={formData.coSignature}
-                onChange={handleInputChange}
-                placeholder="signature"
-                rows={3}
-                disabled={!isEdit}
+              <label className="block text-sm font-medium mb-2">DATE</label>
+              <input
+                type="date"
+                value={formData.commander_date}
+                onChange={(e) => handleInputChange('commander_date', e.target.value)}
+                disabled={!isEdit || isLoading}
                 className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
                 }`}
               />
             </div>
-          </div>
-        </div>
-
-        {/* BN Commander or Equivalent */}
-        <div>
-          <h3 className="text-base font-semibold mb-4">b. BN COMMANDER OR EQUIVALENT</h3>
-
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">FINDING</label>
-              <textarea
-                name="bnFinding"
-                value={formData.bnFinding}
-                onChange={handleInputChange}
-                placeholder="Write here"
-                rows={3}
-                className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">AWARD</label>
-              <input
-                type="text"
-                name="bnAward"
-                value={formData.bnAward}
-                onChange={handleInputChange}
-                placeholder="Write here"
-                className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">RECOMMENDATIONS</label>
-              <textarea
-                name="bnRecommendations"
-                value={formData.bnRecommendations}
-                onChange={handleInputChange}
-                placeholder="Write here"
-                rows={3}
-                className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">DATE</label>
-                <input
-                  type="text"
-                  name="bnDate"
-                  value={formData.bnDate}
-                  onChange={handleInputChange}
-                  placeholder="Write here"
-                  className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">RANK</label>
-                <input
-                  type="text"
-                  name="bnRank"
-                  value={formData.bnRank}
-                  onChange={handleInputChange}
-                  placeholder="Write here"
-                  className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">NAME</label>
-                <input
-                  type="text"
-                  name="bnName"
-                  value={formData.bnName}
-                  onChange={handleInputChange}
-                  placeholder="Write here"
-                  className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">NUMBER</label>
-                <input
-                  type="text"
-                  name="bnNumber"
-                  value={formData.bnNumber}
-                  onChange={handleInputChange}
-                  placeholder="Write here"
-                  className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-            </div>
 
             <div>
               <label className="block text-sm font-medium mb-2">SIGNATURE</label>
-              <textarea
-                name="bnSignature"
-                value={formData.bnSignature}
-                onChange={handleInputChange}
-                placeholder="Write here"
-                rows={3}
-                className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              <input
+                type="file"
+                onChange={(e) =>
+                  handleFileChange('commander_signature', e.target.files?.[0] || null)
+                }
+                disabled={!isEdit || isLoading}
+                accept="image/*,.pdf"
+                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                }`}
               />
+              {formData.commander_signature && (
+                <p className="text-sm text-gray-600 mt-1">
+                  Selected: {formData.commander_signature}
+                </p>
+              )}
             </div>
           </div>
         </div>
 
-        {/* BDE/GAR Commander or Equivalent */}
+        {/* Section 6: Battalion Commander */}
         <div>
-          <h3 className="text-base font-semibold mb-4">c. BDE/GAR COMMANDER OR EQUIVALENT</h3>
+          <h2 className="text-lg font-semibold mb-4 underline">6 BATTALION COMMANDER</h2>
 
           <div className="space-y-4">
+            <div className="relative">
+              <label className="block text-sm font-medium mb-2">OFFICER</label>
+              <input
+                type="text"
+                value={formData.bn_commander_officer_number || ''}
+                onChange={(e) => handleOfficerSearch('bn_commander_officer_id', e.target.value)}
+                placeholder="Search by name or service number"
+                disabled={!isEdit || isLoading}
+                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                }`}
+              />
+              {openOfficerDropdown === 'bn_commander_officer_id' &&
+                formData.bn_commander_officer_number &&
+                filteredOfficers['bn_commander_officer_id']?.length > 0 && (
+                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                    {filteredOfficers['bn_commander_officer_id'].map((officer: any) => (
+                      <button
+                        key={officer.id}
+                        type="button"
+                        onClick={() => handleOfficerSelect('bn_commander_officer_id', officer)}
+                        className="w-full px-4 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
+                      >
+                        <div className="flex justify-between">
+                          <p>{officer.name}</p>
+                          <p className="text-gray-600">{officer.serviceNumber}</p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+            </div>
+
             <div>
               <label className="block text-sm font-medium mb-2">FINDINGS</label>
               <textarea
-                name="bdeFindings"
-                value={formData.bdeFindings}
-                onChange={handleInputChange}
-                placeholder="findings"
+                value={formData.bn_commander_findings}
+                onChange={(e) => handleInputChange('bn_commander_findings', e.target.value)}
+                placeholder="Findings"
                 rows={3}
-                className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                disabled={!isEdit || isLoading}
+                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                }`}
               />
             </div>
 
@@ -753,112 +693,114 @@ export default function DisciplineForm({ isEdit = true, mockData }: DisciplineFo
               <label className="block text-sm font-medium mb-2">AWARD</label>
               <input
                 type="text"
-                name="bdeAward"
-                value={formData.bdeAward}
-                onChange={handleInputChange}
-                placeholder="Punishable under section"
-                className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                value={formData.bn_commander_award}
+                onChange={(e) => handleInputChange('bn_commander_award', e.target.value)}
+                placeholder="Award"
+                disabled={!isEdit || isLoading}
+                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                }`}
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-2">RECOMMENDATIONS</label>
-              <input
-                type="text"
-                name="bdeRecommendations"
-                value={formData.bdeRecommendations}
-                onChange={handleInputChange}
-                placeholder="Punishable under section"
-                className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              <textarea
+                value={formData.bn_commander_recommendations}
+                onChange={(e) => handleInputChange('bn_commander_recommendations', e.target.value)}
+                placeholder="Recommendations"
+                rows={3}
+                disabled={!isEdit || isLoading}
+                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                }`}
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">DATE</label>
-                <input
-                  type="text"
-                  name="bdeDate"
-                  value={formData.bdeDate}
-                  onChange={handleInputChange}
-                  placeholder="DD/MM/YY"
-                  className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">RANK</label>
-                <select
-                  name="bdeRank"
-                  value={formData.bdeRank}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  {rankOptions.map((rank) => (
-                    <option key={rank} value={rank === 'Rank' ? '' : rank}>
-                      {rank}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">NAME</label>
-                <input
-                  type="text"
-                  name="bdeName"
-                  value={formData.bdeName}
-                  onChange={handleInputChange}
-                  placeholder="Full name"
-                  className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">NUMBER</label>
-                <input
-                  type="text"
-                  name="bdeNumber"
-                  value={formData.bdeNumber}
-                  onChange={handleInputChange}
-                  placeholder="Number"
-                  className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">DATE</label>
+              <input
+                type="date"
+                value={formData.bn_commander_date}
+                onChange={(e) => handleInputChange('bn_commander_date', e.target.value)}
+                disabled={!isEdit || isLoading}
+                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                }`}
+              />
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-2">SIGNATURE</label>
-              <textarea
-                name="bdeSignature"
-                value={formData.bdeSignature}
-                onChange={handleInputChange}
-                placeholder="signature"
-                rows={3}
-                className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              <input
+                type="file"
+                onChange={(e) =>
+                  handleFileChange('bn_commander_signature', e.target.files?.[0] || null)
+                }
+                disabled={!isEdit || isLoading}
+                accept="image/*,.pdf"
+                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                }`}
               />
+              {formData.bn_commander_signature && (
+                <p className="text-sm text-gray-600 mt-1">
+                  Selected: {formData.bn_commander_signature}
+                </p>
+              )}
             </div>
           </div>
         </div>
 
-        {/* General Officer Commanding or Equivalent */}
+        {/* Section 7: Brigade Commander */}
         <div>
-          <h3 className="text-base font-semibold mb-4">
-            d. GENERAL OFFICER COMMANDING OR EQUIVALENT
-          </h3>
+          <h2 className="text-lg font-semibold mb-4 underline">7 BRIGADE COMMANDER</h2>
 
           <div className="space-y-4">
+            <div className="relative">
+              <label className="block text-sm font-medium mb-2">OFFICER</label>
+              <input
+                type="text"
+                value={formData.bde_commander_officer_number || ''}
+                onChange={(e) => handleOfficerSearch('bde_commander_officer_id', e.target.value)}
+                placeholder="Search by name or service number"
+                disabled={!isEdit || isLoading}
+                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                }`}
+              />
+              {openOfficerDropdown === 'bde_commander_officer_id' &&
+                formData.bde_commander_officer_number &&
+                filteredOfficers['bde_commander_officer_id']?.length > 0 && (
+                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                    {filteredOfficers['bde_commander_officer_id'].map((officer: any) => (
+                      <button
+                        key={officer.id}
+                        type="button"
+                        onClick={() => handleOfficerSelect('bde_commander_officer_id', officer)}
+                        className="w-full px-4 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
+                      >
+                        <div className="flex justify-between">
+                          <p>{officer.name}</p>
+                          <p className="text-gray-600">{officer.serviceNumber}</p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+            </div>
+
             <div>
               <label className="block text-sm font-medium mb-2">FINDINGS</label>
               <textarea
-                name="gocFindings"
-                value={formData.gocFindings}
-                onChange={handleInputChange}
-                placeholder="findings"
+                value={formData.bde_commander_findings}
+                onChange={(e) => handleInputChange('bde_commander_findings', e.target.value)}
+                placeholder="Findings"
                 rows={3}
-                className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                disabled={!isEdit || isLoading}
+                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                }`}
               />
             </div>
 
@@ -866,92 +808,176 @@ export default function DisciplineForm({ isEdit = true, mockData }: DisciplineFo
               <label className="block text-sm font-medium mb-2">AWARD</label>
               <input
                 type="text"
-                name="gocAward"
-                value={formData.gocAward}
-                onChange={handleInputChange}
-                placeholder="Punishable under section"
-                className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                value={formData.bde_commander_award}
+                onChange={(e) => handleInputChange('bde_commander_award', e.target.value)}
+                placeholder="Award"
+                disabled={!isEdit || isLoading}
+                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                }`}
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-2">RECOMMENDATIONS</label>
-              <input
-                type="text"
-                name="gocRecommendations"
-                value={formData.gocRecommendations}
-                onChange={handleInputChange}
-                placeholder="Punishable under section"
-                className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              <textarea
+                value={formData.bde_commander_recommendations}
+                onChange={(e) => handleInputChange('bde_commander_recommendations', e.target.value)}
+                placeholder="Recommendations"
+                rows={3}
+                disabled={!isEdit || isLoading}
+                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                }`}
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">DATE</label>
-                <input
-                  type="text"
-                  name="gocDate"
-                  value={formData.gocDate}
-                  onChange={handleInputChange}
-                  placeholder="DD/MM/YY"
-                  className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">RANK</label>
-                <select
-                  name="gocRank"
-                  value={formData.gocRank}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  {rankOptions.map((rank) => (
-                    <option key={rank} value={rank === 'Rank' ? '' : rank}>
-                      {rank}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">NAME</label>
-                <input
-                  type="text"
-                  name="gocName"
-                  value={formData.gocName}
-                  onChange={handleInputChange}
-                  placeholder="Full name"
-                  className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">NUMBER</label>
-                <input
-                  type="text"
-                  name="gocNumber"
-                  value={formData.gocNumber}
-                  onChange={handleInputChange}
-                  placeholder="Number"
-                  className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">DATE</label>
+              <input
+                type="date"
+                value={formData.bde_commander_date}
+                onChange={(e) => handleInputChange('bde_commander_date', e.target.value)}
+                disabled={!isEdit || isLoading}
+                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                }`}
+              />
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-2">SIGNATURE</label>
-              <textarea
-                name="gocSignature"
-                value={formData.gocSignature}
-                onChange={handleInputChange}
-                placeholder="signature"
-                rows={3}
-                className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              <input
+                type="file"
+                onChange={(e) =>
+                  handleFileChange('bde_commander_signature', e.target.files?.[0] || null)
+                }
+                disabled={!isEdit || isLoading}
+                accept="image/*,.pdf"
+                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                }`}
               />
+              {formData.bde_commander_signature && (
+                <p className="text-sm text-gray-600 mt-1">
+                  Selected: {formData.bde_commander_signature}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Section 8: General Commander */}
+        <div>
+          <h2 className="text-lg font-semibold mb-4 underline">8 GENERAL COMMANDER</h2>
+
+          <div className="space-y-4">
+            <div className="relative">
+              <label className="block text-sm font-medium mb-2">OFFICER</label>
+              <input
+                type="text"
+                value={formData.gen_commander_officer_number || ''}
+                onChange={(e) => handleOfficerSearch('gen_commander_officer_id', e.target.value)}
+                placeholder="Search by name or service number"
+                disabled={!isEdit || isLoading}
+                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                }`}
+              />
+              {openOfficerDropdown === 'gen_commander_officer_id' &&
+                formData.gen_commander_officer_number &&
+                filteredOfficers['gen_commander_officer_id']?.length > 0 && (
+                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                    {filteredOfficers['gen_commander_officer_id'].map((officer: any) => (
+                      <button
+                        key={officer.id}
+                        type="button"
+                        onClick={() => handleOfficerSelect('gen_commander_officer_id', officer)}
+                        className="w-full px-4 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
+                      >
+                        <div className="flex justify-between">
+                          <p>{officer.name}</p>
+                          <p className="text-gray-600">{officer.serviceNumber}</p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">FINDINGS</label>
+              <textarea
+                value={formData.gen_commander_findings}
+                onChange={(e) => handleInputChange('gen_commander_findings', e.target.value)}
+                placeholder="Findings"
+                rows={3}
+                disabled={!isEdit || isLoading}
+                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                }`}
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">AWARD</label>
+              <input
+                type="text"
+                value={formData.gen_commander_award}
+                onChange={(e) => handleInputChange('gen_commander_award', e.target.value)}
+                placeholder="Award"
+                disabled={!isEdit || isLoading}
+                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                }`}
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">RECOMMENDATIONS</label>
+              <textarea
+                value={formData.gen_commander_recommendations}
+                onChange={(e) => handleInputChange('gen_commander_recommendations', e.target.value)}
+                placeholder="Recommendations"
+                rows={3}
+                disabled={!isEdit || isLoading}
+                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                }`}
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">DATE</label>
+              <input
+                type="date"
+                value={formData.gen_commander_date}
+                onChange={(e) => handleInputChange('gen_commander_date', e.target.value)}
+                disabled={!isEdit || isLoading}
+                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                }`}
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">SIGNATURE</label>
+              <input
+                type="file"
+                onChange={(e) =>
+                  handleFileChange('gen_commander_signature', e.target.files?.[0] || null)
+                }
+                disabled={!isEdit || isLoading}
+                accept="image/*,.pdf"
+                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                }`}
+              />
+              {formData.gen_commander_signature && (
+                <p className="text-sm text-gray-600 mt-1">
+                  Selected: {formData.gen_commander_signature}
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -981,18 +1007,18 @@ export default function DisciplineForm({ isEdit = true, mockData }: DisciplineFo
         {/* Submit Button */}
         <div className="flex justify-center pt-6">
           <button
-            type="submit"
-            disabled={!isEdit}
+            onClick={handleSave}
+            disabled={!isEdit || isLoading}
             className={`font-medium py-3 px-8 rounded transition-colors duration-200 ${
-              !isEdit
+              !isEdit || isLoading
                 ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                 : 'bg-teal-600 hover:bg-teal-700 text-white'
             }`}
           >
-            Save
+            {isLoading ? 'Saving...' : 'Save'}
           </button>
         </div>
-      </form>
+      </div>
     </div>
   );
 }

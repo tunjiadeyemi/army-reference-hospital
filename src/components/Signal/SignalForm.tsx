@@ -1,59 +1,137 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from 'react';
-
-// Mock data for view mode
+import { useState, useRef, useEffect } from 'react';
+import { showError } from '../../utils/toast';
+import {
+  useCreateSignalForm,
+  useUpdateSignalForm
+} from '../../hooks/dashboardhooks/useDasboardData';
 
 interface SignalFormProps {
   isEdit?: boolean;
   mockData?: any;
+  onSuccess?: () => void;
+  isLoading?: boolean;
 }
 
-export default function SignalForm({ isEdit = true, mockData }: SignalFormProps) {
+export default function SignalForm({
+  isEdit = true,
+  mockData,
+  onSuccess,
+  isLoading = false
+}: SignalFormProps) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const createMutation = useCreateSignalForm();
+  const updateMutation = useUpdateSignalForm();
+
   const [formData, setFormData] = useState({
-    drafterName: isEdit ? '' : mockData?.drafterName,
-    from: isEdit ? '' : mockData?.from,
-    to: isEdit ? '' : mockData?.to,
-    info: isEdit ? '' : mockData?.info,
-    precedenceAction: isEdit ? '' : mockData?.precedenceAction,
-    branch: isEdit ? '' : mockData?.branch,
-    precedenceInfo: isEdit ? '' : mockData?.precedenceInfo,
-    telephoneNumber: isEdit ? '' : mockData?.telephoneNumber,
-    dateTimeGroupMonth: isEdit ? '' : mockData?.dateTimeGroupMonth,
-    digSerialNo: isEdit ? '' : mockData?.digSerialNo,
-    nameInBlockLetters: isEdit ? '' : mockData?.nameInBlockLetters,
-    messageInstructions: isEdit ? '' : mockData?.messageInstructions,
-    releasingOfficerRank: isEdit ? '' : mockData?.releasingOfficerRank,
-    securityClassification: isEdit ? '' : mockData?.securityClassification,
-    originatorNumber: isEdit ? '' : mockData?.originatorNumber,
-    text: isEdit ? '' : mockData?.text,
-    internalDistribution: isEdit ? '' : mockData?.internalDistribution,
-    fileNumberReference: isEdit ? '' : mockData?.fileNumberReference,
-    pageNumber: isEdit ? '1' : mockData?.pageNumber,
-    totalPages: isEdit ? '1' : mockData?.totalPages,
-    additionalInfo: isEdit ? '' : mockData?.additionalInfo,
-    thisMessageAppropriate: isEdit ? false : mockData?.thisMessageAppropriate !== undefined,
-    refersToClassified: isEdit ? false : mockData?.refersToClassified !== undefined,
-    doesNotReferClassified: isEdit ? false : mockData?.doesNotReferClassified !== undefined,
-    commGenSerial: isEdit ? '' : mockData?.commGenSerial,
-    seniorReceived: isEdit ? '' : mockData?.seniorReceived,
-    system: isEdit ? '' : mockData?.system,
-    timeInOut: isEdit ? '' : mockData?.timeInOut
+    drafter_name_in: mockData?.drafter_name_in || '',
+    from: mockData?.from || '',
+    to: mockData?.to || '',
+    info: mockData?.info || '',
+    precedence_a_action: mockData?.precedence_a_action || '',
+    branch: mockData?.branch || '',
+    precedence_info: mockData?.precedence_info || '',
+    telephone_number: mockData?.telephone_number || '',
+    date_time_group_month: mockData?.date_time_group_month || '',
+    dig_serial_no: mockData?.dig_serial_no || '',
+    name_in_block_letters: mockData?.name_in_block_letters || '',
+    message_instructions: mockData?.message_instructions || '',
+    releasing_officer_rank: mockData?.releasing_officer_rank || '',
+    security_classification: mockData?.security_classification || '',
+    originator_number: mockData?.originator_number || '',
+    text: mockData?.text || '',
+    internal_distribution: mockData?.internal_distribution || '',
+    file_number_or_reference: mockData?.file_number_or_reference || '',
+    page_details: mockData?.page_details || '',
+    classification_status: mockData?.classification_status || false,
+    comm_gen_serial: mockData?.comm_gen_serial || '',
+    senior_received: mockData?.senior_received || '',
+    system: mockData?.system || '',
+    time_in_out: mockData?.time_in_out || '',
+    upload: null as File | null
   });
 
-  const handleInputChange = (e: any) => {
-    if (!isEdit) return; // Only allow changes when in edit mode
+  // Update form when mockData changes
+  useEffect(() => {
+    if (mockData) {
+      setFormData((prev) => ({
+        ...prev,
+        drafter_name_in: mockData?.drafter_name_in || '',
+        from: mockData?.from || '',
+        to: mockData?.to || '',
+        info: mockData?.info || '',
+        precedence_a_action: mockData?.precedence_a_action || '',
+        branch: mockData?.branch || '',
+        precedence_info: mockData?.precedence_info || '',
+        telephone_number: mockData?.telephone_number || '',
+        date_time_group_month: mockData?.date_time_group_month || '',
+        dig_serial_no: mockData?.dig_serial_no || '',
+        name_in_block_letters: mockData?.name_in_block_letters || '',
+        message_instructions: mockData?.message_instructions || '',
+        releasing_officer_rank: mockData?.releasing_officer_rank || '',
+        security_classification: mockData?.security_classification || '',
+        originator_number: mockData?.originator_number || '',
+        text: mockData?.text || '',
+        internal_distribution: mockData?.internal_distribution || '',
+        file_number_or_reference: mockData?.file_number_or_reference || '',
+        page_details: mockData?.page_details || '',
+        classification_status: mockData?.classification_status || false,
+        comm_gen_serial: mockData?.comm_gen_serial || '',
+        senior_received: mockData?.senior_received || '',
+        system: mockData?.system || '',
+        time_in_out: mockData?.time_in_out || ''
+      }));
+    }
+  }, [mockData]);
 
-    const { name, value, type, checked } = e.target;
+  const handleInsertSignatureClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleRemoveFile = () => {
     setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      upload: null
     }));
   };
 
-  const handleSubmit = (e: any) => {
+  const handleInputChange = (e: any) => {
+    if (!isEdit) return;
+
+    const { name, value, type, checked, files } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : type === 'file' ? files?.[0] || null : value
+    }));
+  };
+
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
-    console.log('Form Data:', formData);
-    alert('Form saved successfully!');
+
+    if (!formData.drafter_name_in.trim()) {
+      showError('Drafter name is required');
+      return;
+    }
+
+    try {
+      console.log('[SignalForm] Submitting with data:', formData);
+
+      // Use update mutation if ID exists, otherwise create
+      const isUpdate = mockData?.id;
+      const mutation = isUpdate ? updateMutation : createMutation;
+
+      // Pass ID in payload for update
+      const payload = isUpdate ? { ...formData, id: mockData.id } : formData;
+
+      await mutation.mutateAsync(payload);
+
+      console.log('[SignalForm] Success!');
+      if (onSuccess) onSuccess();
+    } catch (error) {
+      console.error('[SignalForm] Error:', error);
+    }
   };
 
   const rankOptions = [
@@ -109,13 +187,13 @@ export default function SignalForm({ isEdit = true, mockData }: SignalFormProps)
             <label className="block text-sm font-medium mb-2">DRAFTER'S NAME IN</label>
             <input
               type="text"
-              name="drafterName"
-              value={formData.drafterName}
+              name="drafter_name_in"
+              value={formData.drafter_name_in}
               onChange={handleInputChange}
               placeholder="Drafter's Name in block letters"
-              disabled={!isEdit}
+              disabled={!isEdit || isLoading}
               className={`w-64 p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
               }`}
             />
           </div>
@@ -133,9 +211,9 @@ export default function SignalForm({ isEdit = true, mockData }: SignalFormProps)
               value={formData.from}
               onChange={handleInputChange}
               placeholder="from"
-              disabled={!isEdit}
+              disabled={!isEdit || isLoading}
               className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
               }`}
             />
           </div>
@@ -148,9 +226,9 @@ export default function SignalForm({ isEdit = true, mockData }: SignalFormProps)
               value={formData.to}
               onChange={handleInputChange}
               placeholder="to"
-              disabled={!isEdit}
+              disabled={!isEdit || isLoading}
               className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
               }`}
             />
           </div>
@@ -163,9 +241,9 @@ export default function SignalForm({ isEdit = true, mockData }: SignalFormProps)
               onChange={handleInputChange}
               placeholder="info"
               rows={4}
-              disabled={!isEdit}
+              disabled={!isEdit || isLoading}
               className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
               }`}
             />
           </div>
@@ -177,13 +255,13 @@ export default function SignalForm({ isEdit = true, mockData }: SignalFormProps)
             <label className="block text-sm font-medium mb-2">PRECEDENCE - A - ACTION</label>
             <input
               type="text"
-              name="precedenceAction"
-              value={formData.precedenceAction}
+              name="precedence_a_action"
+              value={formData.precedence_a_action}
               onChange={handleInputChange}
               placeholder="precedence"
-              disabled={!isEdit}
+              disabled={!isEdit || isLoading}
               className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
               }`}
             />
           </div>
@@ -196,9 +274,9 @@ export default function SignalForm({ isEdit = true, mockData }: SignalFormProps)
               value={formData.branch}
               onChange={handleInputChange}
               placeholder="branch"
-              disabled={!isEdit}
+              disabled={!isEdit || isLoading}
               className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
               }`}
             />
           </div>
@@ -207,11 +285,14 @@ export default function SignalForm({ isEdit = true, mockData }: SignalFormProps)
             <label className="block text-sm font-medium mb-2">PRECEDENCE - INFO</label>
             <input
               type="text"
-              name="precedenceInfo"
-              value={formData.precedenceInfo}
+              name="precedence_info"
+              value={formData.precedence_info}
               onChange={handleInputChange}
               placeholder="precedence"
-              className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              disabled={isLoading}
+              className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+              }`}
             />
           </div>
         </div>
@@ -222,11 +303,14 @@ export default function SignalForm({ isEdit = true, mockData }: SignalFormProps)
             <label className="block text-sm font-medium mb-2">TELEPHONE NUMBER</label>
             <input
               type="text"
-              name="telephoneNumber"
-              value={formData.telephoneNumber}
+              name="telephone_number"
+              value={formData.telephone_number}
               onChange={handleInputChange}
               placeholder="telephone number"
-              className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              disabled={isLoading}
+              className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+              }`}
             />
           </div>
 
@@ -234,11 +318,14 @@ export default function SignalForm({ isEdit = true, mockData }: SignalFormProps)
             <label className="block text-sm font-medium mb-2">DATE TIME GROUP MONTH</label>
             <input
               type="text"
-              name="dateTimeGroupMonth"
-              value={formData.dateTimeGroupMonth}
+              name="date_time_group_month"
+              value={formData.date_time_group_month}
               onChange={handleInputChange}
               placeholder="70"
-              className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              disabled={isLoading}
+              className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+              }`}
             />
           </div>
 
@@ -246,11 +333,14 @@ export default function SignalForm({ isEdit = true, mockData }: SignalFormProps)
             <label className="block text-sm font-medium mb-2">DIG SERIAL NO (if used)</label>
             <input
               type="text"
-              name="digSerialNo"
-              value={formData.digSerialNo}
+              name="dig_serial_no"
+              value={formData.dig_serial_no}
               onChange={handleInputChange}
               placeholder="Dig"
-              className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              disabled={isLoading}
+              className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+              }`}
             />
           </div>
         </div>
@@ -261,23 +351,29 @@ export default function SignalForm({ isEdit = true, mockData }: SignalFormProps)
             <label className="block text-sm font-medium mb-2">NAME IN BLOCK LETTERS</label>
             <input
               type="text"
-              name="nameInBlockLetters"
-              value={formData.nameInBlockLetters}
+              name="name_in_block_letters"
+              value={formData.name_in_block_letters}
               onChange={handleInputChange}
               placeholder="name in block letters"
-              className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              disabled={isLoading}
+              className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+              }`}
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium mb-2">MESSAGE INSTRUCTIONS</label>
             <textarea
-              name="messageInstructions"
-              value={formData.messageInstructions}
+              name="message_instructions"
+              value={formData.message_instructions}
               onChange={handleInputChange}
               placeholder="message instructions"
               rows={4}
-              className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              disabled={isLoading}
+              className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+              }`}
             />
           </div>
         </div>
@@ -291,24 +387,56 @@ export default function SignalForm({ isEdit = true, mockData }: SignalFormProps)
             <div className="flex justify-center">
               <button
                 type="button"
-                disabled={!isEdit}
+                onClick={handleInsertSignatureClick}
+                disabled={!isEdit || isLoading}
                 className={`px-4 py-2 rounded transition-colors ${
-                  !isEdit
+                  !isEdit || isLoading
                     ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                 }`}
               >
                 Insert signature
               </button>
+
+              {/* Hidden file input */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                name="upload"
+                onChange={handleInputChange}
+                disabled={!isEdit || isLoading}
+                className="hidden"
+              />
             </div>
 
+            {formData.upload && (
+              <div className="border border-gray-300 rounded-lg p-3 flex items-center justify-between">
+                <p className="text-sm text-gray-700 font-medium">{formData.upload.name}</p>
+                <button
+                  type="button"
+                  onClick={handleRemoveFile}
+                  disabled={isLoading}
+                  className="text-gray-500 hover:text-red-600 transition-colors"
+                  title="Remove file"
+                >
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                      fillRule="evenodd"
+                      d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </button>
+              </div>
+            )}
+
             <select
-              name="releasingOfficerRank"
-              value={formData.releasingOfficerRank}
+              name="releasing_officer_rank"
+              value={formData.releasing_officer_rank}
               onChange={handleInputChange}
-              disabled={!isEdit}
+              disabled={!isEdit || isLoading}
               className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
               }`}
             >
               {rankOptions.map((rank) => (
@@ -328,11 +456,14 @@ export default function SignalForm({ isEdit = true, mockData }: SignalFormProps)
           </label>
           <input
             type="text"
-            name="securityClassification"
-            value={formData.securityClassification}
+            name="security_classification"
+            value={formData.security_classification}
             onChange={handleInputChange}
             placeholder="70"
-            className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            disabled={isLoading}
+            className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+              isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+            }`}
           />
         </div>
 
@@ -341,11 +472,14 @@ export default function SignalForm({ isEdit = true, mockData }: SignalFormProps)
           <label className="block text-sm font-medium mb-2">ORIGINATOR'S NUMBER</label>
           <input
             type="text"
-            name="originatorNumber"
-            value={formData.originatorNumber}
+            name="originator_number"
+            value={formData.originator_number}
             onChange={handleInputChange}
             placeholder="01"
-            className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            disabled={isLoading}
+            className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+              isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+            }`}
           />
         </div>
 
@@ -358,9 +492,9 @@ export default function SignalForm({ isEdit = true, mockData }: SignalFormProps)
             onChange={handleInputChange}
             placeholder="Write here"
             rows={8}
-            disabled={!isEdit}
+            disabled={!isEdit || isLoading}
             className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-              !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+              !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
             }`}
           />
         </div>
@@ -374,14 +508,14 @@ export default function SignalForm({ isEdit = true, mockData }: SignalFormProps)
                 INTERNAL DISTRIBUTION AG CMD'S FILE
               </label>
               <textarea
-                name="internalDistribution"
-                value={formData.internalDistribution}
+                name="internal_distribution"
+                value={formData.internal_distribution}
                 onChange={handleInputChange}
                 placeholder="Write here"
                 rows={3}
-                disabled={!isEdit}
+                disabled={!isEdit || isLoading}
                 className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
                 }`}
               />
             </div>
@@ -390,32 +524,18 @@ export default function SignalForm({ isEdit = true, mockData }: SignalFormProps)
               <div className="flex items-center space-x-3">
                 <input
                   type="checkbox"
-                  name="thisMessageAppropriate"
-                  checked={formData.thisMessageAppropriate}
+                  name="classification_status"
+                  checked={formData.classification_status}
                   onChange={handleInputChange}
-                  disabled={!isEdit}
+                  disabled={!isEdit || isLoading}
                   className={`w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 ${
-                    !isEdit ? 'cursor-not-allowed opacity-50' : ''
+                    !isEdit || isLoading ? 'cursor-not-allowed opacity-50' : ''
                   }`}
                 />
                 <div>
                   <div className="font-medium">This message (tick as appropriate)</div>
                   <div className="text-sm text-gray-600">Refers to classified message</div>
                 </div>
-              </div>
-
-              <div className="flex items-center space-x-3">
-                <input
-                  type="checkbox"
-                  name="doesNotReferClassified"
-                  checked={formData.doesNotReferClassified}
-                  onChange={handleInputChange}
-                  disabled={!isEdit}
-                  className={`w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 ${
-                    !isEdit ? 'cursor-not-allowed opacity-50' : ''
-                  }`}
-                />
-                <div className="text-sm text-gray-600">Does not refer to a classified message</div>
               </div>
             </div>
 
@@ -424,11 +544,14 @@ export default function SignalForm({ isEdit = true, mockData }: SignalFormProps)
                 <label className="block text-sm font-medium mb-2">COMM./GEN SERIAL</label>
                 <input
                   type="text"
-                  name="commGenSerial"
-                  value={formData.commGenSerial}
+                  name="comm_gen_serial"
+                  value={formData.comm_gen_serial}
                   onChange={handleInputChange}
                   placeholder="Write here"
-                  className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  disabled={isLoading}
+                  className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                  }`}
                 />
               </div>
 
@@ -436,11 +559,14 @@ export default function SignalForm({ isEdit = true, mockData }: SignalFormProps)
                 <label className="block text-sm font-medium mb-2">SENIOR RECEIVED</label>
                 <input
                   type="text"
-                  name="seniorReceived"
-                  value={formData.seniorReceived}
+                  name="senior_received"
+                  value={formData.senior_received}
                   onChange={handleInputChange}
                   placeholder="Write here"
-                  className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  disabled={isLoading}
+                  className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                  }`}
                 />
               </div>
             </div>
@@ -454,7 +580,10 @@ export default function SignalForm({ isEdit = true, mockData }: SignalFormProps)
                   value={formData.system}
                   onChange={handleInputChange}
                   placeholder="Write here"
-                  className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  disabled={isLoading}
+                  className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                  }`}
                 />
               </div>
 
@@ -462,11 +591,14 @@ export default function SignalForm({ isEdit = true, mockData }: SignalFormProps)
                 <label className="block text-sm font-medium mb-2">TIME IN/OUT</label>
                 <input
                   type="text"
-                  name="timeInOut"
-                  value={formData.timeInOut}
+                  name="time_in_out"
+                  value={formData.time_in_out}
                   onChange={handleInputChange}
                   placeholder="Write here"
-                  className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  disabled={isLoading}
+                  className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                  }`}
                 />
               </div>
             </div>
@@ -477,12 +609,15 @@ export default function SignalForm({ isEdit = true, mockData }: SignalFormProps)
             <div>
               <label className="block text-sm font-medium mb-2">FILE NUMBER OR REFERENCE</label>
               <textarea
-                name="fileNumberReference"
-                value={formData.fileNumberReference}
+                name="file_number_or_reference"
+                value={formData.file_number_or_reference}
                 onChange={handleInputChange}
                 placeholder="Write here"
                 rows={3}
-                className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                disabled={isLoading}
+                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                }`}
               />
             </div>
 
@@ -492,7 +627,7 @@ export default function SignalForm({ isEdit = true, mockData }: SignalFormProps)
                 <input
                   type="text"
                   name="pageNumber"
-                  value={formData.pageNumber}
+                  value={formData.page_details}
                   onChange={handleInputChange}
                   className="w-8 text-center border-b border-gray-400 focus:border-blue-500 focus:outline-none"
                 />
@@ -500,7 +635,7 @@ export default function SignalForm({ isEdit = true, mockData }: SignalFormProps)
                 <input
                   type="text"
                   name="totalPages"
-                  value={formData.totalPages}
+                  value={formData.page_details}
                   onChange={handleInputChange}
                   className="w-8 text-center border-b border-gray-400 focus:border-blue-500 focus:outline-none"
                 />
@@ -508,8 +643,8 @@ export default function SignalForm({ isEdit = true, mockData }: SignalFormProps)
               </div>
 
               <textarea
-                name="additionalInfo"
-                value={formData.additionalInfo}
+                name="page_details"
+                value={formData.page_details}
                 onChange={handleInputChange}
                 placeholder="Write here"
                 rows={3}
@@ -523,14 +658,36 @@ export default function SignalForm({ isEdit = true, mockData }: SignalFormProps)
         <div className="flex justify-center pt-6">
           <button
             onClick={handleSubmit}
-            disabled={!isEdit}
-            className={`font-medium py-3 px-8 rounded transition-colors duration-200 ${
-              !isEdit
+            disabled={!isEdit || isLoading}
+            className={`font-medium py-3 px-8 rounded transition-colors duration-200 flex items-center gap-2 ${
+              !isEdit || isLoading
                 ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                 : 'bg-teal-600 hover:bg-teal-700 text-white'
             }`}
           >
-            Save
+            {isLoading && (
+              <svg
+                className="animate-spin h-5 w-5"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
+              </svg>
+            )}
+            {isLoading ? 'Saving...' : 'Save'}
           </button>
         </div>
       </div>

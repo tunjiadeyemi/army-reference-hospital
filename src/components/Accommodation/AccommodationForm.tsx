@@ -1,5 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from 'react';
+import { useGetOfficers } from '../UnitBible/hooks/useUnitBible';
+import {
+  useCreateAccomodation,
+  useGetAccomodations
+} from '../../hooks/dashboardhooks/useDasboardData';
+
+import { showSuccess } from '../../utils/toast';
 
 interface AccommodationFormProps {
   isEdit?: boolean;
@@ -10,14 +17,15 @@ export default function ArmyAllocationForm({ isEdit = true, mockData }: Accommod
   const [formData, setFormData] = useState(
     isEdit
       ? {
-          armyNumber: '',
-          rank: '',
+          officer_id: null,
+          serviceNumber: '',
+          // rank: '',
           name: '',
-          blockNo: '',
-          roomNo: '',
+          block_no: '',
+          room_no: '',
           unit: '',
-          allocationDate: '',
-          remark: ''
+          allocation_date: ''
+          // remark: ''
         }
       : {
           ...mockData
@@ -58,29 +66,119 @@ export default function ArmyAllocationForm({ isEdit = true, mockData }: Accommod
     handleInputChange('rank', rank);
     setIsRankDropdownOpen(false);
   };
+  
+  const [openOfficerNames, setOpenOfficerNames] = useState(false);
+  const handleSelectOfficer = (officer: any) => {
+    handleInputChange('name', officer.name);
+    handleInputChange('serviceNumber', officer.serviceNumber);
+    handleInputChange('rank', officer.rank);
+    const newArmyNumber = officer.serviceNumber;
 
+    const findId = officers.find(
+      (officer: any) =>
+        String(officer.serviceNumber).trim().toLowerCase() ===
+        String(newArmyNumber).trim().toLowerCase()
+    );
+    setOpenOfficerNames(false);
+    if (findId) {
+      setFormData((prev: any) => ({
+        ...prev,
+        officer_id: findId.id
+      }));
+    } else {
+      setFormData((prev: any) => ({
+        ...prev,
+        officer_id: null
+      }));
+    }
+  };
   const toggleRankDropdown = () => {
     if (!isEdit) return; // Only allow dropdown to open in edit mode
     setIsRankDropdownOpen(!isRankDropdownOpen);
   };
+  const { data: officers } = useGetOfficers();
+  const [filteredArmy, setFilteredArmy] = useState([]);
+  const [, setOfficerID] = useState({});
+  const handleSetOfficerId = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newArmyNumber = e.target.value;
+    console.log('ARMY NO.:', newArmyNumber);
 
+    setOpenOfficerNames(true);
+    handleInputChange('serviceNumber', newArmyNumber);
+
+    const filtered = officers.filter((officer: any) =>
+      officer.serviceNumber.toLowerCase().includes(newArmyNumber.toLowerCase())
+    );
+    setFilteredArmy(filtered);
+    const findId = officers.find(
+      (officer: any) =>
+        String(officer.serviceNumber).trim().toLowerCase() ===
+        String(newArmyNumber).trim().toLowerCase()
+    );
+    setOfficerID(findId);
+
+    if (findId) {
+      setFormData((prev: any) => ({
+        ...prev,
+        officer_id: findId.id
+      }));
+    } else {
+      setFormData((prev: any) => ({
+        ...prev,
+        officer_id: null
+      }));
+    }
+
+    console.log('Filtered officers:', filtered, findId);
+  };
+
+  const createMutation = useCreateAccomodation();
+  const { refetch } = useGetAccomodations();
+  const { isPending } = createMutation;
+  const handleSubmit = async () => {
+    try {
+      await createMutation.mutateAsync({ ...formData });
+      showSuccess('New Accomodation Allocated!');
+      await refetch();
+    } catch (err) {
+      console.log(err);
+    }
+    console.log('Form Data: ', formData);
+  };
   return (
     <div className="max-w-4xl mx-auto p-8 bg-white">
       <div className="space-y-8">
         {/* Army Number Field */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 items-center">
           <label className="text-gray-700 font-medium text-right">ARMY NUMBER</label>
-          <div className="lg:col-span-3">
+          <div className="lg:col-span-3 relative">
             <input
               type="text"
               placeholder="Army Number"
-              value={formData.armyNumber}
-              onChange={(e) => handleInputChange('armyNumber', e.target.value)}
+              value={formData.serviceNumber}
+              onChange={handleSetOfficerId}
               disabled={!isEdit}
               className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-colors ${
                 !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : 'placeholder-gray-400'
               }`}
             />
+            {openOfficerNames && formData.serviceNumber !== '' && filteredArmy.length > 0 && (
+              <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                {filteredArmy?.map((officer: any) => (
+                  <button
+                    key={officer.id}
+                    type="button"
+                    onClick={() => handleSelectOfficer(officer)}
+                    className="w-full px-4 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
+                  >
+                    <div className="flex justify-between">
+                      <p>{officer.name}</p>
+                      <p>{officer.serviceNumber}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
@@ -155,8 +253,8 @@ export default function ArmyAllocationForm({ isEdit = true, mockData }: Accommod
             <input
               type="text"
               placeholder="block"
-              value={formData.blockNo}
-              onChange={(e) => handleInputChange('blockNo', e.target.value)}
+              value={formData.block_no}
+              onChange={(e) => handleInputChange('block_no', e.target.value)}
               disabled={!isEdit}
               className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-colors ${
                 !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : 'placeholder-gray-400'
@@ -172,8 +270,8 @@ export default function ArmyAllocationForm({ isEdit = true, mockData }: Accommod
             <input
               type="text"
               placeholder="Room No"
-              value={formData.roomNo}
-              onChange={(e) => handleInputChange('roomNo', e.target.value)}
+              value={formData.room_no}
+              onChange={(e) => handleInputChange('room_no', e.target.value)}
               disabled={!isEdit}
               className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-colors ${
                 !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : 'placeholder-gray-400'
@@ -205,8 +303,8 @@ export default function ArmyAllocationForm({ isEdit = true, mockData }: Accommod
           <div className="lg:col-span-3 relative">
             <input
               type="date"
-              value={formData.allocationDate}
-              onChange={(e) => handleInputChange('allocationDate', e.target.value)}
+              value={formData.allocation_date}
+              onChange={(e) => handleInputChange('allocation_date', e.target.value)}
               disabled={!isEdit}
               className={`w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-colors ${
                 !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
@@ -221,7 +319,7 @@ export default function ArmyAllocationForm({ isEdit = true, mockData }: Accommod
         </div>
 
         {/* Remark Field */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 items-start">
+        {/* <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 items-start">
           <label className="text-gray-700 font-medium text-right pt-3">Remark</label>
           <div className="lg:col-span-3">
             <textarea
@@ -235,12 +333,13 @@ export default function ArmyAllocationForm({ isEdit = true, mockData }: Accommod
               }`}
             />
           </div>
-        </div>
+        </div> */}
 
         {/* Save Button */}
         <div className="flex justify-center pt-8">
           <button
             type="submit"
+            onClick={handleSubmit}
             disabled={!isEdit}
             className={`px-12 py-3 font-medium rounded-lg transition-colors ${
               isEdit
@@ -248,7 +347,7 @@ export default function ArmyAllocationForm({ isEdit = true, mockData }: Accommod
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
             }`}
           >
-            Save
+            {isPending ? 'Loading...' : 'Save'}
           </button>
         </div>
       </div>

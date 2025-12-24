@@ -328,7 +328,7 @@ export const OfficerBioDataForm: React.FC<OfficerBioDataFormProps> = ({
             <div>
               <label className="block text-sm   text-gray-700 mb-1">DATE OF BIRTH</label>
               <input
-                type="text"
+                type="date"
                 placeholder="DD/MM/YY"
                 className="w-full px-3 py-2 border  border-[#B1B8B7] placeholder:text-sm rounded-md outline-none"
                 value={formData.dateOfBirth}
@@ -356,7 +356,7 @@ export const OfficerBioDataForm: React.FC<OfficerBioDataFormProps> = ({
             <div>
               <label className="block text-sm   text-gray-700 mb-1">DATE OF COMMISSION</label>
               <input
-                type="text"
+                type="date"
                 placeholder="DD/MM/YY"
                 className="w-full px-3 py-2 border  border-[#B1B8B7] placeholder:text-sm rounded-md outline-none"
                 value={formData.dateOfCommission}
@@ -420,7 +420,7 @@ export const OfficerBioDataForm: React.FC<OfficerBioDataFormProps> = ({
             <div>
               <label className="block text-sm   text-gray-700 mb-1">DATE OF COMMISSION</label>
               <input
-                type="text"
+                type="date"
                 placeholder="DD/MM/YY"
                 className="w-full px-3 py-2 border  border-[#B1B8B7] placeholder:text-sm rounded-md outline-none"
                 value={formData.dateOfCommission2}
@@ -435,7 +435,7 @@ export const OfficerBioDataForm: React.FC<OfficerBioDataFormProps> = ({
             <div>
               <label className="block text-sm   text-gray-700 mb-1">DATE OF LAST PROMOTION</label>
               <input
-                type="text"
+                type="date"
                 placeholder="DD/MM/YY"
                 className="w-full px-3 py-2 border  border-[#B1B8B7] placeholder:text-sm rounded-md outline-none"
                 value={formData.dateOfLastPromotion}
@@ -448,7 +448,7 @@ export const OfficerBioDataForm: React.FC<OfficerBioDataFormProps> = ({
                 DATE OF TAKING ON STRENGTH
               </label>
               <input
-                type="text"
+                type="date"
                 placeholder="DD/MM/YY"
                 className="w-full px-3 py-2 border  border-[#B1B8B7] placeholder:text-sm rounded-md outline-none"
                 value={formData.dateOfTakingStrength}
@@ -477,7 +477,7 @@ export const OfficerBioDataForm: React.FC<OfficerBioDataFormProps> = ({
             <div>
               <label className="block text-sm   text-gray-700 mb-1">DATE OF POSTED IN</label>
               <input
-                type="text"
+                type="date"
                 placeholder="DD/MM/YY"
                 className="w-full px-3 py-2 border  border-[#B1B8B7] placeholder:text-sm rounded-md outline-none"
                 value={formData.dateOfPostedIn}
@@ -784,7 +784,7 @@ export const OfficerBioDataForm: React.FC<OfficerBioDataFormProps> = ({
                         className="w-4 h-4 text-gray-400"
                       />
                       <input
-                        type="text"
+                        type="date"
                         placeholder="Date"
                         className="flex-1 px-2 py-1 border border-gray-200 placeholder:text-sm rounded text-sm"
                         value={op.date}

@@ -1,14 +1,17 @@
 import { useContext, useState } from 'react';
 import Modal from '../Modal';
 import { AppContext } from '../../context/AppContext';
-import { mockMammyFormData, mockOrderData } from '../../utils/constants';
+import {  mockOrderData } from '../../utils/constants';
 
 import MammyForm from './MammyForm';
+// import { useGetMammyMarkets } from '../../hooks/dashboardhooks/useDasboardData';
 
 const MammyModal = () => {
   const [orderData, setOrderData] = useState(mockOrderData);
   const [editMode, setEditMode] = useState(false);
   const [editDraft, setEditDraft] = useState(orderData);
+
+ 
 
   const { setShowMammyModal, selectedMammyRecord } = useContext(AppContext);
 
@@ -41,7 +44,7 @@ const MammyModal = () => {
               <img src="/department/chevron-left.svg" alt="chevron-left" />
             </button>
 
-            <h1>{selectedMammyRecord}</h1>
+            <h1>{selectedMammyRecord.shop_owner}</h1>
           </div>
 
           <button
@@ -85,7 +88,7 @@ const MammyModal = () => {
         </div>
 
         {/* body */}
-        <MammyForm isEdit={editMode} mockData={mockMammyFormData} />
+        <MammyForm isEdit={editMode} mockData={selectedMammyRecord} />
       </div>
     </Modal>
   );

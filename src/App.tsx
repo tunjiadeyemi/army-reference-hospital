@@ -4,7 +4,7 @@ import './global.css';
 
 import Header from './components/Header';
 import Navigation from './components/Navigation';
-import { useContext} from 'react';
+import { useContext } from 'react';
 import { AppContext } from './context/AppContext';
 import AddRecordModal from './components/DepartmentFile/AddRecordModal';
 import ViewDutyReportModal from './components/DutyReport/ViewDutyReportModal';
@@ -28,7 +28,7 @@ import Providers from './provider/providers';
 import { Toaster } from 'react-hot-toast';
 import SickModal from './components/SickReport/SickModal';
 import UnitHoldingModal from './components/UnitHolding/UnitHoldingModal';
-
+import SignalModal from './components/Signal/SignalModal';
 
 const App = () => {
   const location = useLocation();
@@ -53,10 +53,10 @@ const App = () => {
     showVehicleModal,
     showUnitModal,
     showAdminDetails,
-    showUnitHoldingModal
+    showUnitHoldingModal,
+    showSignalModal
   } = useContext(AppContext);
 
-  
   return (
     <div className="flex items-start h-screen overflow-hidden overflow-y-auto">
       <Providers>
@@ -82,6 +82,7 @@ const App = () => {
           {showVehicleModal && <VehicleModal />}
           {showUnitModal && <UnitModal />}
           {showUnitHoldingModal && <UnitHoldingModal />}
+          {showSignalModal && <SignalModal />}
           {showAdminDetails && <AdminDetails />}
 
           <div

@@ -1,7 +1,7 @@
 import { useContext, useState } from 'react';
 import Modal from '../Modal';
 import { AppContext } from '../../context/AppContext';
-import { mockGuardFormData, mockOrderData } from '../../utils/constants';
+import { mockOrderData } from '../../utils/constants';
 
 import GuardForm from './GuardForm';
 
@@ -41,7 +41,7 @@ const GuardModal = () => {
               <img src="/department/chevron-left.svg" alt="chevron-left" />
             </button>
 
-            <h1>{selectedGuardRecord}</h1>
+            <h1>{selectedGuardRecord.name}</h1>
           </div>
 
           <button
@@ -85,7 +85,7 @@ const GuardModal = () => {
         </div>
 
         {/* body */}
-        <GuardForm isEdit={editMode} mockData={mockGuardFormData} />
+        <GuardForm isEdit={editMode} mockData={selectedGuardRecord} />
       </div>
     </Modal>
   );

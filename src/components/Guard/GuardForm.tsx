@@ -1,5 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from 'react';
+import { useContext, useState } from 'react';
+import { useGetOfficers } from '../UnitBible/hooks/useUnitBible';
+import {
+  useCreateGuardRoom,
+  useGetGuardRooms,
+  useUpdateGuardRoom
+} from '../../hooks/dashboardhooks/useDasboardData';
+import { showSuccess } from '../../utils/toast';
+import { AppContext } from '../../context/AppContext';
 
 interface GuardFormProps {
   isEdit?: boolean;
@@ -8,30 +16,35 @@ interface GuardFormProps {
 
 export default function GuardForm({ isEdit = true, mockData }: GuardFormProps) {
   const [formData, setFormData] = useState({
-    armyNumber: isEdit ? '' : mockData?.armyNumber,
+    officer_id: isEdit ? ' ' : mockData?.id,
+    serviceNumber: isEdit ? '' : mockData?.serviceNumber,
     rank: isEdit ? '' : mockData?.rank,
     name: isEdit ? '' : mockData?.name,
     offence: isEdit ? '' : mockData?.offence,
-    dateDetained: isEdit ? '' : mockData?.dateDetained,
-    detainedBy: isEdit ? '' : mockData?.detainedBy,
-    releasedBy: isEdit ? '' : mockData?.releasedBy,
+    date_detained: isEdit ? '' : mockData?.date_detained,
+    detained_by: isEdit ? '' : mockData?.detained_by,
+    released_by: isEdit ? '' : mockData?.released_by,
     remark: isEdit ? '' : mockData?.remark
   });
+  // const findOfficer = (armyNumber: string, officers: any[]) => {
+  //   if (!armyNumber || !officers?.length) return null;
 
-  const handleInputChange = (e: any) => {
-    if (!isEdit) return; // Only allow changes when in edit mode
+  //   const findId = officers.find(
+  //     (officer: any) =>
+  //       String(officer.serviceNumber).trim().toLowerCase() ===
+  //       String(armyNumber).trim().toLowerCase()
+  //   );
 
-    const { name, value } = e.target;
-    setFormData((prev) => ({
+  //   return findId || null;
+  // };
+  const handleInputChange = (field: keyof typeof formData, value: string) => {
+    if (!isEdit) return;
+    setFormData((prev: any) => ({
       ...prev,
-      [name]: value
+      [field]: value
     }));
   };
-
-  const handleSave = () => {
-    console.log('Form Data:', formData);
-    alert('Form saved successfully!');
-  };
+  const [openOfficerNames, setOpenOfficerNames] = useState(false);
 
   const rankOptions = [
     'Rank',
@@ -52,27 +65,131 @@ export default function GuardForm({ isEdit = true, mockData }: GuardFormProps) {
     'Lance Corporal',
     'Private'
   ];
+  const [filteredArmy, setFilteredArmy] = useState([]);
+  const { data: officers } = useGetOfficers();
+
+  const handleSelectOfficer = (officer: any) => {
+    handleInputChange('name', officer.name);
+    handleInputChange('serviceNumber', officer.serviceNumber);
+    handleInputChange('rank', officer.rank);
+    const newArmyNumber = officer.serviceNumber;
+
+    const findId = officers.find(
+      (officer: any) =>
+        String(officer.serviceNumber).trim().toLowerCase() ===
+        String(newArmyNumber).trim().toLowerCase()
+    );
+    setOpenOfficerNames(false);
+    if (findId) {
+      setFormData((prev: any) => ({
+        ...prev,
+        officer_id: findId.id
+      }));
+    } else {
+      setFormData((prev: any) => ({
+        ...prev,
+        officer_id: null
+      }));
+    }
+  };
+  const handleSetOfficerId = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newArmyNumber = e.target.value;
+    console.log('ARMY NO.:', newArmyNumber);
+
+    setOpenOfficerNames(true);
+    handleInputChange('serviceNumber', newArmyNumber);
+
+    const filtered = officers.filter((officer: any) =>
+      officer.serviceNumber.toLowerCase().includes(newArmyNumber.toLowerCase())
+    );
+    setFilteredArmy(filtered);
+    const findId = officers.find(
+      (officer: any) =>
+        String(officer.serviceNumber).trim().toLowerCase() ===
+        String(newArmyNumber).trim().toLowerCase()
+    );
+
+    if (findId) {
+      setFormData((prev: any) => ({
+        ...prev,
+        officer_id: findId.id
+      }));
+    } else {
+      setFormData((prev: any) => ({
+        ...prev,
+        officer_id: null
+      }));
+    }
+
+    console.log('Filtered officers:', filtered, findId);
+  };
+  const createMutation = useCreateGuardRoom();
+  const updateMutation = useUpdateGuardRoom();
+  const { refetch } = useGetGuardRooms();
+  const { showGuardModal } = useContext(AppContext);
+
+  const handleSave = async () => {
+    if (showGuardModal) {
+      try {
+        await updateMutation.mutateAsync(formData);
+        showSuccess('Guard Room Report Added');
+        await refetch();
+      } catch (err) {
+        console.error(err);
+      }
+      return
+    }
+
+    try {
+      await createMutation.mutateAsync(formData);
+      showSuccess('Guard Room Report Added');
+      await refetch();
+    } catch (err) {
+      console.error(err);
+    }
+    console.log('Form Data:', formData);
+    // alert('Form saved successfully!');
+  };
 
   return (
     <div className="p-8">
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
         <div className="space-y-6">
           {/* Army Number */}
-          <div className="flex items-center">
+          <div className="flex relative items-center">
             <label className="block text-sm font-medium text-gray-700 w-48 flex-shrink-0">
               ARMY NUMBER
             </label>
-            <input
-              type="text"
-              name="armyNumber"
-              value={formData.armyNumber}
-              onChange={handleInputChange}
-              placeholder="Army Number"
-              disabled={!isEdit}
-              className={`flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
-                !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-              }`}
-            />
+            <div className="lg:w-full relative">
+              <input
+                type="text"
+                name="serviceNumber"
+                value={formData.serviceNumber}
+                onChange={handleSetOfficerId}
+                placeholder="Army Number"
+                disabled={!isEdit}
+                className={`flex-1 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+                  !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                }`}
+              />
+              {openOfficerNames && formData.serviceNumber !== '' && filteredArmy.length > 0 && (
+                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                  {filteredArmy?.map((officer: any) => (
+                    <button
+                      key={officer.id}
+                      type="button"
+                      onClick={() => handleSelectOfficer(officer)}
+                      className="w-full px-4 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
+                    >
+                      <div className="flex justify-between">
+                        <p>{officer.name}</p>
+                        <p>{officer.serviceNumber}</p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Rank */}
@@ -84,7 +201,7 @@ export default function GuardForm({ isEdit = true, mockData }: GuardFormProps) {
               <select
                 name="rank"
                 value={formData.rank}
-                onChange={handleInputChange}
+                onChange={(e) => handleInputChange('rank', e.target.value)}
                 disabled={!isEdit}
                 className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 appearance-none bg-white ${
                   !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
@@ -123,7 +240,7 @@ export default function GuardForm({ isEdit = true, mockData }: GuardFormProps) {
               type="text"
               name="name"
               value={formData.name}
-              onChange={handleInputChange}
+              onChange={(e) => handleInputChange('name', e.target.value)}
               placeholder="Full Name"
               disabled={!isEdit}
               className={`flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
@@ -141,7 +258,7 @@ export default function GuardForm({ isEdit = true, mockData }: GuardFormProps) {
               type="text"
               name="offence"
               value={formData.offence}
-              onChange={handleInputChange}
+              onChange={(e) => handleInputChange('offence', e.target.value)}
               placeholder="Offence"
               disabled={!isEdit}
               className={`flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
@@ -158,9 +275,9 @@ export default function GuardForm({ isEdit = true, mockData }: GuardFormProps) {
             <div className="flex-1 relative">
               <input
                 type="date"
-                name="dateDetained"
-                value={formData.dateDetained}
-                onChange={handleInputChange}
+                name="date_detained"
+                value={formData.date_detained}
+                onChange={(e) => handleInputChange('date_detained', e.target.value)}
                 disabled={!isEdit}
                 className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
                   !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
@@ -182,8 +299,8 @@ export default function GuardForm({ isEdit = true, mockData }: GuardFormProps) {
             <input
               type="text"
               name="detainedBy"
-              value={formData.detainedBy}
-              onChange={handleInputChange}
+              value={formData.detained_by}
+              onChange={(e) => handleInputChange('detained_by', e.target.value)}
               placeholder="Detain by"
               disabled={!isEdit}
               className={`flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
@@ -199,9 +316,9 @@ export default function GuardForm({ isEdit = true, mockData }: GuardFormProps) {
             </label>
             <input
               type="text"
-              name="releasedBy"
-              value={formData.releasedBy}
-              onChange={handleInputChange}
+              name="released_by"
+              value={formData.released_by}
+              onChange={(e) => handleInputChange('released_by', e.target.value)}
               placeholder="Release by"
               disabled={!isEdit}
               className={`flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
@@ -218,7 +335,7 @@ export default function GuardForm({ isEdit = true, mockData }: GuardFormProps) {
             <textarea
               name="remark"
               value={formData.remark}
-              onChange={handleInputChange}
+              onChange={(e) => handleInputChange('remark', e.target.value)}
               placeholder="Remark"
               rows={4}
               disabled={!isEdit}

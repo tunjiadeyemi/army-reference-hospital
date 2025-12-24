@@ -1,7 +1,7 @@
 import { useContext, useState } from 'react';
 import Modal from '../Modal';
 import { AppContext } from '../../context/AppContext';
-import { mockAccommodationFormData, mockOrderData } from '../../utils/constants';
+import {  mockOrderData } from '../../utils/constants';
 
 import MailForm from './AccommodationForm';
 
@@ -10,7 +10,7 @@ const AccommodationModal = () => {
   const [editMode, setEditMode] = useState(false);
   const [editDraft, setEditDraft] = useState(orderData);
 
-  const { setShowMailModal, selectedMailRecord } = useContext(AppContext);
+  const {  selectedAccommodationRecord, setShowAccommodationModal } = useContext(AppContext);
 
   const handleEditClick = () => {
     setEditDraft(orderData);
@@ -36,18 +36,18 @@ const AccommodationModal = () => {
             <button
               className="hover:scale-95 duration-300 transition-all cursor-pointer"
               type="button"
-              onClick={() => setShowMailModal(false)}
+              onClick={() => setShowAccommodationModal(false)}
             >
               <img src="/department/chevron-left.svg" alt="chevron-left" />
             </button>
 
-            <h1>{selectedMailRecord}</h1>
+            <h1>{selectedAccommodationRecord.name}</h1>
           </div>
 
           <button
             className="hover:scale-95 duration-300 transition-all cursor-pointer"
             type="button"
-            onClick={() => setShowMailModal(false)}
+            onClick={() => setShowAccommodationModal(false)}
           >
             <img src="/department/x-close-icon.svg" alt="x-close-icon" />
           </button>
@@ -85,7 +85,7 @@ const AccommodationModal = () => {
         </div>
 
         {/* body */}
-        <MailForm isEdit={editMode} mockData={mockAccommodationFormData} />
+        <MailForm isEdit={editMode} mockData={selectedAccommodationRecord} />
       </div>
     </Modal>
   );

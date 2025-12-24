@@ -1,28 +1,46 @@
-import { useContext, useState } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import Modal from '../Modal';
 import { AppContext } from '../../context/AppContext';
-import { mockDisciplineFormData, mockOrderData } from '../../utils/constants';
+import { mockOrderData } from '../../utils/constants';
 import DisciplineForm from './DisciplineForm';
+import {
+  useGetChargeSheet,
+  useUpdateChargeSheet
+} from '../../hooks/dashboardhooks/useDasboardData';
+import { showSuccess, showError } from '../../utils/toast';
 
 const DisciplineModal = () => {
   const [orderData, setOrderData] = useState(mockOrderData);
   const [editMode, setEditMode] = useState(false);
-  const [editDraft, setEditDraft] = useState(orderData);
 
   const { setShowDisciplineModal, selectedDisciplineRecord } = useContext(AppContext);
+  const { data: chargeSheetData, isLoading } = useGetChargeSheet(selectedDisciplineRecord);
+  const updateMutation = useUpdateChargeSheet();
+
+  // Update orderData when charge sheet data is fetched
+  useEffect(() => {
+    if (chargeSheetData) {
+      setOrderData(chargeSheetData);
+    }
+  }, [chargeSheetData]);
 
   const handleEditClick = () => {
-    setEditDraft(orderData);
     setEditMode(true);
   };
 
-  const handleSave = () => {
-    setOrderData(editDraft);
-    setEditMode(false);
+  const handleSave = async (submissionData: any) => {
+    try {
+      await updateMutation.mutateAsync(submissionData);
+      setOrderData(submissionData);
+      setEditMode(false);
+      showSuccess('Charge sheet updated successfully');
+    } catch (error) {
+      showError('Failed to update charge sheet');
+      console.error('Update error:', error);
+    }
   };
 
   const handleCancel = () => {
-    setEditDraft(orderData);
     setEditMode(false);
   };
 
@@ -82,7 +100,12 @@ const DisciplineModal = () => {
         </div>
 
         {/* body */}
-        <DisciplineForm isEdit={editMode} mockData={mockDisciplineFormData} />
+        <DisciplineForm
+          isEdit={editMode}
+          mockData={orderData}
+          onSave={handleSave}
+          isLoading={isLoading}
+        />
       </div>
     </Modal>
   );

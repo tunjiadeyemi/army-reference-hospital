@@ -9,6 +9,7 @@ interface UsePersistedQueryOptions<T> {
   currentStoreValue?: T;
   staleTime?: number;
   gcTime?: number;
+  enabled?:boolean
 }
 
 // Overload signatures for backward compatibility
@@ -54,7 +55,7 @@ export function usePersistedQuery<T>(
   const query = useQuery<T, Error>({
     queryKey: [key],
     queryFn: fn,
-    enabled: !storeValue,
+    enabled:options.enabled ?? !storeValue,
     staleTime,
     gcTime,
     initialData: storeValue,

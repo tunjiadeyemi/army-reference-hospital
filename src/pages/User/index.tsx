@@ -8,6 +8,7 @@ import AddUser from '../../components/User/AddUser';
 import Layout from '../../components/Layout';
 import { sampleUserData } from '../../utils/constants';
 import { AppContext } from '../../context/AppContext';
+import { useGetUsers } from '../../hooks/dashboardhooks/useDasboardData';
 // import { useAxiosInstance } from '../../hooks/axios';
 // import axios from 'axios';
 
@@ -23,6 +24,8 @@ const User = () => {
   const [loading, setLoading] = useState(false);
 
   const { setShowAdminDetails, setAdminDetails } = useContext(AppContext);
+   
+  const {data: users} = useGetUsers()
 
   // const axiosInstance = useAxiosInstance();
   // const baseUrl = import.meta.env.VITE_BASE_URL;
@@ -59,16 +62,16 @@ const User = () => {
   }, [active]);
 
   const columns = [
-    { header: 'Name', accessor: 'name' },
+    { header: 'Name', accessor: 'first_name' },
     { header: 'Email Address', accessor: 'email' },
     { header: 'Rank', accessor: 'rank' },
     { header: 'Role', accessor: 'role' },
-    { header: 'Status', accessor: 'status' },
+    { header: 'Status', accessor: 'is_suspended' },
     { header: 'Date Created', accessor: 'dateCreated' }
   ];
 
   // const paginatedData = users.slice((currentPage - 1) * pageSize, currentPage * pageSize);
-  const paginatedData = sampleUserData.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const paginatedData = users.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);

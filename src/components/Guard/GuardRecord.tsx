@@ -3,18 +3,19 @@ import { useContext } from 'react';
 import MainTable from '../MainTable';
 
 import { AppContext } from '../../context/AppContext';
-import { sampleGuardData } from '../../utils/constants';
+
 import type { MainTableColumn, MainTableData } from '../../utils/types/department';
+import { useGetGuardRooms } from '../../hooks/dashboardhooks/useDasboardData';
 
 const GuardRecord = () => {
   const columns: MainTableColumn<MainTableData>[] = [
     {
-      key: 'number',
+      key: 'id',
       header: 'S/N',
       className: 'w-[5%]'
     },
     {
-      key: 'armyNumber',
+      key: 'serviceNumber',
       header: 'Army Number',
       className: 'w-[10%]'
     },
@@ -26,7 +27,7 @@ const GuardRecord = () => {
     {
       key: 'name',
       header: 'Name',
-      className: 'w-[20%]'
+      className: 'w-[10%]'
     },
     {
       key: 'offence',
@@ -34,27 +35,27 @@ const GuardRecord = () => {
       className: 'w-[10%]'
     },
     {
-      key: 'dateDetained',
+      key: 'date_detained',
       header: 'Date Detained',
       className: 'w-[5%]'
     },
     {
-      key: 'detainedBy',
+      key: 'detained_by',
       header: 'Detained By',
-      className: 'w-[23%]'
+      className: 'w-[7%]'
     },
     {
-      key: 'releasedBy',
+      key: 'released_by',
       header: 'Released By',
-      className: 'w-[23%]'
+      className: 'w-[13%]'
     }
   ];
 
   const { setSelectedGuardRecord, setShowGuardModal } = useContext(AppContext);
-
+  const {data: guardRoomData} = useGetGuardRooms()
   return (
     <MainTable
-      data={sampleGuardData}
+      data={guardRoomData}
       columns={columns}
       itemsPerPageOptions={[10, 25, 50, 100]}
       defaultItemsPerPage={11}
@@ -63,7 +64,7 @@ const GuardRecord = () => {
       onCellClick={(params) => {
         console.log('Cell clicked:', params);
         setShowGuardModal(true);
-        setSelectedGuardRecord(params.row.name);
+        setSelectedGuardRecord(params.row);
       }}
     />
   );

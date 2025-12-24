@@ -1,5 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from 'react';
+import { useContext, useState } from 'react';
+import { useGetOfficers } from '../UnitBible/hooks/useUnitBible';
+import {
+  useCreateStaffNominal,
+  useGetStaffNominal,
+  useGetStaffNominals,
+  useUpdateStaffNominal
+} from '../../hooks/dashboardhooks/useDasboardData';
+import { showSuccess } from '../../utils/toast';
+import { AppContext } from '../../context/AppContext';
 
 // Mock data for view mode
 
@@ -10,20 +19,21 @@ interface StaffFormProps {
 
 export default function StaffForm({ isEdit = true, mockData }: StaffFormProps) {
   const [formData, setFormData] = useState({
-    armyNumber: isEdit ? '' : mockData?.armyNumber,
+    officer_id: isEdit ? '' : mockData?.id,
+    serviceNumber: isEdit ? '' : mockData?.serviceNumber,
     rank: isEdit ? '' : mockData?.rank,
     name: isEdit ? '' : mockData?.name,
-    dob: isEdit ? '' : mockData?.dob,
-    maritalStatus: isEdit ? 'Single' : mockData?.maritalStatus,
-    tradeClass: isEdit ? '' : mockData?.tradeClass,
+    date_of_birth: isEdit ? '' : mockData?.date_of_birth,
+    marital_status: isEdit ? 'Single' : mockData?.marital_status,
+    trade_class: isEdit ? '' : mockData?.trade_class,
     doe: isEdit ? '' : mockData?.doe,
     dolp: isEdit ? '' : mockData?.dolp,
     dtos: isEdit ? '' : mockData?.dtos,
-    currentDepartment: isEdit ? '' : mockData?.currentDepartment,
+    current_department: isEdit ? '' : mockData?.current_department,
     directorate: isEdit ? '' : mockData?.directorate,
-    lastThreeUnits: isEdit ? ['', '', ''] : mockData?.lastThreeUnits,
+    lastThreeUnitsServed: isEdit ? ['', '', ''] : mockData?.lastThreeUnitsServed,
     corps: isEdit ? '' : mockData?.corps,
-    phoneNumber: isEdit ? '' : mockData?.phoneNumber,
+    phone_number: isEdit ? '' : mockData?.phone_number,
     remarks: isEdit ? '' : mockData?.remarks
   });
 
@@ -39,16 +49,41 @@ export default function StaffForm({ isEdit = true, mockData }: StaffFormProps) {
   const handleUnitChange = (index: number, value: string) => {
     if (!isEdit) return; // Only allow changes when in edit mode
 
-    const newUnits = [...formData.lastThreeUnits];
+    const newUnits = [...formData.lastThreeUnitsServed];
     newUnits[index] = value;
     setFormData((prev) => ({
       ...prev,
-      lastThreeUnits: newUnits
+      lastThreeUnitsServed: newUnits
     }));
   };
+  const createMutation = useCreateStaffNominal();
+  const updateMutation = useUpdateStaffNominal();
+  const { showStaffModal } = useContext(AppContext);
+  const { isPending } = createMutation;
+  const { isPending: updating } = updateMutation;
+  const { refetch } = useGetStaffNominals();
+  const {refetch: refetchNominal} = useGetStaffNominal(formData.officer_id)
 
-  const handleSubmit = (e: { preventDefault: () => void }) => {
+  const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
+    if (showStaffModal) {
+      try {
+        await updateMutation.mutateAsync(formData);
+        showSuccess('Updated Staff Nominal');
+        await refetchNominal()
+        await refetch();
+      } catch (err) {
+        console.error(err);
+      }
+      return;
+    }
+    try {
+      await createMutation.mutateAsync(formData);
+      showSuccess('Added Staff Nominal');
+      await refetch();
+    } catch (err) {
+      console.error(err);
+    }
     console.log('Form submitted:', formData);
     alert('Form saved successfully!');
   };
@@ -73,24 +108,101 @@ export default function StaffForm({ isEdit = true, mockData }: StaffFormProps) {
   ];
 
   const maritalStatuses = ['Single', 'Married', 'Divorced', 'Widowed'];
+  const [openOfficerNames, setOpenOfficerNames] = useState(false);
+  const [filteredArmy, setFilteredArmy] = useState([]);
+  const { data: officers } = useGetOfficers();
+  const handleSetOfficerId = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newArmyNumber = e.target.value;
+    console.log('ARMY NO.:', newArmyNumber);
+
+    setOpenOfficerNames(true);
+    handleInputChange('serviceNumber', newArmyNumber);
+
+    const filtered = officers.filter((officer: any) =>
+      officer.serviceNumber.toLowerCase().includes(newArmyNumber.toLowerCase())
+    );
+    setFilteredArmy(filtered);
+    const findId = officers.find(
+      (officer: any) =>
+        String(officer.serviceNumber).trim().toLowerCase() ===
+        String(newArmyNumber).trim().toLowerCase()
+    );
+
+    if (findId) {
+      setFormData((prev: any) => ({
+        ...prev,
+        officer_id: findId.id
+      }));
+    } else {
+      setFormData((prev: any) => ({
+        ...prev,
+        officer_id: null
+      }));
+    }
+
+    console.log('Filtered officers:', filtered, findId);
+  };
+  const handleSelectOfficer = (officer: any) => {
+    handleInputChange('name', officer.name);
+    handleInputChange('serviceNumber', officer.serviceNumber);
+    handleInputChange('rank', officer.rank);
+    const newArmyNumber = officer.serviceNumber;
+
+    const findId = officers.find(
+      (officer: any) =>
+        String(officer.serviceNumber).trim().toLowerCase() ===
+        String(newArmyNumber).trim().toLowerCase()
+    );
+    setOpenOfficerNames(false);
+    if (findId) {
+      setFormData((prev: any) => ({
+        ...prev,
+        officer_id: findId.id
+      }));
+    } else {
+      setFormData((prev: any) => ({
+        ...prev,
+        officer_id: null
+      }));
+    }
+  };
 
   return (
     <div className="max-w-6xl mx-auto p-6 bg-white">
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Row 1 */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div>
+          <div className="relative w-full ">
             <label className="block text-sm font-medium text-gray-700 mb-2">ARMY NUMBER</label>
             <input
               type="text"
               placeholder="Army Number"
-              value={formData.armyNumber}
-              onChange={(e) => handleInputChange('armyNumber', e.target.value)}
+              value={formData.serviceNumber}
+              onChange={handleSetOfficerId}
               disabled={!isEdit}
               className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent placeholder-gray-400 ${
                 !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
               }`}
             />
+            <div className="">
+              {openOfficerNames && formData.serviceNumber !== '' && filteredArmy.length > 0 && (
+                <div className="absolute z-10   mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                  {filteredArmy?.map((officer: any) => (
+                    <button
+                      key={officer.id}
+                      type="button"
+                      onClick={() => handleSelectOfficer(officer)}
+                      className="w-full px-4 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
+                    >
+                      <div className="flex justify-between">
+                        <p>{officer.name}</p>
+                        <p>{officer.serviceNumber}</p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           <div>
@@ -139,10 +251,10 @@ export default function StaffForm({ isEdit = true, mockData }: StaffFormProps) {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">DOB</label>
             <input
-              type="text"
+              type="date"
               placeholder="DD/MM/YY"
-              value={formData.dob}
-              onChange={(e) => handleInputChange('dob', e.target.value)}
+              value={formData.date_of_birth}
+              onChange={(e) => handleInputChange('date_of_birth', e.target.value)}
               disabled={!isEdit}
               className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent placeholder-gray-400 ${
                 !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
@@ -154,8 +266,8 @@ export default function StaffForm({ isEdit = true, mockData }: StaffFormProps) {
             <label className="block text-sm font-medium text-gray-700 mb-2">MARITAL STATUS</label>
             <div className="relative">
               <select
-                value={formData.maritalStatus}
-                onChange={(e) => handleInputChange('maritalStatus', e.target.value)}
+                value={formData.marital_status}
+                onChange={(e) => handleInputChange('marital_status', e.target.value)}
                 disabled={!isEdit}
                 className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent appearance-none bg-white text-gray-700 ${
                   !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
@@ -180,8 +292,8 @@ export default function StaffForm({ isEdit = true, mockData }: StaffFormProps) {
             <input
               type="text"
               placeholder="Trade Class"
-              value={formData.tradeClass}
-              onChange={(e) => handleInputChange('tradeClass', e.target.value)}
+              value={formData.trade_class}
+              onChange={(e) => handleInputChange('trade_class', e.target.value)}
               disabled={!isEdit}
               className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent placeholder-gray-400 ${
                 !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
@@ -244,8 +356,8 @@ export default function StaffForm({ isEdit = true, mockData }: StaffFormProps) {
             <input
               type="text"
               placeholder="Current department"
-              value={formData.currentDepartment}
-              onChange={(e) => handleInputChange('currentDepartment', e.target.value)}
+              value={formData.current_department}
+              onChange={(e) => handleInputChange('current_department', e.target.value)}
               disabled={!isEdit}
               className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent placeholder-gray-400 ${
                 !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
@@ -272,7 +384,7 @@ export default function StaffForm({ isEdit = true, mockData }: StaffFormProps) {
               LAST 3 UNITS SERVED
             </label>
             <div className="space-y-2">
-              {formData.lastThreeUnits.map((unit: any, index: any) => (
+              {formData.lastThreeUnitsServed.map((unit: any, index: any) => (
                 <div key={index} className="flex items-center space-x-2">
                   <span className="text-gray-600 font-medium">{index + 1}.</span>
                   <input
@@ -311,8 +423,8 @@ export default function StaffForm({ isEdit = true, mockData }: StaffFormProps) {
             <input
               type="tel"
               placeholder="Phone number"
-              value={formData.phoneNumber}
-              onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
+              value={formData.phone_number}
+              onChange={(e) => handleInputChange('phone_number', e.target.value)}
               disabled={!isEdit}
               className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent placeholder-gray-400 ${
                 !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
@@ -347,7 +459,8 @@ export default function StaffForm({ isEdit = true, mockData }: StaffFormProps) {
                 : 'bg-teal-600 hover:bg-teal-700 text-white'
             }`}
           >
-            Save
+            {isPending || updating ? "Loading..." : "Save"}
+          
           </button>
         </div>
       </form>

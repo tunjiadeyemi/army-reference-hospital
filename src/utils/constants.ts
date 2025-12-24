@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import HomeIcon from '../assets/navIcons/HomeIcon';
 import DepartmentIcon from '../assets/navIcons/DepartmentIcon';
-import DutyIcon from '../assets/navIcons/DutyIcon';
+// import DutyIcon from '../assets/navIcons/DutyIcon';
 import UnitIcon from '../assets/navIcons/UnitIcon';
-import OrdersIcon from '../assets/navIcons/OrdersIcon';
+// import OrdersIcon from '../assets/navIcons/OrdersIcon';
 import SickIcon from '../assets/navIcons/SickIcon';
-import LeaveIcon from '../assets/navIcons/LeaveIcon';
-import TrialIcon from '../assets/navIcons/TrialIcon';
-import DisciplineIcon from '../assets/navIcons/DisciplineIcon';
-import SignalIcon from '../assets/navIcons/SignalIcon';
+// import LeaveIcon from '../assets/navIcons/LeaveIcon';
+// import TrialIcon from '../assets/navIcons/TrialIcon';
+// import DisciplineIcon from '../assets/navIcons/DisciplineIcon';
+// import SignalIcon from '../assets/navIcons/SignalIcon';
 import GuardIcon from '../assets/navIcons/GuardIcon';
 import StaffIcon from '../assets/navIcons/StaffIcon';
 import MailIcon from '../assets/navIcons/MailIcon';
@@ -23,6 +23,9 @@ import UsersIcon from '../assets/navIcons/UsersIcon';
 import type { NavigationItem } from './types';
 import type { MainTableData } from './types/department';
 import type { FormData } from './types/dutyReport';
+import SignalIcon from '../assets/navIcons/SignalIcon';
+import TrialIcon from '../assets/navIcons/TrialIcon';
+import DisciplineIcon from '../assets/navIcons/DisciplineIcon';
 
 export const navigationItems: NavigationItem[] = [
   {
@@ -42,16 +45,16 @@ export const navigationItems: NavigationItem[] = [
       { label: 'Department file list', action: 'list', rout: '/departmentFile/list' }
     ]
   },
-  {
-    id: 'Duty Report',
-    label: 'Duty Report',
-    icon: DutyIcon,
-    hasSubmenu: true,
-    submenuItems: [
-      { label: 'Add new', action: 'add', rout: '/dutyReport/add' },
-      { label: 'Daily Duty Report list', action: 'list', rout: '/dutyReport/list' }
-    ]
-  },
+  // {
+  //   id: 'Duty Report',
+  //   label: 'Duty Report',
+  //   icon: DutyIcon,
+  //   hasSubmenu: true,
+  //   submenuItems: [
+  //     { label: 'Add new', action: 'add', rout: '/dutyReport/add' },
+  //     { label: 'Daily Duty Report list', action: 'list', rout: '/dutyReport/list' }
+  //   ]
+  // },
   {
     id: 'Unit Bible',
     label: 'Unit Bible',
@@ -62,18 +65,18 @@ export const navigationItems: NavigationItem[] = [
       { label: 'Unit Bible list', action: 'list', rout: '/unitBible/list' }
     ]
   },
-  {
-    id: 'Part 1 and Part 2 Orders',
-    label: 'Part 1 and Part 2 Orders',
-    icon: OrdersIcon,
-    hasSubmenu: true,
-    submenuItems: [
-      { label: 'Add new Part 1 Order', action: 'add-part1', rout: '/order/add-new-p1' },
-      { label: 'Add new Part 2 Order', action: 'add-part2', rout: '/order/add-new-p2' },
-      { label: 'Part 1 Orders list', action: 'list-part1', rout: '/order/part-1-order-list' },
-      { label: 'Part 2 Orders list', action: 'list-part2', rout: '/order/part-2-order-list' }
-    ]
-  },
+  // {
+  //   id: 'Part 1 and Part 2 Orders',
+  //   label: 'Part 1 and Part 2 Orders',
+  //   icon: OrdersIcon,
+  //   hasSubmenu: true,
+  //   submenuItems: [
+  //     { label: 'Add new Part 1 Order', action: 'add-part1', rout: '/order/add-new-p1' },
+  //     { label: 'Add new Part 2 Order', action: 'add-part2', rout: '/order/add-new-p2' },
+  //     { label: 'Part 1 Orders list', action: 'list-part1', rout: '/order/part-1-order-list' },
+  //     { label: 'Part 2 Orders list', action: 'list-part2', rout: '/order/part-2-order-list' }
+  //   ]
+  // },
   {
     id: 'Sick Report',
     label: 'Sick Report',
@@ -84,16 +87,16 @@ export const navigationItems: NavigationItem[] = [
       { label: 'Sick Report list', action: 'list', rout: '/sick-report/list' }
     ]
   },
-  {
-    id: 'Leave/Pass',
-    label: 'Leave/Pass',
-    icon: LeaveIcon,
-    hasSubmenu: true,
-    submenuItems: [
-      { label: 'Add new', action: 'add', rout: '/leave/add' },
-      { label: 'Leave/Pass list', action: 'list', rout: '/leave/list' }
-    ]
-  },
+  // {
+  //   id: 'Leave/Pass',
+  //   label: 'Leave/Pass',
+  //   icon: LeaveIcon,
+  //   hasSubmenu: true,
+  //   submenuItems: [
+  //     { label: 'Add new', action: 'add', rout: '/leave/add' },
+  //     { label: 'Leave/Pass list', action: 'list', rout: '/leave/list' }
+  //   ]
+  // },
   {
     id: 'Trial Form',
     label: 'Trial Form',
@@ -154,16 +157,7 @@ export const navigationItems: NavigationItem[] = [
       { label: 'Mail list', action: 'list', rout: '/mail/list' }
     ]
   },
-  // {
-  //   id: 'Returns',
-  //   label: 'Returns',
-  //   icon: ReturnsIcon,
-  //   hasSubmenu: true,
-  //   submenuItems: [
-  //     { label: 'Add new', action: 'add' },
-  //     { label: 'Returns list', action: 'list' }
-  //   ]
-  // },
+
   {
     id: 'Accommodation',
     label: 'Accommodation',

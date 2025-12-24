@@ -5,10 +5,12 @@ import Layout from '../../components/Layout';
 import TrialIcon from '../../assets/navIcons/TrialIcon';
 import TrialForm from '../../components/Trial/TrialForm';
 import TrialRecord from '../../components/Trial/TrialRecord';
+import { useCreateTrialForm } from '../../hooks/dashboardhooks/useDasboardData';
 
 const Trial = () => {
   const { active } = useParams<{ active?: string }>();
   const [activeTab, setActiveTab] = useState(active || 'add');
+  const createTrialMutation = useCreateTrialForm();
 
   const tabs = [
     {
@@ -40,6 +42,37 @@ const Trial = () => {
     setActiveTab(slug);
   };
 
+  const handleCreateTrialForm = async (data: any) => {
+    try {
+      console.log('[Trial Page] Creating trial form:', data);
+
+      // Build payload with only required fields
+      const payload = {
+        officer_id: data.officer_id,
+        unit: data.unit,
+        q1: data.q1,
+        q2: data.q2,
+        q3: data.q3,
+        q4: data.q4,
+        q5: data.q5,
+        q6: data.q6,
+        q7: data.q7,
+        finding: data.finding,
+        award: data.award,
+        date: data.date,
+        rank_officer: data.rank_officer,
+        appointment: data.appointment,
+        upload: data.upload || null
+      };
+
+      await createTrialMutation.mutateAsync(payload);
+      console.log('[Trial Page] Trial form created successfully');
+      setActiveTab('list'); // Switch to list tab after successful creation
+    } catch (error) {
+      console.error('[Trial Page] Create failed:', error);
+    }
+  };
+
   return (
     <Layout className="h-full">
       <section className="bg-white rounded-md p-6 pb-2">
@@ -65,7 +98,13 @@ const Trial = () => {
       </section>
 
       <section className="bg-white p-4">
-        {activeTab === 'add' && <TrialForm />}
+        {activeTab === 'add' && (
+          <TrialForm
+            isEdit={true}
+            onSave={handleCreateTrialForm}
+            isLoading={createTrialMutation.isPending}
+          />
+        )}
         {activeTab === 'list' && <TrialRecord />}
       </section>
     </Layout>

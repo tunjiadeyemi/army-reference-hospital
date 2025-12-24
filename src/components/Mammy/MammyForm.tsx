@@ -1,5 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useRef } from 'react';
+import { useState, useRef, useContext } from 'react';
+import {
+  useCreateMammyMarkets,
+  useGetMammyMarkets,
+  useUpdateMammyMarkets
+} from '../../hooks/dashboardhooks/useDasboardData';
+import { showError, showSuccess } from '../../utils/toast';
+import { AppContext } from '../../context/AppContext';
 
 interface MammyFormProps {
   isEdit?: boolean;
@@ -7,16 +14,19 @@ interface MammyFormProps {
 }
 
 export default function MammyForm({ isEdit = true, mockData }: MammyFormProps) {
+  const { showMammyModal } = useContext(AppContext);
   const [formData, setFormData] = useState(
     isEdit
       ? {
-          shopOwner: '',
-          rentage: '',
-          shopNumber: '',
-          natureOfBusiness: '',
-          phoneNumber: '',
-          allocationDate: '',
-          remark: ''
+          id: '',
+          shop_owner: '',
+          rentage_fee: '',
+          shop_no: '',
+          business_nature: '',
+          phone_number: '',
+          allocation_date: '',
+          upload: '',
+          profile_pic: ''
         }
       : {
           ...mockData
@@ -24,18 +34,24 @@ export default function MammyForm({ isEdit = true, mockData }: MammyFormProps) {
   );
 
   const [uploadedImage, setUploadedImage] = useState<string | null>(
-    isEdit ? null : mockData?.uploadedImage
+    isEdit ? '/unitBible/camera-icon.svg' : '/unitBible/camera-icon.svg'
   );
+
+  const createMutation = useCreateMammyMarkets();
+  const { isPending } = createMutation;
+
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   interface MammyFormData {
-    shopOwner: string;
-    rentage: string;
-    shopNumber: string;
-    natureOfBusiness: string;
-    phoneNumber: string;
-    allocationDate: string;
-    remark: string;
+    shop_owner: string;
+    rentage_fee: string;
+    shop_no: string;
+    business_nature: string;
+    phone_number: string;
+    allocation_date: string;
+    upload: string;
+    profile_pic?: string;
+    // remark: string;
   }
 
   type MammyFormField = keyof MammyFormData;
@@ -47,31 +63,64 @@ export default function MammyForm({ isEdit = true, mockData }: MammyFormProps) {
       [field]: value
     }));
   };
-
+  const [, setShowImage] = useState(false);
   const handleCameraClick = () => {
+    setShowImage(true);
     if (!isEdit) return; // Only allow image upload in edit mode
     fileInputRef.current?.click();
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!isEdit) return; // Only allow file upload in edit mode
-    const file = e.target.files && e.target.files[0];
-    if (file && file.type.startsWith('image/')) {
+    if (!isEdit) return;
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.type.startsWith('image/')) {
       const reader = new FileReader();
+
       reader.onload = (event) => {
-        if (event.target && typeof event.target.result === 'string') {
-          setUploadedImage(event.target.result);
+        const result = event.target?.result;
+        if (result instanceof ArrayBuffer) {
+          setFormData((prev: MammyFormData) => ({
+            ...prev,
+            upload: file
+          }));
+          const imageUrl = URL.createObjectURL(file);
+          setUploadedImage(imageUrl);
         }
       };
-      reader.readAsDataURL(file);
+      reader.readAsArrayBuffer(file);
     }
   };
 
-  const handleSave = () => {
-    if (!isEdit) return; // Only allow save in edit mode
-    console.log('Form data:', formData);
+  const { refetch } = useGetMammyMarkets();
+  const updateMutation = useUpdateMammyMarkets();
+
+  const {isPending: updating} = updateMutation
+  const handleSave = async () => {
+    if (!isEdit) return;
+    console.log('Image Created:', formData);
+    if (showMammyModal) {
+      try {
+        await updateMutation.mutateAsync(formData);
+        showSuccess('Successfully Added Updated Markets');
+        await refetch();
+      } catch (err) {
+        showError('Error Occured adding market');
+      }
+      return;
+    }
+
+    try {
+      await createMutation.mutateAsync(formData);
+      await refetch();
+      showSuccess('Successfully Added Market');
+    } catch (err) {
+      showError('Failed to Add Market');
+      console.log('Ther');
+    }
+
     console.log('Uploaded image:', uploadedImage);
-    // Handle form submission here
   };
 
   return (
@@ -86,32 +135,27 @@ export default function MammyForm({ isEdit = true, mockData }: MammyFormProps) {
                 isEdit ? 'cursor-pointer hover:bg-gray-300' : 'cursor-not-allowed'
               }`}
             >
-              {uploadedImage ? (
+              {showMammyModal ? (
                 <>
-                  <img src={uploadedImage} alt="Uploaded" className="w-full h-full object-cover" />
-                  {/* Camera overlay on hover - only show in edit mode */}
-                  {isEdit && (
-                    <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <img src="/unitBible/camera-icon.svg" alt="" className="w-8 h-8 text-white" />
-                    </div>
+                  {uploadedImage !== null && uploadedImage !== '/unitBible/camera-icon.svg' ? (
+                    <img src={uploadedImage.trim()} />
+                  ) : formData.profile_pic === null ? (
+                    <img src="/unitBible/camera-icon.svg" />
+                  ) : (
+                    <img src={formData.profile_pic} />
                   )}
-                  {/* Disabled overlay in view mode */}
-                  {/* {!isEdit && (
-                    <div className="absolute inset-0 bg-gray-500 bg-opacity-30 flex items-center justify-center">
-                      <span className="text-xs text-gray-600 bg-white bg-opacity-80 px-2 py-1 rounded">
-                        View Only
-                      </span>
-                    </div>
-                  )} */}
                 </>
               ) : (
-                <img
-                  src="/unitBible/camera-icon.svg"
-                  alt=""
-                  className={`w-8 h-8 ${isEdit ? 'text-gray-600' : 'text-gray-400'}`}
-                />
+                <>
+                  {uploadedImage === '' ? (
+                    <img src="/unitBible/camera-icon.svg" />
+                  ) : (
+                    <img src={uploadedImage ?? ''} />
+                  )}
+                </>
               )}
             </div>
+
             <input
               ref={fileInputRef}
               type="file"
@@ -130,8 +174,8 @@ export default function MammyForm({ isEdit = true, mockData }: MammyFormProps) {
             <input
               type="text"
               placeholder="Shop Owner"
-              value={formData.shopOwner}
-              onChange={(e) => handleInputChange('shopOwner', e.target.value)}
+              value={formData.shop_owner}
+              onChange={(e) => handleInputChange('shop_owner', e.target.value)}
               disabled={!isEdit}
               className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-colors ${
                 !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : 'placeholder-gray-400'
@@ -147,8 +191,8 @@ export default function MammyForm({ isEdit = true, mockData }: MammyFormProps) {
             <input
               type="text"
               placeholder="₦"
-              value={formData.rentage}
-              onChange={(e) => handleInputChange('rentage', e.target.value)}
+              value={formData.rentage_fee}
+              onChange={(e) => handleInputChange('rentage_fee', e.target.value)}
               disabled={!isEdit}
               className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-colors ${
                 !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : 'placeholder-gray-400'
@@ -164,8 +208,8 @@ export default function MammyForm({ isEdit = true, mockData }: MammyFormProps) {
             <input
               type="text"
               placeholder="Shop Number"
-              value={formData.shopNumber}
-              onChange={(e) => handleInputChange('shopNumber', e.target.value)}
+              value={formData.shop_no}
+              onChange={(e) => handleInputChange('shop_no', e.target.value)}
               disabled={!isEdit}
               className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-colors ${
                 !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : 'placeholder-gray-400'
@@ -181,8 +225,8 @@ export default function MammyForm({ isEdit = true, mockData }: MammyFormProps) {
             <input
               type="text"
               placeholder="Nature of Business"
-              value={formData.natureOfBusiness}
-              onChange={(e) => handleInputChange('natureOfBusiness', e.target.value)}
+              value={formData.business_nature}
+              onChange={(e) => handleInputChange('business_nature', e.target.value)}
               disabled={!isEdit}
               className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-colors ${
                 !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : 'placeholder-gray-400'
@@ -198,8 +242,8 @@ export default function MammyForm({ isEdit = true, mockData }: MammyFormProps) {
             <input
               type="tel"
               placeholder="Phone Number"
-              value={formData.phoneNumber}
-              onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
+              value={formData.phone_number}
+              onChange={(e) => handleInputChange('phone_number', e.target.value)}
               disabled={!isEdit}
               className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-colors ${
                 !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : 'placeholder-gray-400'
@@ -214,8 +258,8 @@ export default function MammyForm({ isEdit = true, mockData }: MammyFormProps) {
           <div className="lg:col-span-3 relative">
             <input
               type="date"
-              value={formData.allocationDate}
-              onChange={(e) => handleInputChange('allocationDate', e.target.value)}
+              value={formData.allocation_date}
+              onChange={(e) => handleInputChange('allocation_date', e.target.value)}
               disabled={!isEdit}
               className={`w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-colors ${
                 !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
@@ -230,7 +274,7 @@ export default function MammyForm({ isEdit = true, mockData }: MammyFormProps) {
         </div>
 
         {/* Remark Field */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 items-start">
+        {/* <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 items-start">
           <label className="text-gray-700 font-medium text-right pt-3">REMARK</label>
           <div className="lg:col-span-3">
             <textarea
@@ -244,7 +288,7 @@ export default function MammyForm({ isEdit = true, mockData }: MammyFormProps) {
               }`}
             />
           </div>
-        </div>
+        </div> */}
 
         {/* Save Button */}
         <div className="flex justify-center pt-8">
@@ -257,7 +301,10 @@ export default function MammyForm({ isEdit = true, mockData }: MammyFormProps) {
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
             }`}
           >
-            Save
+            {
+              isPending || updating ? "Loading..." : "Save"
+            }
+            
           </button>
         </div>
       </div>

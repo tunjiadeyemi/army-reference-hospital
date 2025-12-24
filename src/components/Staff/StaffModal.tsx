@@ -1,14 +1,16 @@
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import Modal from '../Modal';
 import { AppContext } from '../../context/AppContext';
-import { mockOrderData, mockStaffFormData } from '../../utils/constants';
-
+import { mockOrderData } from '../../utils/constants';
+import { useDashboardStore } from '../../store/useDashboardStore';
 import StaffForm from './StaffForm';
+import { useGetStaffNominal} from '../../hooks/dashboardhooks/useDasboardData';
 
 const StaffModal = () => {
   const [orderData, setOrderData] = useState(mockOrderData);
   const [editMode, setEditMode] = useState(false);
   const [editDraft, setEditDraft] = useState(orderData);
+  const {setStaffNominal} = useDashboardStore()
 
   const { setShowStaffModal, selectedStaffRecord } = useContext(AppContext);
 
@@ -26,6 +28,16 @@ const StaffModal = () => {
     setEditDraft(orderData);
     setEditMode(false);
   };
+  console.log("IDD:", selectedStaffRecord.id)
+  const {data: staffNominalById, refetch} = useGetStaffNominal(selectedStaffRecord.id)
+  
+  console.log("Staff NOMINAL ID:", staffNominalById)
+useEffect(() => {
+  if (selectedStaffRecord?.id) {
+    setStaffNominal(undefined); // reset store value
+    refetch();
+  }
+}, [selectedStaffRecord?.id]);
 
   return (
     <Modal>
@@ -41,7 +53,7 @@ const StaffModal = () => {
               <img src="/department/chevron-left.svg" alt="chevron-left" />
             </button>
 
-            <h1>{selectedStaffRecord}</h1>
+            <h1>{selectedStaffRecord.name ?? "Name"}</h1>
           </div>
 
           <button
@@ -85,7 +97,7 @@ const StaffModal = () => {
         </div>
 
         {/* body */}
-        <StaffForm isEdit={editMode} mockData={mockStaffFormData} />
+        <StaffForm isEdit={editMode} mockData={staffNominalById} />
       </div>
     </Modal>
   );
