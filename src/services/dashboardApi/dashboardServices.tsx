@@ -2,6 +2,36 @@
 import type { CreateOfficerPayload } from '../../utils/types/unitBible';
 import api from '../api';
 
+// Prefetch all data on successful login
+export const prefetchAllData = async () => {
+  try {
+    const promises = [
+      getUsers(),
+      getOverview(),
+      getOfficers(),
+      getArms(),
+      getUnitHoldingArms(),
+      getSickReports(),
+      getDepartmentFiles(),
+      getVehicleInventorys(),
+      getEquipmentInventorys(),
+      getBooks(),
+      getMailArchives(),
+      getMammyMarkets(),
+      getAccomodations(),
+      getStaffNominals(),
+      getGuardRooms(),
+      getSignalForms(),
+      getTrialForms(),
+      getChargeSheets()
+    ];
+
+    await Promise.all(promises);
+  } catch (error) {
+    console.error('Error prefetching data:', error);
+  }
+};
+
 const convertToCustomDate = (date: string | Date | undefined): string => {
   if (!date) return '';
 
@@ -245,27 +275,27 @@ export const deleteArm = async (id: string | number) => {
 // UNIT_HOLDING ARMS
 
 export const getUnitHoldingArms = async () => {
-  const res = await api.get('/unit-holding-arms');
+  const res = await api.get('/v1/unit-holding-arms');
   return res.data;
 };
 export const getUnitHoldingArm = async (id?: number) => {
-  const res = await api.get(`/unit-holding-arms/${id}`);
+  const res = await api.get(`/v1/unit-holding-arms/${id}`);
   return res.data;
 };
 
 export const createUnitHoldingArms = async (payload: any) => {
-  const res = await api.post('/unit-holding-arms/create', payload);
+  const res = await api.post('/v1/unit-holding-arms/create', payload);
   return res.data;
 };
 
 export const updateUnitHoldingArms = async (payload: any) => {
   const { id, ...data } = payload;
-  const res = await api.patch(`/unit-holding-arms/edit/${id}`, data);
+  const res = await api.patch(`/v1/unit-holding-arms/edit/${id}`, data);
   return res.data;
 };
 
 export const deleteUnitHoldingArms = async (id: string | number) => {
-  const res = await api.delete(`/unit-holding-arms/${id}`);
+  const res = await api.delete(`/v1/unit-holding-arms/${id}`);
   return res.data;
 };
 

@@ -20,6 +20,8 @@ export default function TrialForm({
   const { data: officers } = useGetOfficers();
   const [openOfficerNames, setOpenOfficerNames] = useState(false);
   const [filteredArmy, setFilteredArmy] = useState([]);
+  const [isOfficerConfirmed, setIsOfficerConfirmed] = useState(false);
+  const [officerFieldTouched, setOfficerFieldTouched] = useState(false);
   const [showSignaturePad, setShowSignaturePad] = useState(false);
   const signatureRef = useRef<SignatureCanvas>(null);
   const canvasContainerRef = useRef<HTMLDivElement>(null);
@@ -52,6 +54,10 @@ export default function TrialForm({
     if (mockData) {
       console.log('[Trial Form] Syncing formData from mockData:', mockData);
       setFormData(mockData);
+      // If mockData has a valid officer_id, mark as confirmed
+      if (mockData.officer_id) {
+        setIsOfficerConfirmed(true);
+      }
     }
   }, [mockData]);
 
@@ -97,6 +103,7 @@ export default function TrialForm({
     handleInputChange('serviceNumber', officer.serviceNumber);
     handleInputChange('rank', officer.rank);
     setOpenOfficerNames(false);
+    setIsOfficerConfirmed(true);
     setFormData((prev: any) => ({
       ...prev,
       officer_id: officer.id
@@ -105,6 +112,20 @@ export default function TrialForm({
 
   const handleSetOfficerId = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newArmyNumber = e.target.value;
+    setOfficerFieldTouched(true);
+
+    // When user edits the field, clear confirmation state - they must re-select
+    if (isOfficerConfirmed) {
+      setIsOfficerConfirmed(false);
+      // Clear the officer_id since the user is modifying the selection
+      setFormData((prev: any) => ({
+        ...prev,
+        officer_id: '',
+        name: '',
+        rank: ''
+      }));
+    }
+
     setOpenOfficerNames(true);
     handleInputChange('serviceNumber', newArmyNumber);
 
@@ -113,34 +134,67 @@ export default function TrialForm({
     );
     setFilteredArmy(filtered || []);
 
-    // Only update officer_id if we find an exact match
-    const findId = officers?.find(
-      (officer: any) =>
-        String(officer.serviceNumber).trim().toLowerCase() ===
-        String(newArmyNumber).trim().toLowerCase()
-    );
-
-    if (findId) {
-      setFormData((prev: any) => ({
-        ...prev,
-        officer_id: findId.id
-      }));
-    } else if (newArmyNumber.trim() === '') {
-      // Only clear if field is emptied, not on every non-match
+    // Clear officer_id if field is emptied
+    if (newArmyNumber.trim() === '') {
       setFormData((prev: any) => ({
         ...prev,
         officer_id: ''
       }));
     }
-    // If user types something that doesn't match, keep the existing officer_id
-    // They can either select from dropdown or correct their input
+    // User must explicitly select from dropdown - no auto-matching
+  };
+
+  // Helper function to get the current field state for officer selection
+  const getOfficerFieldState = () => {
+    const hasInput = formData.serviceNumber?.trim();
+    const hasMatches = filteredArmy.length > 0;
+    const hasOfficerId = formData.officer_id && formData.officer_id !== 0;
+
+    if (!hasInput && !officerFieldTouched) {
+      return 'empty';
+    }
+    if (!hasInput && officerFieldTouched) {
+      return 'cleared';
+    }
+    if (hasInput && !hasMatches) {
+      return 'no-match';
+    }
+    if (hasInput && hasMatches && !hasOfficerId) {
+      return 'pending-selection';
+    }
+    if (hasOfficerId && isOfficerConfirmed) {
+      return 'confirmed';
+    }
+    return 'pending-selection';
   };
 
   const handleSave = async () => {
     try {
-      // Validate required fields
+      // Validate officer selection with contextual messages
+      const officerState = getOfficerFieldState();
+
+      if (officerState === 'empty' || officerState === 'cleared') {
+        showError('Please enter a service number to continue');
+        console.log('[Trial Form] Officer validation failed: field empty');
+        return;
+      }
+
+      if (officerState === 'no-match') {
+        showError(
+          'This service number does not match any officer on record. Please verify the number or contact your administrator.'
+        );
+        console.log('[Trial Form] Officer validation failed: no matching officer');
+        return;
+      }
+
+      if (officerState === 'pending-selection') {
+        showError('Please select the officer from the dropdown to confirm your choice');
+        console.log('[Trial Form] Officer validation failed: officer not selected from dropdown');
+        return;
+      }
+
       if (!formData.officer_id && formData.officer_id !== 0) {
-        showError('Officer ID is required');
+        showError('A valid officer must be selected before submitting');
         console.log('[Trial Form] Officer ID validation failed:', formData.officer_id);
         return;
       }
@@ -210,40 +264,106 @@ export default function TrialForm({
 
         <div className="space-y-6">
           {/* Basic Information */}
-          <div className="grid grid-cols-12 gap-4 items-center">
-            <label className="col-span-3 text-sm font-medium text-gray-700 uppercase">
+          <div className="grid grid-cols-12 gap-4 items-start">
+            <label className="col-span-3 text-sm font-medium text-gray-700 uppercase pt-2.5">
               OFFICER ID / SERVICE NUMBER
             </label>
             <div className="col-span-9 relative">
-              <input
-                type="text"
-                name="serviceNumber"
-                value={formData.serviceNumber}
-                onChange={handleSetOfficerId}
-                placeholder="Service Number"
-                disabled={!isEdit || isLoading}
-                className={`w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 ${
-                  !isEdit || isLoading
-                    ? 'bg-gray-50 text-gray-600 cursor-not-allowed'
-                    : 'placeholder-gray-400'
+              <div className="relative">
+                <input
+                  type="text"
+                  name="serviceNumber"
+                  value={formData.serviceNumber}
+                  onChange={handleSetOfficerId}
+                  onFocus={() => {
+                    if (formData.serviceNumber && !isOfficerConfirmed) {
+                      setOpenOfficerNames(true);
+                    }
+                  }}
+                  onBlur={() => {
+                    // Delay closing to allow click on dropdown items
+                    setTimeout(() => setOpenOfficerNames(false), 200);
+                  }}
+                  placeholder="Enter service number to search"
+                  disabled={!isEdit || isLoading}
+                  className={`w-full px-3 py-2.5 border rounded-md focus:outline-none focus:ring-1 ${
+                    isOfficerConfirmed
+                      ? 'border-green-500 focus:ring-green-400 focus:border-green-400 bg-green-50'
+                      : officerFieldTouched && formData.serviceNumber && filteredArmy.length === 0
+                      ? 'border-amber-400 focus:ring-amber-400 focus:border-amber-400'
+                      : 'border-gray-300 focus:ring-gray-400 focus:border-gray-400'
+                  } ${
+                    !isEdit || isLoading
+                      ? 'bg-gray-50 text-gray-600 cursor-not-allowed'
+                      : 'placeholder-gray-400'
+                  }`}
+                />
+                {/* Confirmation checkmark */}
+                {isOfficerConfirmed && (
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                )}
+              </div>
+
+              {/* Helper text */}
+              <p
+                className={`text-xs mt-1.5 ${
+                  isOfficerConfirmed
+                    ? 'text-green-600'
+                    : officerFieldTouched && formData.serviceNumber && filteredArmy.length === 0
+                    ? 'text-amber-600'
+                    : officerFieldTouched &&
+                      formData.serviceNumber &&
+                      filteredArmy.length > 0 &&
+                      !isOfficerConfirmed
+                    ? 'text-blue-600'
+                    : 'text-gray-500'
                 }`}
-              />
-              {openOfficerNames && formData.serviceNumber !== '' && filteredArmy.length > 0 && (
+              >
+                {isOfficerConfirmed
+                  ? '✓ Officer confirmed'
+                  : officerFieldTouched && formData.serviceNumber && filteredArmy.length === 0
+                  ? 'No officer found with this service number'
+                  : officerFieldTouched && formData.serviceNumber && filteredArmy.length > 0
+                  ? 'Select an officer from the list to confirm'
+                  : "Enter the officer's service number to search"}
+              </p>
+
+              {/* Dropdown - now shows even with no results */}
+              {openOfficerNames && formData.serviceNumber !== '' && !isOfficerConfirmed && (
                 <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                  {filteredArmy?.map((officer: any) => (
-                    <button
-                      key={officer.id}
-                      type="button"
-                      onClick={() => handleSelectOfficer(officer)}
-                      disabled={!isEdit || isLoading}
-                      className="w-full px-4 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none disabled:opacity-50"
-                    >
-                      <div className="flex justify-between">
-                        <p>{officer.name}</p>
-                        <p>{officer.serviceNumber}</p>
-                      </div>
-                    </button>
-                  ))}
+                  {filteredArmy.length > 0 ? (
+                    filteredArmy.map((officer: any) => (
+                      <button
+                        key={officer.id}
+                        type="button"
+                        onClick={() => handleSelectOfficer(officer)}
+                        disabled={!isEdit || isLoading}
+                        className="w-full px-4 py-2.5 text-left hover:bg-teal-50 focus:bg-teal-50 focus:outline-none disabled:opacity-50 border-b border-gray-100 last:border-b-0"
+                      >
+                        <div className="flex justify-between items-center">
+                          <span className="font-medium text-gray-900">{officer.name}</span>
+                          <span className="text-sm text-gray-500">{officer.serviceNumber}</span>
+                        </div>
+                      </button>
+                    ))
+                  ) : (
+                    <div className="px-4 py-4 text-center">
+                      <p className="text-sm text-gray-600 font-medium">
+                        No officer found with this service number
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Verify the number or contact your unit administrator
+                      </p>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

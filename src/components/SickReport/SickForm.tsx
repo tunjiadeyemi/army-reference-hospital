@@ -89,7 +89,7 @@ export default function SickForm({ isEdit = true, mockData }: SickFormProps) {
       recName: '',
       admission_days: '',
       sick_leave_days: '',
-      return_date: '05/20/2026',
+      return_date: '',
       remark: ''
     };
   };
@@ -458,7 +458,7 @@ export default function SickForm({ isEdit = true, mockData }: SickFormProps) {
           <label className="col-span-2 text-sm font-medium text-gray-700 uppercase tracking-wide">
             ADMISSION NO. OF DAYS
           </label>
-          <div className="col-span-3">
+          <div className="col-span-3">\
             <input
               type="text"
               placeholder="No of days"
@@ -639,7 +639,7 @@ export default function SickForm({ isEdit = true, mockData }: SickFormProps) {
           </label>
           <div className="col-span-9">
             <input
-              type="text"
+              type="date"
               value={formData.return_date}
               onChange={(e) => handleInputChange('return_date', e.target.value)}
               disabled={!isEdit}

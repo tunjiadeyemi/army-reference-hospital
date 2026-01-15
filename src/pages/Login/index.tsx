@@ -8,7 +8,7 @@ import Loader from '../../components/ui/Loader';
 import { showError, showSuccess } from '../../utils/toast';
 
 import { useQueryClient } from '@tanstack/react-query';
-import { getOverview } from '../../services/dashboardApi/dashboardServices';
+import { getOverview, prefetchAllData } from '../../services/dashboardApi/dashboardServices';
 const Login = () => {
   const [isPasswordVisible, togglePassword] = useToggle();
   const queryClient = useQueryClient()
@@ -35,6 +35,9 @@ const Login = () => {
           
         })
 
+        // Prefetch all data immediately after login
+        await prefetchAllData();
+
         navigate('/home');
 
       },
@@ -45,21 +48,21 @@ const Login = () => {
   };
   return (
     <div
-      className="lg:h-screen w-full bg-cover bg-center "
+      className="h-screen overflow-y-auto w-full bg-cover bg-center "
       style={{ backgroundImage: "url('/images/login.png')", backgroundColor: 'black' }}
     >
-      <div className="flex items-center justify-center w-full h-full bg-black/40 py-30 ">
-        <div className="lg:w-[43%] w-[90%]  lg:h-auto flex flex-col items-center bg-white py-14 px-5 rounded-xl shadow-lg">
-          <img className="w-[240px]" src="/logo.svg" alt="Logo" />
-          <div>
-            <h2 className="font-extrabold text-center text-[#2D403D] text-2xl uppercase mt-5 mb-9">
+      <div className="flex items-center justify-center w-full h-full overflow-y-auto bg-black/40 py-30 ">
+        <div className="my-3 lg:w-[43%] w-[90%] h-auto flex flex-col items-center  bg-white py-7  sm:px-5 rounded-xl shadow-lg">
+          <img className="2xl:w-60 w-30 sm:w-40 " src="/logo.svg" alt="Logo" />
+          <div className='px-5 w-full '>
+            <h2 className="font-extrabold  text-center text-[#2D403D] text-xl md:text-2xl uppercase md:mt-5 mb-4.5 lg:mb-9">
               44 Nigerian Army Reference Hospital
             </h2>
-            <h2 className="font-extrabold text-[#22A08E] text-3xl  text-center mb-9">
+            <h2 className="font-extrabold text-[#22A08E] text-2xl md:text-3xl  text-center mb-4.5 lg:mb-9">
               Welcome Back!
             </h2>
           </div>
-          <form onSubmit={handleSignUp} className="w-[85%] flex flex-col">
+          <form onSubmit={handleSignUp} className="w-[85%] flex flex-col gap-0">
             <label className="text-sm uppercase font-semibold mb-1.5" htmlFor="Email">
               Email Address
             </label>
@@ -71,7 +74,7 @@ const Login = () => {
               onChange={setFormData}
               type="text"
             />
-            <label className="text-sm uppercase font-semibold mt-10 mb-1.5" htmlFor="Email">
+            <label className="text-sm uppercase font-semibold mt-5 md:mt-10 mb-1.5" htmlFor="Email">
               Password
             </label>
             <div className="w-full relative h-12">
@@ -99,7 +102,7 @@ const Login = () => {
             </div>
 
             <button
-              className="cursor-pointer flex justify-center items-center w-full h-15 mt-20 rounded-sm bg-[#22A08E] text-white"
+              className="cursor-pointer flex justify-center items-center w-full lg:h-15 h-10 mt-5 lg:mt-20 rounded-sm bg-[#22A08E] text-white"
               type="submit"
             >
               {isPending ? <Loader /> : 'Login'}
