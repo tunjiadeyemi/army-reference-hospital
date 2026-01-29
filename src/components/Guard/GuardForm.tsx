@@ -137,7 +137,7 @@ export default function GuardForm({ isEdit = true, mockData }: GuardFormProps) {
       } catch (err) {
         console.error(err);
       }
-      return
+      return;
     }
 
     try {
@@ -156,193 +156,196 @@ export default function GuardForm({ isEdit = true, mockData }: GuardFormProps) {
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
         <div className="space-y-6">
           {/* Army Number */}
-          <div className="flex relative items-center">
-            <label className="block text-sm font-medium text-gray-700 w-48 flex-shrink-0">
-              ARMY NUMBER
-            </label>
-            <div className="lg:w-full relative">
-              <input
-                type="text"
-                name="serviceNumber"
-                value={formData.serviceNumber}
-                onChange={handleSetOfficerId}
-                placeholder="Army Number"
-                disabled={!isEdit}
-                className={`flex-1 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
-                  !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                }`}
-              />
-              {openOfficerNames && formData.serviceNumber !== '' && filteredArmy.length > 0 && (
-                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                  {filteredArmy?.map((officer: any) => (
-                    <button
-                      key={officer.id}
-                      type="button"
-                      onClick={() => handleSelectOfficer(officer)}
-                      className="w-full px-4 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
-                    >
-                      <div className="flex justify-between">
-                        <p>{officer.name}</p>
-                        <p>{officer.serviceNumber}</p>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Rank */}
-          <div className="flex items-center">
-            <label className="block text-sm font-medium text-gray-700 w-48 flex-shrink-0">
-              RANK
-            </label>
-            <div className="flex-1 relative">
-              <select
-                name="rank"
-                value={formData.rank}
-                onChange={(e) => handleInputChange('rank', e.target.value)}
-                disabled={!isEdit}
-                className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 appearance-none bg-white ${
-                  !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                }`}
-              >
-                {rankOptions.map((rank) => (
-                  <option key={rank} value={rank === 'Rank' ? '' : rank}>
-                    {rank}
-                  </option>
-                ))}
-              </select>
-              <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                <svg
-                  className="w-4 h-4 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
+          <div className="grid grid-cols-4 gap-4">
+            <div className="flex flex-col relative space-y-2">
+              <label className="block text-sm font-medium text-gray-700 w-48 flex-shrink-0">
+                ARMY NUMBER
+              </label>
+              <div className="lg:w-full relative">
+                <input
+                  type="text"
+                  name="serviceNumber"
+                  value={formData.serviceNumber}
+                  onChange={handleSetOfficerId}
+                  placeholder="Army Number"
+                  disabled={!isEdit}
+                  className={`flex-1 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+                    !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                  }`}
+                />
+                {openOfficerNames && formData.serviceNumber !== '' && filteredArmy.length > 0 && (
+                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                    {filteredArmy?.map((officer: any) => (
+                      <button
+                        key={officer.id}
+                        type="button"
+                        onClick={() => handleSelectOfficer(officer)}
+                        className="w-full px-4 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
+                      >
+                        <div className="flex justify-between">
+                          <p>{officer.name}</p>
+                          <p>{officer.serviceNumber}</p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
-          </div>
 
-          {/* Name */}
-          <div className="flex items-center">
-            <label className="block text-sm font-medium text-gray-700 w-48 flex-shrink-0">
-              NAME
-            </label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={(e) => handleInputChange('name', e.target.value)}
-              placeholder="Full Name"
-              disabled={!isEdit}
-              className={`flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
-                !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-              }`}
-            />
-          </div>
+            {/* Rank */}
+            <div className="flex flex-col relative space-y-2">
+              <label className="block text-sm font-medium text-gray-700 w-48 flex-shrink-0">
+                RANK
+              </label>
+              <div className="flex-1  relative">
+                <select
+                  name="rank"
+                  value={formData.rank}
+                  onChange={(e) => handleInputChange('rank', e.target.value)}
+                  disabled={!isEdit}
+                  className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 appearance-none bg-white ${
+                    !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                  }`}
+                >
+                  {rankOptions.map((rank) => (
+                    <option key={rank} value={rank === 'Rank' ? '' : rank}>
+                      {rank}
+                    </option>
+                  ))}
+                </select>
+                <div className="absolute inset-y-0 right-0  top-4  px-2 pointer-events-none">
+                  <svg
+                    className="w-4 h-4 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </div>
 
-          {/* Offence */}
-          <div className="flex items-center">
-            <label className="block text-sm font-medium text-gray-700 w-48 flex-shrink-0">
-              OFFENCE
-            </label>
-            <input
-              type="text"
-              name="offence"
-              value={formData.offence}
-              onChange={(e) => handleInputChange('offence', e.target.value)}
-              placeholder="Offence"
-              disabled={!isEdit}
-              className={`flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
-                !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-              }`}
-            />
-          </div>
-
-          {/* Date Detained */}
-          <div className="flex items-center">
-            <label className="block text-sm font-medium text-gray-700 w-48 flex-shrink-0">
-              DATE DETAINED
-            </label>
-            <div className="flex-1 relative">
+            {/* Name */}
+            <div className="flex flex-col relative space-y-2">
+              <label className="block text-sm font-medium text-gray-700 w-48 flex-shrink-0">
+                NAME
+              </label>
               <input
-                type="date"
-                name="date_detained"
-                value={formData.date_detained}
-                onChange={(e) => handleInputChange('date_detained', e.target.value)}
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={(e) => handleInputChange('name', e.target.value)}
+                placeholder="Full Name"
                 disabled={!isEdit}
-                className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+                className={`flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
                   !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
                 }`}
               />
-              {/* <img
+            </div>
+
+            {/* Offence */}
+            <div className="flex flex-col relative space-y-2">
+              <label className="block text-sm font-medium text-gray-700 w-48 flex-shrink-0">
+                OFFENCE
+              </label>
+              <input
+                type="text"
+                name="offence"
+                value={formData.offence}
+                onChange={(e) => handleInputChange('offence', e.target.value)}
+                placeholder="Offence"
+                disabled={!isEdit}
+                className={`flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+                  !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                }`}
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-4 gap-4">
+            {/* Date Detained */}
+            <div className="flex flex-col relative space-y-2">
+              <label className="block text-sm font-medium text-gray-700 w-48 flex-shrink-0">
+                DATE DETAINED
+              </label>
+              <div className="flex-1 relative">
+                <input
+                  type="date"
+                  name="date_detained"
+                  value={formData.date_detained}
+                  onChange={(e) => handleInputChange('date_detained', e.target.value)}
+                  disabled={!isEdit}
+                  className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+                    !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                  }`}
+                />
+                {/* <img
                 src="/unitBible/calendar-icon.svg"
                 alt=""
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none"
               /> */}
+              </div>
             </div>
-          </div>
 
-          {/* Detained By */}
-          <div className="flex items-center">
-            <label className="block text-sm font-medium text-gray-700 w-48 flex-shrink-0">
-              DETAINED BY
-            </label>
-            <input
-              type="text"
-              name="detainedBy"
-              value={formData.detained_by}
-              onChange={(e) => handleInputChange('detained_by', e.target.value)}
-              placeholder="Detain by"
-              disabled={!isEdit}
-              className={`flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
-                !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-              }`}
-            />
-          </div>
+            {/* Detained By */}
+            <div className="flex flex-col relative space-y-2">
+              <label className="block text-sm font-medium text-gray-700 w-48 flex-shrink-0">
+                DETAINED BY
+              </label>
+              <input
+                type="text"
+                name="detainedBy"
+                value={formData.detained_by}
+                onChange={(e) => handleInputChange('detained_by', e.target.value)}
+                placeholder="Detain by"
+                disabled={!isEdit}
+                className={`flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+                  !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                }`}
+              />
+            </div>
 
-          {/* Released By */}
-          <div className="flex items-center">
-            <label className="block text-sm font-medium text-gray-700 w-48 flex-shrink-0">
-              RELEASED BY
-            </label>
-            <input
-              type="text"
-              name="released_by"
-              value={formData.released_by}
-              onChange={(e) => handleInputChange('released_by', e.target.value)}
-              placeholder="Release by"
-              disabled={!isEdit}
-              className={`flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
-                !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-              }`}
-            />
-          </div>
+            {/* Released By */}
+            <div className="flex flex-col relative space-y-2">
+              <label className="block text-sm font-medium text-gray-700 w-48 flex-shrink-0">
+                RELEASED BY
+              </label>
+              <input
+                type="text"
+                name="released_by"
+                value={formData.released_by}
+                onChange={(e) => handleInputChange('released_by', e.target.value)}
+                placeholder="Release by"
+                disabled={!isEdit}
+                className={`flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+                  !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                }`}
+              />
+            </div>
 
-          {/* Remark */}
-          <div className="flex items-start">
-            <label className="block text-sm font-medium text-gray-700 w-48 flex-shrink-0 pt-3">
-              REMARK
-            </label>
-            <textarea
-              name="remark"
-              value={formData.remark}
-              onChange={(e) => handleInputChange('remark', e.target.value)}
-              placeholder="Remark"
-              rows={4}
-              disabled={!isEdit}
-              className={`flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none ${
-                !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-              }`}
-            />
+            {/* Remark */}
+            <div className="flex flex-col relative space-y-2">
+              <label className="block text-sm font-medium text-gray-700 w-48 flex-shrink-0 ">
+                REMARK
+              </label>
+              <input
+                name="remark"
+                value={formData.remark}
+                onChange={(e) => handleInputChange('remark', e.target.value)}
+                placeholder="Remark"
+           
+                disabled={!isEdit}
+                className={`flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none ${
+                  !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                }`}
+              />
+            </div>
           </div>
 
           {/* Save Button */}

@@ -243,256 +243,263 @@ export default function SickForm({ isEdit = true, mockData }: SickFormProps) {
 
   return (
     <div className="px-5">
-      <div className="space-y-6">
+      <div className="space-y-3">
         {/* Army Number */}
-        <div className="grid grid-cols-12 gap-4 items-center">
-          <label className="col-span-3 text-sm font-medium text-gray-700 uppercase tracking-wide">
-            ARMY NUMBER
-          </label>
-          <div className="col-span-9">
-            <input
-              type="text"
-              placeholder="Army Number"
-              value={formData.serviceNumber}
-              onChange={handleSetArmyName}
-              disabled={!isEdit}
-              className={`w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 ${
-                !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : 'placeholder-gray-400'
-              }`}
-            />
+        <div className="grid grid-cols-4 gap-4">
+          <div className="flex flex-col gap-4 justify-center">
+            <label className="col-span-3 text-sm font-medium text-gray-700 uppercase tracking-wide">
+              ARMY NUMBER
+            </label>
+            <div className="col-span-9">
+              <input
+                type="text"
+                placeholder="Army Number"
+                value={formData.serviceNumber}
+                onChange={handleSetArmyName}
+                disabled={!isEdit}
+                className={`w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 ${
+                  !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : 'placeholder-gray-400'
+                }`}
+              />
+            </div>
           </div>
-        </div>
 
-        {/* Rank */}
-        <div className="grid grid-cols-12 gap-4 items-center">
-          <label className="col-span-3 text-sm font-medium text-gray-700 uppercase tracking-wide">
-            RANK
-          </label>
-          <div className="col-span-9 relative">
-            <button
-              type="button"
-              onClick={() => toggleDropdown('rank')}
-              disabled={!isEdit}
-              className={`w-full px-3 py-2.5 border border-gray-300 rounded-md text-left focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 flex justify-between items-center ${
-                !isEdit ? 'bg-gray-50 cursor-not-allowed' : ''
-              }`}
-            >
-              <span className={formData.rank ? 'text-gray-900' : 'text-gray-400'}>
-                {formData.rank || 'Rank'}
-              </span>
-              {isEdit && <img src="/chevron-down.svg" alt="" className="h-5 w-5 text-gray-400" />}
-            </button>
-            {dropdowns.rank && isEdit && (
-              <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg">
-                {rankOptions.map((option, index) => (
-                  <button
-                    key={index}
-                    type="button"
-                    onClick={() => selectOption('rank', option)}
-                    className={`w-full px-3 py-2 text-left hover:bg-gray-50 text-gray-900 ${
-                      index === 0 ? 'rounded-t-md' : ''
-                    } ${index === rankOptions.length - 1 ? 'rounded-b-md' : ''}`}
-                  >
-                    {option}
-                  </button>
-                ))}
-              </div>
-            )}
+          {/* Rank */}
+          <div className="flex flex-col gap-4 justify-center">
+            <label className="col-span-3 text-sm font-medium text-gray-700 uppercase tracking-wide">
+              RANK
+            </label>
+            <div className="col-span-9 relative">
+              <button
+                type="button"
+                onClick={() => toggleDropdown('rank')}
+                disabled={!isEdit}
+                className={`w-full px-3 py-2.5 border border-gray-300 rounded-md text-left focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 flex justify-between items-center ${
+                  !isEdit ? 'bg-gray-50 cursor-not-allowed' : ''
+                }`}
+              >
+                <span className={formData.rank ? 'text-gray-900' : 'text-gray-400'}>
+                  {formData.rank || 'Rank'}
+                </span>
+                {isEdit && <img src="/chevron-down.svg" alt="" className="h-5 w-5 text-gray-400" />}
+              </button>
+              {dropdowns.rank && isEdit && (
+                <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg">
+                  {rankOptions.map((option, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={() => selectOption('rank', option)}
+                      className={`w-full px-3 py-2 text-left hover:bg-gray-50 text-gray-900 ${
+                        index === 0 ? 'rounded-t-md' : ''
+                      } ${index === rankOptions.length - 1 ? 'rounded-b-md' : ''}`}
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
 
-        {/* Name */}
-        <div className="grid grid-cols-12 gap-4 items-center">
-          <label className="col-span-3 text-sm font-medium text-gray-700 uppercase tracking-wide">
-            NAME
-          </label>
-          <div className="col-span-9 relative">
-            <button
-              type="button"
-              onClick={() => toggleDropdown('name')}
-              disabled={!isEdit}
-              className={`w-full px-3 py-2.5 border border-gray-300 rounded-md text-left focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 flex justify-between items-center ${
-                !isEdit ? 'bg-gray-50 cursor-not-allowed' : ''
-              }`}
-            >
-              <span className={formData.name ? 'text-gray-900' : 'text-gray-400'}>
-                {formData.name || 'Name'}
-              </span>
-              {isEdit && <img src="/chevron-down.svg" alt="" className="h-5 w-5 text-gray-400" />}
-            </button>
-            {dropdowns.name && isEdit && (
-              <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
-                {officersData.map((officer: any, index: number) => (
-                  <button
-                    key={index}
-                    type="button"
-                    onClick={() => selectOption('name', officer.name)}
-                    className="w-full px-3 py-2 text-left hover:bg-gray-50 text-gray-900 first:rounded-t-md last:rounded-b-md"
-                  >
-                    <div className="flex justify-between items-center">
-                      <span>{officer.name}</span>
-                      <span className="text-sm text-gray-500">{officer.serviceNumber}</span>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            )}
+          {/* Name */}
+          <div className="flex flex-col gap-4 justify-center">
+            <label className="col-span-3 text-sm font-medium text-gray-700 uppercase tracking-wide">
+              NAME
+            </label>
+            <div className="col-span-9 relative">
+              <button
+                type="button"
+                onClick={() => toggleDropdown('name')}
+                disabled={!isEdit}
+                className={`w-full px-3 py-2.5 border border-gray-300 rounded-md text-left focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 flex justify-between items-center ${
+                  !isEdit ? 'bg-gray-50 cursor-not-allowed' : ''
+                }`}
+              >
+                <span className={formData.name ? 'text-gray-900' : 'text-gray-400'}>
+                  {formData.name || 'Name'}
+                </span>
+                {isEdit && <img src="/chevron-down.svg" alt="" className="h-5 w-5 text-gray-400" />}
+              </button>
+              {dropdowns.name && isEdit && (
+                <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                  {officersData.map((officer: any, index: number) => (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={() => selectOption('name', officer.name)}
+                      className="w-full px-3 py-2 text-left hover:bg-gray-50 text-gray-900 first:rounded-t-md last:rounded-b-md"
+                    >
+                      <div className="flex justify-between items-center">
+                        <span>{officer.name}</span>
+                        <span className="text-sm text-gray-500">{officer.serviceNumber}</span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
 
-        {/* Department */}
-        <div className="grid grid-cols-12 gap-4 items-center">
-          <label className="col-span-3 text-sm font-medium text-gray-700 uppercase tracking-wide">
-            DEPARTMENT
-          </label>
-          <div className="col-span-9 relative">
-            <button
-              type="button"
-              onClick={() => toggleDropdown('department')}
-              disabled={!isEdit}
-              className={`w-full px-3 py-2.5 border border-gray-300 rounded-md text-left focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 flex justify-between items-center ${
-                !isEdit ? 'bg-gray-50 cursor-not-allowed' : ''
-              }`}
-            >
-              <span className={formData.department ? 'text-gray-900' : 'text-gray-400'}>
-                {formData.department || 'Department'}
-              </span>
-              {isEdit && <img src="/chevron-down.svg" alt="" className="h-5 w-5 text-gray-400" />}
-            </button>
-            {dropdowns.department && isEdit && (
-              <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg">
-                {departmentOptions.map((option, index) => (
-                  <button
-                    key={index}
-                    type="button"
-                    onClick={() => selectOption('department', option)}
-                    className={`w-full px-3 py-2 text-left hover:bg-gray-50 text-gray-900 ${
-                      index === 0 ? 'rounded-t-md' : ''
-                    } ${index === departmentOptions.length - 1 ? 'rounded-b-md' : ''}`}
-                  >
-                    {option}
-                  </button>
-                ))}
-              </div>
-            )}
+          {/* Department */}
+          <div className="flex flex-col gap-4 justify-center">
+            <label className="col-span-3 text-sm font-medium text-gray-700 uppercase tracking-wide">
+              DEPARTMENT
+            </label>
+            <div className="col-span-9 relative">
+              <button
+                type="button"
+                onClick={() => toggleDropdown('department')}
+                disabled={!isEdit}
+                className={`w-full px-3 py-2.5 border border-gray-300 rounded-md text-left focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 flex justify-between items-center ${
+                  !isEdit ? 'bg-gray-50 cursor-not-allowed' : ''
+                }`}
+              >
+                <span className={formData.department ? 'text-gray-900' : 'text-gray-400'}>
+                  {formData.department || 'Department'}
+                </span>
+                {isEdit && <img src="/chevron-down.svg" alt="" className="h-5 w-5 text-gray-400" />}
+              </button>
+              {dropdowns.department && isEdit && (
+                <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg">
+                  {departmentOptions.map((option, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={() => selectOption('department', option)}
+                      className={`w-full px-3 py-2 text-left hover:bg-gray-50 text-gray-900 ${
+                        index === 0 ? 'rounded-t-md' : ''
+                      } ${index === departmentOptions.length - 1 ? 'rounded-b-md' : ''}`}
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Action Header */}
-        <div className="text-center py-4">
+        <div className="text-left py-2">
           <h3 className="text-sm font-medium text-gray-700 uppercase tracking-wide">ACTION</h3>
         </div>
+        <div></div>
 
         {/* Excuse Duty */}
-        <div className="grid grid-cols-12 gap-4 items-start">
-          <label className="col-span-3 text-sm font-medium text-gray-700 uppercase tracking-wide">
-            EXCUSE DUTY
-          </label>
-          <div className="col-span-6 relative">
-            <button
-              type="button"
-              onClick={() => toggleDropdown('excuseDuty')}
-              disabled={!isEdit}
-              className={`w-full px-3 py-2.5 border border-gray-300 rounded-md text-left focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 flex justify-between items-center ${
-                !isEdit ? 'bg-gray-50 cursor-not-allowed' : ''
-              }`}
-            >
-              <span className="text-gray-900">{formData.excuse_duty}</span>
-              {isEdit && <img src="/chevron-down.svg" alt="" className="h-5 w-5 text-gray-400" />}
-            </button>
-            {dropdowns.excuseDuty && isEdit && (
-              <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg">
-                {excuseDutyOptions.map((option, index) => (
-                  <button
-                    key={index}
-                    type="button"
-                    onClick={() => selectOption('excuse_duty', option)}
-                    className={`w-full px-3 py-2 text-left hover:bg-gray-50 ${
-                      option === formData.excuse_duty ? 'bg-teal-500 text-white' : 'text-gray-900'
-                    } ${index === 0 ? 'rounded-t-md' : ''} ${
-                      index === excuseDutyOptions.length - 1 ? 'rounded-b-md' : ''
-                    }`}
-                  >
-                    {option}
-                  </button>
-                ))}
-              </div>
-            )}
+        <div className="grid grid-cols-5 gap-4">
+          <div className="flex flex-col gap-4 justify-center">
+            <label className="col-span-3 text-sm font-medium text-gray-700 uppercase tracking-wide">
+              EXCUSE DUTY
+            </label>
+            <div className="col-span-6 relative">
+              <button
+                type="button"
+                onClick={() => toggleDropdown('excuseDuty')}
+                disabled={!isEdit}
+                className={`w-full px-3 py-2.5 border border-gray-300 rounded-md text-left focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 flex justify-between items-center ${
+                  !isEdit ? 'bg-gray-50 cursor-not-allowed' : ''
+                }`}
+              >
+                <span className="text-gray-900">{formData.excuse_duty}</span>
+                {isEdit && <img src="/chevron-down.svg" alt="" className="h-5 w-5 text-gray-400" />}
+              </button>
+              {dropdowns.excuseDuty && isEdit && (
+                <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg">
+                  {excuseDutyOptions.map((option, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={() => selectOption('excuse_duty', option)}
+                      className={`w-full px-3 py-2 text-left hover:bg-gray-50 ${
+                        option === formData.excuse_duty ? 'bg-teal-500 text-white' : 'text-gray-900'
+                      } ${index === 0 ? 'rounded-t-md' : ''} ${
+                        index === excuseDutyOptions.length - 1 ? 'rounded-b-md' : ''
+                      }`}
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
 
-        {/* Excuse Duty Days */}
-        <div className="grid grid-cols-12 gap-4 items-center">
-          <label className="col-span-3 text-sm font-medium text-gray-700 uppercase tracking-wide">
-            EXCUSE DUTY (NO. OF DAYS)
-          </label>
-          <div className="col-span-9">
-            <input
-              type="text"
-              value={formData.excuse_duty_days}
-              onChange={(e) => handleInputChange('excuse_duty_days', e.target.value)}
-              disabled={!isEdit}
-              className={`w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 ${
-                !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-              }`}
-            />
+          {/* Excuse Duty Days */}
+          <div className="flex flex-col gap-4 justify-center">
+            <label className="col-span-3 text-sm font-medium text-gray-700 uppercase tracking-wide">
+              EXCUSE DUTY (NO. OF DAYS)
+            </label>
+            <div className="col-span-9">
+              <input
+                type="text"
+                value={formData.excuse_duty_days}
+                onChange={(e) => handleInputChange('excuse_duty_days', e.target.value)}
+                disabled={!isEdit}
+                className={`w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 ${
+                  !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                }`}
+              />
+            </div>
+          </div>
+          <div className="flex flex-col gap-4 justify-center">
+            <label className="col-span-3 text-sm font-medium text-gray-700 uppercase tracking-wide">
+              ADMISSION
+            </label>
+            <div className="col-span-4">
+              <input
+                type="text"
+                value={formData.admission}
+                onChange={(e) => handleInputChange('admission', e.target.value)}
+                disabled={!isEdit}
+                className={`w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 ${
+                  !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                }`}
+              />
+            </div>
+          </div>
+          <div className="flex flex-col gap-4 justify-center">
+            <label className="col-span-2 text-sm font-medium text-gray-700 uppercase tracking-wide">
+              ADMISSION NO. OF DAYS
+            </label>
+            <div className="col-span-3">
+              <input
+                type="text"
+                placeholder="No of days"
+                value={formData.admission_days}
+                onChange={(e) => handleInputChange('admission_days', e.target.value)}
+                disabled={!isEdit}
+                className={`w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 ${
+                  !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : 'placeholder-gray-400'
+                }`}
+              />
+            </div>
+          </div>
+          <div className="flex flex-col gap-4 justify-center">
+            <label className="col-span-3 text-sm font-medium text-gray-700 uppercase tracking-wide">
+              SICK LEAVE NO. OF DAYS
+            </label>
+            <div className="col-span-9">
+              <input
+                type="text"
+                placeholder="No of days"
+                value={formData.sick_leave_days}
+                onChange={(e) => handleInputChange('sick_leave_days', e.target.value)}
+                disabled={!isEdit}
+                className={`w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 ${
+                  !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : 'placeholder-gray-400'
+                }`}
+              />
+            </div>
           </div>
         </div>
 
         {/* Admission and Admission Days */}
-        <div className="grid grid-cols-12 gap-4 items-center">
-          <label className="col-span-3 text-sm font-medium text-gray-700 uppercase tracking-wide">
-            ADMISSION
-          </label>
-          <div className="col-span-4">
-            <input
-              type="text"
-              value={formData.admission}
-              onChange={(e) => handleInputChange('admission', e.target.value)}
-              disabled={!isEdit}
-              className={`w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 ${
-                !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-              }`}
-            />
-          </div>
-          <label className="col-span-2 text-sm font-medium text-gray-700 uppercase tracking-wide">
-            ADMISSION NO. OF DAYS
-          </label>
-          <div className="col-span-3">\
-            <input
-              type="text"
-              placeholder="No of days"
-              value={formData.admission_days}
-              onChange={(e) => handleInputChange('admission_days', e.target.value)}
-              disabled={!isEdit}
-              className={`w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 ${
-                !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : 'placeholder-gray-400'
-              }`}
-            />
-          </div>
-        </div>
 
         {/* Sick Leave */}
-        <div className="grid grid-cols-12 gap-4 items-center">
-          <label className="col-span-3 text-sm font-medium text-gray-700 uppercase tracking-wide">
-            SICK LEAVE NO. OF DAYS
-          </label>
-          <div className="col-span-9">
-            <input
-              type="text"
-              placeholder="No of days"
-              value={formData.sick_leave_days}
-              onChange={(e) => handleInputChange('sick_leave_days', e.target.value)}
-              disabled={!isEdit}
-              className={`w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 ${
-                !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : 'placeholder-gray-400'
-              }`}
-            />
-          </div>
-        </div>
 
         {/* Divider */}
-        <div className="border-t border-gray-200 pt-8 mt-8">
+        <div className="border-t border-gray-200 pt-4 mt-4">
           <div className="flex justify-between items-center mb-6">
             <hr className="border-gray-200 flex-1" />
             <h3 className="text-sm font-medium text-gray-700 uppercase tracking-wide text-center px-4">
@@ -533,144 +540,150 @@ export default function SickForm({ isEdit = true, mockData }: SickFormProps) {
             </div>
           </div>
 
-          <div className="space-y-6">
-            <div className="grid grid-cols-12 gap-4 items-center">
-              <label className="col-span-3 text-sm font-medium text-gray-700 uppercase tracking-wide">
-                ARMY NO.
-              </label>
-              <div className="col-span-9">
-                <input
-                  type="text"
-                  placeholder="Army Number"
-                  value={formData.recServiceNumber}
-                  onChange={(e) => handleInputChange('recServiceNumber', e.target.value)}
-                  disabled={!isEdit}
-                  className={`w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 ${
-                    !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : 'placeholder-gray-400'
-                  }`}
-                />
+          <div className="space-y-3">
+            <div className="grid grid-cols-3 gap-4">
+              <div className="flex flex-col gap-4 justify-center">
+                <label className="col-span-3 text-sm font-medium text-gray-700 uppercase tracking-wide">
+                  ARMY NO.
+                </label>
+                <div className="col-span-9">
+                  <input
+                    type="text"
+                    placeholder="Army Number"
+                    value={formData.recServiceNumber}
+                    onChange={(e) => handleInputChange('recServiceNumber', e.target.value)}
+                    disabled={!isEdit}
+                    className={`w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 ${
+                      !isEdit
+                        ? 'bg-gray-50 text-gray-600 cursor-not-allowed'
+                        : 'placeholder-gray-400'
+                    }`}
+                  />
+                </div>
               </div>
-            </div>
-            <div className="grid grid-cols-12 gap-4 items-center">
-              <label className="col-span-3 text-sm font-medium text-gray-700 uppercase tracking-wide">
-                NAME
-              </label>
-              <div className="col-span-9 relative">
-                <button
-                  type="button"
-                  onClick={() => toggleDropdown('recName')}
-                  disabled={!isEdit}
-                  className={`w-full px-3 py-2.5 border border-gray-300 rounded-md text-left focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 flex justify-between items-center ${
-                    !isEdit ? 'bg-gray-50 cursor-not-allowed' : ''
-                  }`}
-                >
-                  <span className={formData.recName ? 'text-gray-900' : 'text-gray-400'}>
-                    {formData.recName || 'Name'}
-                  </span>
-                  {isEdit && (
-                    <img src="/chevron-down.svg" alt="" className="h-5 w-5 text-gray-400" />
+              <div className="flex flex-col gap-4 justify-center">
+                <label className="col-span-3 text-sm font-medium text-gray-700 uppercase tracking-wide">
+                  NAME
+                </label>
+                <div className="col-span-9 relative">
+                  <button
+                    type="button"
+                    onClick={() => toggleDropdown('recName')}
+                    disabled={!isEdit}
+                    className={`w-full px-3 py-2.5 border border-gray-300 rounded-md text-left focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 flex justify-between items-center ${
+                      !isEdit ? 'bg-gray-50 cursor-not-allowed' : ''
+                    }`}
+                  >
+                    <span className={formData.recName ? 'text-gray-900' : 'text-gray-400'}>
+                      {formData.recName || 'Name'}
+                    </span>
+                    {isEdit && (
+                      <img src="/chevron-down.svg" alt="" className="h-5 w-5 text-gray-400" />
+                    )}
+                  </button>
+                  {dropdowns.recName && isEdit && (
+                    <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                      {officersData.map((officer: any, index: number) => (
+                        <button
+                          key={index}
+                          type="button"
+                          onClick={() => selectOption('recName', officer.name)}
+                          className="w-full px-3 py-2 text-left hover:bg-gray-50 text-gray-900 first:rounded-t-md last:rounded-b-md"
+                        >
+                          <div className="flex justify-between items-center">
+                            <span>{officer.name}</span>
+                            <span className="text-sm text-gray-500">{officer.serviceNumber}</span>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
                   )}
-                </button>
-                {dropdowns.recName && isEdit && (
-                  <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
-                    {officersData.map((officer: any, index: number) => (
-                      <button
-                        key={index}
-                        type="button"
-                        onClick={() => selectOption('recName', officer.name)}
-                        className="w-full px-3 py-2 text-left hover:bg-gray-50 text-gray-900 first:rounded-t-md last:rounded-b-md"
-                      >
-                        <div className="flex justify-between items-center">
-                          <span>{officer.name}</span>
-                          <span className="text-sm text-gray-500">{officer.serviceNumber}</span>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                )}
+                </div>
               </div>
-            </div>
-            <div className="grid grid-cols-12 gap-4 items-center">
-              <label className="col-span-3 text-sm font-medium text-gray-700 uppercase tracking-wide">
-                RANK
-              </label>
-              <div className="col-span-9 relative">
-                <button
-                  type="button"
-                  onClick={() => toggleDropdown('recRank')}
-                  disabled={!isEdit}
-                  className={`w-full px-3 py-2.5 border border-gray-300 rounded-md text-left focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 flex justify-between items-center ${
-                    !isEdit ? 'bg-gray-50 cursor-not-allowed' : ''
-                  }`}
-                >
-                  <span className={formData.recRank ? 'text-gray-900' : 'text-gray-400'}>
-                    {formData.recRank || 'Rank'}
-                  </span>
-                  {isEdit && (
-                    <img src="/chevron-down.svg" alt="" className="h-5 w-5 text-gray-400" />
+              <div className="flex flex-col gap-4 justify-center">
+                <label className="col-span-3 text-sm font-medium text-gray-700 uppercase tracking-wide">
+                  RANK
+                </label>
+                <div className="col-span-9 relative">
+                  <button
+                    type="button"
+                    onClick={() => toggleDropdown('recRank')}
+                    disabled={!isEdit}
+                    className={`w-full px-3 py-2.5 border border-gray-300 rounded-md text-left focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 flex justify-between items-center ${
+                      !isEdit ? 'bg-gray-50 cursor-not-allowed' : ''
+                    }`}
+                  >
+                    <span className={formData.recRank ? 'text-gray-900' : 'text-gray-400'}>
+                      {formData.recRank || 'Rank'}
+                    </span>
+                    {isEdit && (
+                      <img src="/chevron-down.svg" alt="" className="h-5 w-5 text-gray-400" />
+                    )}
+                  </button>
+                  {dropdowns.recRank && isEdit && (
+                    <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                      {rankOptions.map((option, index) => (
+                        <button
+                          key={index}
+                          type="button"
+                          onClick={() => selectOption('recRank', option)}
+                          className="w-full px-3 py-2 text-left hover:bg-gray-50 text-gray-900 first:rounded-t-md last:rounded-b-md"
+                        >
+                          {option}
+                        </button>
+                      ))}
+                    </div>
                   )}
-                </button>
-                {dropdowns.recRank && isEdit && (
-                  <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
-                    {rankOptions.map((option, index) => (
-                      <button
-                        key={index}
-                        type="button"
-                        onClick={() => selectOption('recRank', option)}
-                        className="w-full px-3 py-2 text-left hover:bg-gray-50 text-gray-900 first:rounded-t-md last:rounded-b-md"
-                      >
-                        {option}
-                      </button>
-                    ))}
-                  </div>
-                )}
+                </div>
               </div>
             </div>
 
-            <hr className="border-gray-200 my-8" />
-            <div className="flex justify-center pt-4"></div>
+            <hr className="border-gray-200 my-4" />
+            <div className="flex justify-center pt-2"></div>
           </div>
         </div>
 
         {/* Return Date */}
-        <div className="grid grid-cols-12 gap-4 items-center">
-          <label className="col-span-3 text-sm font-medium text-gray-700 uppercase tracking-wide">
-            RETURN DATE
-          </label>
-          <div className="col-span-9">
-            <input
-              type="date"
-              value={formData.return_date}
-              onChange={(e) => handleInputChange('return_date', e.target.value)}
-              disabled={!isEdit}
-              className={`w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 ${
-                !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-              }`}
-            />
+        <div className='grid grid-cols-2 gap-4'>
+          <div className="flex flex-col gap-4 justify-center">
+            <label className="col-span-3 text-sm font-medium text-gray-700 uppercase tracking-wide">
+              RETURN DATE
+            </label>
+            <div className="col-span-9">
+              <input
+                type="date"
+                value={formData.return_date}
+                onChange={(e) => handleInputChange('return_date', e.target.value)}
+                disabled={!isEdit}
+                className={`w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 ${
+                  !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                }`}
+              />
+            </div>
           </div>
-        </div>
 
-        {/* Remarks */}
-        <div className="grid grid-cols-12 gap-4 items-start">
-          <label className="col-span-3 text-sm font-medium text-gray-700 uppercase tracking-wide">
-            REMARKS
-          </label>
-          <div className="col-span-9">
-            <textarea
-              rows={3}
-              placeholder="Remarks"
-              value={formData.remark}
-              onChange={(e) => handleInputChange('remark', e.target.value)}
-              disabled={!isEdit}
-              className={`w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 resize-none ${
-                !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : 'placeholder-gray-400'
-              }`}
-            />
+          {/* Remarks */}
+          <div className="flex flex-col gap-4 justify-center">
+            <label className="col-span-3 text-sm font-medium text-gray-700 uppercase tracking-wide">
+              REMARKS
+            </label>
+            <div className="col-span-9">
+              <input
+            
+                placeholder="Remarks"
+                value={formData.remark}
+                onChange={(e) => handleInputChange('remark', e.target.value)}
+                disabled={!isEdit}
+                className={`w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 resize-none ${
+                  !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : 'placeholder-gray-400'
+                }`}
+              />
+            </div>
           </div>
         </div>
 
         {/* Save Button */}
-        <div className="flex justify-center pt-8">
+        <div className="flex justify-center pt-4">
           <button
             onClick={handleSickReport}
             type="button"

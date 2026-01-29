@@ -31,7 +31,7 @@ export default function StaffForm({ isEdit = true, mockData }: StaffFormProps) {
     dtos: isEdit ? '' : mockData?.dtos,
     current_department: isEdit ? '' : mockData?.current_department,
     directorate: isEdit ? '' : mockData?.directorate,
-    lastThreeUnitsServed: isEdit ? ['', '', ''] : mockData?.lastThreeUnitsServed,
+    lastThreeUnitsServed: isEdit ? ['', '', ''] : mockData?.lastThreeUnitsServed || ['', '', ''],
     corps: isEdit ? '' : mockData?.corps,
     phone_number: isEdit ? '' : mockData?.phone_number,
     remarks: isEdit ? '' : mockData?.remarks
@@ -62,15 +62,36 @@ export default function StaffForm({ isEdit = true, mockData }: StaffFormProps) {
   const { isPending } = createMutation;
   const { isPending: updating } = updateMutation;
   const { refetch } = useGetStaffNominals();
-  const {refetch: refetchNominal} = useGetStaffNominal(formData.officer_id)
+  const { refetch: refetchNominal } = useGetStaffNominal(formData.officer_id);
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
+
+    // Validate date_of_birth is not empty
+    if (!formData.date_of_birth) {
+      alert('Please select a date of birth');
+      return;
+    }
+
+    // Ensure date is in ISO 8601 format (YYYY-MM-DD)
+    let iso8601Date = formData.date_of_birth;
+    if (formData.date_of_birth) {
+      const date = new Date(formData.date_of_birth);
+      if (!isNaN(date.getTime())) {
+        iso8601Date = date.toISOString().split('T')[0]; // YYYY-MM-DD format
+      }
+    }
+
+    const payload = {
+      ...formData,
+      date_of_birth: iso8601Date
+    };
+
     if (showStaffModal) {
       try {
-        await updateMutation.mutateAsync(formData);
+        await updateMutation.mutateAsync(payload);
         showSuccess('Updated Staff Nominal');
-        await refetchNominal()
+        await refetchNominal();
         await refetch();
       } catch (err) {
         console.error(err);
@@ -78,7 +99,7 @@ export default function StaffForm({ isEdit = true, mockData }: StaffFormProps) {
       return;
     }
     try {
-      await createMutation.mutateAsync(formData);
+      await createMutation.mutateAsync(payload);
       showSuccess('Added Staff Nominal');
       await refetch();
     } catch (err) {
@@ -249,16 +270,19 @@ export default function StaffForm({ isEdit = true, mockData }: StaffFormProps) {
         {/* Row 2 */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">DOB</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              DATE OF BIRTH <span className="text-red-500">*</span>
+            </label>
             <input
               type="date"
               placeholder="DD/MM/YY"
               value={formData.date_of_birth}
               onChange={(e) => handleInputChange('date_of_birth', e.target.value)}
               disabled={!isEdit}
+              required
               className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent placeholder-gray-400 ${
                 !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-              }`}
+              } ${!formData.date_of_birth ? 'border-yellow-400 bg-yellow-50' : ''}`}
             />
           </div>
 
@@ -384,7 +408,7 @@ export default function StaffForm({ isEdit = true, mockData }: StaffFormProps) {
               LAST 3 UNITS SERVED
             </label>
             <div className="space-y-2">
-              {formData.lastThreeUnitsServed.map((unit: any, index: any) => (
+              {(formData.lastThreeUnitsServed || []).map((unit: any, index: any) => (
                 <div key={index} className="flex items-center space-x-2">
                   <span className="text-gray-600 font-medium">{index + 1}.</span>
                   <input
@@ -459,8 +483,7 @@ export default function StaffForm({ isEdit = true, mockData }: StaffFormProps) {
                 : 'bg-teal-600 hover:bg-teal-700 text-white'
             }`}
           >
-            {isPending || updating ? "Loading..." : "Save"}
-          
+            {isPending || updating ? 'Loading...' : 'Save'}
           </button>
         </div>
       </form>

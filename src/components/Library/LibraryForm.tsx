@@ -93,7 +93,7 @@ export default function LibraryForm({ isEdit = true, mockData }: LibraryFormProp
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      handleSimpleFileChange('upload', file, ({ base64}) => {
+      handleSimpleFileChange('upload', file, ({ base64 }) => {
         setBookCover(`data:image/png;base64, ${base64}`);
       });
     }
@@ -101,14 +101,13 @@ export default function LibraryForm({ isEdit = true, mockData }: LibraryFormProp
 
   const createMutation = useCreateBooks();
   const updateMutation = useUpdateBooks();
-  const {isPending} = createMutation
-  const {isPending: updating} = updateMutation
+  const { isPending } = createMutation;
+  const { isPending: updating } = updateMutation;
   const { showLibraryModal } = useContext(AppContext);
-    
 
-  const { refetch} = useGetBooks();
+  const { refetch } = useGetBooks();
   const handleSave = async () => {
-    if(showLibraryModal){
+    if (showLibraryModal) {
       try {
         await updateMutation.mutateAsync({ ...formData });
         showSuccess('Successfully updated Books');
@@ -117,13 +116,10 @@ export default function LibraryForm({ isEdit = true, mockData }: LibraryFormProp
         showError('Failed to  update Books');
       }
       return;
-
     }
     try {
       await createMutation.mutateAsync({ ...formData });
-      showSuccess(
-    'Successfully Added A Book'
-      );
+      showSuccess('Successfully Added A Book');
       await refetch();
     } catch (error) {
       showError('Failed to  Add A Book');
@@ -131,7 +127,7 @@ export default function LibraryForm({ isEdit = true, mockData }: LibraryFormProp
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-8 bg-white">
+    <div className="w-full   p-8 bg-white">
       <div className="space-y-8">
         {/* Header */}
         <div className="text-center">
@@ -139,254 +135,262 @@ export default function LibraryForm({ isEdit = true, mockData }: LibraryFormProp
         </div>
 
         {/* Book Title Field */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 items-center">
-          <label className="text-gray-700 font-medium text-right">BOOK TITLE</label>
-          <div className="lg:col-span-3">
-            <input
-              type="text"
-              placeholder="Book Title"
-              value={formData.title}
-              onChange={(e) => handleInputChange('title', e.target.value)}
-              disabled={!isEdit}
-              className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-colors ${
-                !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : 'placeholder-gray-400'
-              }`}
-            />
-          </div>
-        </div>
-
-        {/* Author Field */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 items-center">
-          <label className="text-gray-700 font-medium text-right">AUTHOR</label>
-          <div className="lg:col-span-3">
-            <input
-              type="text"
-              placeholder="Book Author"
-              value={formData.author}
-              onChange={(e) => handleInputChange('author', e.target.value)}
-              disabled={!isEdit}
-              className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-colors ${
-                !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : 'placeholder-gray-400'
-              }`}
-            />
-          </div>
-        </div>
-
-        {/* ISBN Field */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 items-center">
-          <label className="text-gray-700 font-medium text-right">ISBN</label>
-          <div className="lg:col-span-3">
-            <input
-              type="text"
-              placeholder="ISBN"
-              value={formData.isbn}
-              onChange={(e) => handleInputChange('isbn', e.target.value)}
-              disabled={!isEdit}
-              className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-colors ${
-                !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : 'placeholder-gray-400'
-              }`}
-            />
-          </div>
-        </div>
-
-        {/* Genre/Category Field */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 items-center">
-          <label className="text-gray-700 font-medium text-right">
-            GENRE/
-            <br />
-            CATEGORY
-          </label>
-          <div className="lg:col-span-3 relative">
-            <button
-              type="button"
-              onClick={() => isEdit && setIsGenreDropdownOpen(!isGenreDropdownOpen)}
-              disabled={!isEdit}
-              className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-colors text-left flex items-center justify-between ${
-                !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-              }`}
-            >
-              <span
-                className={
-                  formData.cateogory ? (isEdit ? 'text-gray-900' : 'text-gray-600') : 'text-gray-400'
-                }
-              >
-                {formData.cateogory}
-              </span>
-              <img
-                src="/chevron-down.svg"
-                alt=""
-                className={`w-5 h-5 text-gray-400 transition-transform ${
-                  isGenreDropdownOpen ? 'rotate-180' : ''
+        <div className="grid grid-cols-8 space-x-4">
+          {/* Book Cover Field */}
+          <div className="col-span-2 flex flex-col h-full space-y-2 ">
+            <label className="text-gray-700 font-medium ">BOOK COVER</label>
+            <div className="flex-1 flex flex-col">
+              <div
+                onClick={isEdit ? handleBookCoverUpload : undefined}
+                className={`w-full  border-2 border-dashed flex-1  overflow-hidden  border-gray-300 rounded-lg flex flex-col items-center justify-center transition-colors ${
+                  isEdit
+                    ? 'cursor-pointer hover:border-gray-400 hover:bg-gray-50'
+                    : 'bg-gray-50 cursor-not-allowed'
                 }`}
-              />
-            </button>
-            {isGenreDropdownOpen && isEdit && (
-              <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                {genres.map((genre) => (
-                  <button
-                    key={genre}
-                    type="button"
-                    onClick={() => handleInputChange('cateogory', genre)}
-                    className={`w-full px-4 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none ${
-                      formData.cateogory === genre ? 'bg-teal-50 text-teal-700' : ''
-                    }`}
-                  >
-                    {genre}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Language Field */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 items-center">
-          <label className="text-gray-700 font-medium text-right">LANGUAGE</label>
-          <div className="lg:col-span-3 relative">
-            <button
-              type="button"
-              onClick={() => isEdit && setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
-              disabled={!isEdit}
-              className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-colors text-left flex items-center justify-between ${
-                !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-              }`}
-            >
-              <span
-                className={
-                  formData.language ? (isEdit ? 'text-gray-900' : 'text-gray-600') : 'text-gray-400'
-                }
               >
-                {formData.language}
-              </span>
-              <img
-                src="/chevron-down.svg"
-                alt=""
-                className={`w-5 h-5 text-gray-400 transition-transform ${
-                  isLanguageDropdownOpen ? 'rotate-180' : ''
-                }`}
-              />
-            </button>
-            {isLanguageDropdownOpen && isEdit && (
-              <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                {languages.map((language) => (
-                  <button
-                    key={language}
-                    type="button"
-                    onClick={() => handleInputChange('language', language)}
-                    className={`w-full px-4 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none ${
-                      formData.language === language ? 'bg-teal-50 text-teal-700' : ''
-                    }`}
-                  >
-                    {language}
-                  </button>
-                ))}
+                
+                {bookCover ? (
+                  <img src={bookCover} alt="Book cover" className="max-h-full max-w-full object-contain rounded" />
+                ) : (
+                  <>
+                    <img src="/upload-icon.svg" alt="" className="w-6 h-6 text-gray-400 mb-2" />
+                    <span className="text-gray-400 text-sm">
+                      {isEdit ? 'Upload here' : 'No cover uploaded'}
+                    </span>
+                  </>
+                )}
               </div>
-            )}
-          </div>
-        </div>
-
-        {/* Book Cover Field */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 items-center">
-          <label className="text-gray-700 font-medium text-right">BOOK COVER</label>
-          <div className="lg:col-span-3">
-            <div
-              onClick={isEdit ? handleBookCoverUpload : undefined}
-              className={`w-full h-32 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center transition-colors ${
-                isEdit
-                  ? 'cursor-pointer hover:border-gray-400 hover:bg-gray-50'
-                  : 'bg-gray-50 cursor-not-allowed'
-              }`}
-            >
-              {bookCover ? (
-                <img src={bookCover} alt="Book cover" className="h-full w-auto rounded" />
-              ) : (
-                <>
-                  <img src="/upload-icon.svg" alt="" className="w-6 h-6 text-gray-400 mb-2" />
-                  <span className="text-gray-400 text-sm">
-                    {isEdit ? 'Upload here' : 'No cover uploaded'}
-                  </span>
-                </>
-              )}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileSelect}
+                className="hidden"
+                disabled={!isEdit}
+              />
             </div>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleFileSelect}
-              className="hidden"
-              disabled={!isEdit}
-            />
           </div>
-        </div>
+          <div className="col-span-6 space-y-4">
+            <div className="flex flex-col space-y-2 ">
+              <label className="text-gray-700 font-medium ">BOOK TITLE</label>
+              <div className="lg:col-span-3">
+                <input
+                  type="text"
+                  placeholder="Book Title"
+                  value={formData.title}
+                  onChange={(e) => handleInputChange('title', e.target.value)}
+                  disabled={!isEdit}
+                  className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-colors ${
+                    !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : 'placeholder-gray-400'
+                  }`}
+                />
+              </div>
+            </div>
+            <div className="gflex flex-col space-y-2 ">
+              <label className="text-gray-700 font-medium text-right">AUTHOR</label>
+              <div className="lg:col-span-3">
+                <input
+                  type="text"
+                  placeholder="Book Author"
+                  value={formData.author}
+                  onChange={(e) => handleInputChange('author', e.target.value)}
+                  disabled={!isEdit}
+                  className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-colors ${
+                    !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : 'placeholder-gray-400'
+                  }`}
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              {/* ISBN Field */}
+              <div className="flex flex-col space-y-2  ">
+                <label className="text-gray-700 font-medium ">ISBN</label>
+                <div className="lg:col-span-3">
+                  <input
+                    type="text"
+                    placeholder="ISBN"
+                    value={formData.isbn}
+                    onChange={(e) => handleInputChange('isbn', e.target.value)}
+                    disabled={!isEdit}
+                    className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-colors ${
+                      !isEdit
+                        ? 'bg-gray-50 text-gray-600 cursor-not-allowed'
+                        : 'placeholder-gray-400'
+                    }`}
+                  />
+                </div>
+              </div>
 
-        {/* Issued Date Field */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 items-center">
-          <label className="text-gray-700 font-medium text-right">ISSUED DATE</label>
-          <div className="lg:col-span-3 relative">
-            <input
-              type="date"
-              value={formData.issued_date}
-              onChange={(e) => handleInputChange('issued_date', e.target.value)}
-              disabled={!isEdit}
-              className={`w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-colors ${
-                !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-              }`}
-            />
-            <img
-              src="/unitBible/calendar-icon.svg"
-              alt=""
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none"
-            />
-          </div>
-        </div>
-
-        {/* Number of Copies Field */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 items-center">
-          <label className="text-gray-700 font-medium text-right">
-            NUMBERS OF
-            <br />
-            COPIES
-          </label>
-          <div className="lg:col-span-3 relative">
-            <button
-              type="button"
-              onClick={() => isEdit && setIsCopiesDropdownOpen(!isCopiesDropdownOpen)}
-              disabled={!isEdit}
-              className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-colors text-left flex items-center justify-between ${
-                !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-              }`}
-            >
-              <span
-                className={
-                  formData.copies ? (isEdit ? 'text-gray-900' : 'text-gray-600') : 'text-gray-400'
-                }
-              >
-                {formData.copies}
-              </span>
-              <img
-                src="/chevron-down.svg"
-                alt=""
-                className={`w-5 h-5 text-gray-400 transition-transform ${
-                  isCopiesDropdownOpen ? 'rotate-180' : ''
-                }`}
-              />
-            </button>
-            {isCopiesDropdownOpen && isEdit && (
-              <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                {numberOfCopies.map((copies) => (
+              {/* Genre/Category Field */}
+              <div className="flex flex-col space-y-2 ">
+                <label className="text-gray-700 font-medium ">GENRE/ CATEGORY</label>
+                <div className="lg:col-span-3 relative">
                   <button
-                    key={copies}
                     type="button"
-                    onClick={() => handleInputChange('copies', copies)}
-                    className={`w-full px-4 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none ${
-                      formData.copies === copies ? 'bg-teal-50 text-teal-700' : ''
+                    onClick={() => isEdit && setIsGenreDropdownOpen(!isGenreDropdownOpen)}
+                    disabled={!isEdit}
+                    className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-colors text-left flex items-center justify-between ${
+                      !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
                     }`}
                   >
-                    {copies}
+                    <span
+                      className={
+                        formData.cateogory
+                          ? isEdit
+                            ? 'text-gray-900'
+                            : 'text-gray-600'
+                          : 'text-gray-400'
+                      }
+                    >
+                      {formData.cateogory}
+                    </span>
+                    <img
+                      src="/chevron-down.svg"
+                      alt=""
+                      className={`w-5 h-5 text-gray-400 transition-transform ${
+                        isGenreDropdownOpen ? 'rotate-180' : ''
+                      }`}
+                    />
                   </button>
-                ))}
+                  {isGenreDropdownOpen && isEdit && (
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                      {genres.map((genre) => (
+                        <button
+                          key={genre}
+                          type="button"
+                          onClick={() => handleInputChange('cateogory', genre)}
+                          className={`w-full px-4 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none ${
+                            formData.cateogory === genre ? 'bg-teal-50 text-teal-700' : ''
+                          }`}
+                        >
+                          {genre}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
-            )}
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              {/* Language Field */}
+              <div className="flex flex-col space-y-2 ">
+                <label className="text-gray-700 font-medium">LANGUAGE</label>
+                <div className="lg:col-span-3 relative">
+                  <button
+                    type="button"
+                    onClick={() => isEdit && setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
+                    disabled={!isEdit}
+                    className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-colors text-left flex items-center justify-between ${
+                      !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                    }`}
+                  >
+                    <span
+                      className={
+                        formData.language
+                          ? isEdit
+                            ? 'text-gray-900'
+                            : 'text-gray-600'
+                          : 'text-gray-400'
+                      }
+                    >
+                      {formData.language}
+                    </span>
+                    <img
+                      src="/chevron-down.svg"
+                      alt=""
+                      className={`w-5 h-5 text-gray-400 transition-transform ${
+                        isLanguageDropdownOpen ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </button>
+                  {isLanguageDropdownOpen && isEdit && (
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                      {languages.map((language) => (
+                        <button
+                          key={language}
+                          type="button"
+                          onClick={() => handleInputChange('language', language)}
+                          className={`w-full px-4 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none ${
+                            formData.language === language ? 'bg-teal-50 text-teal-700' : ''
+                          }`}
+                        >
+                          {language}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Issued Date Field */}
+              <div className="flex flex-col space-y-2 ">
+                <label className="text-gray-700 font-medium">ISSUED DATE</label>
+                <div className="lg:col-span-3 relative">
+                  <input
+                    type="date"
+                    value={formData.issued_date}
+                    onChange={(e) => handleInputChange('issued_date', e.target.value)}
+                    disabled={!isEdit}
+                    className={`w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-colors ${
+                      !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                    }`}
+                  />
+                  <img
+                    src="/unitBible/calendar-icon.svg"
+                    alt=""
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none"
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-col space-y-2 ">
+              <label className="text-gray-700 font-medium">NUMBERS OF COPIES</label>
+              <div className="lg:col-span-3 relative">
+                <button
+                  type="button"
+                  onClick={() => isEdit && setIsCopiesDropdownOpen(!isCopiesDropdownOpen)}
+                  disabled={!isEdit}
+                  className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-colors text-left flex items-center justify-between ${
+                    !isEdit ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                  }`}
+                >
+                  <span
+                    className={
+                      formData.copies
+                        ? isEdit
+                          ? 'text-gray-900'
+                          : 'text-gray-600'
+                        : 'text-gray-400'
+                    }
+                  >
+                    {formData.copies}
+                  </span>
+                  <img
+                    src="/chevron-down.svg"
+                    alt=""
+                    className={`w-5 h-5 text-gray-400 transition-transform ${
+                      isCopiesDropdownOpen ? 'rotate-180' : ''
+                    }`}
+                  />
+                </button>
+                {isCopiesDropdownOpen && isEdit && (
+                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                    {numberOfCopies.map((copies) => (
+                      <button
+                        key={copies}
+                        type="button"
+                        onClick={() => handleInputChange('copies', copies)}
+                        className={`w-full px-4 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none ${
+                          formData.copies === copies ? 'bg-teal-50 text-teal-700' : ''
+                        }`}
+                      >
+                        {copies}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 
@@ -401,8 +405,7 @@ export default function LibraryForm({ isEdit = true, mockData }: LibraryFormProp
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
             }`}
           >
-            {(isPending || updating) ? "Loading..." : "Save"}
-          
+            {isPending || updating ? 'Loading...' : 'Save'}
           </button>
         </div>
       </div>

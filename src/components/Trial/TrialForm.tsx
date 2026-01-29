@@ -264,372 +264,124 @@ export default function TrialForm({
 
         <div className="space-y-6">
           {/* Basic Information */}
-          <div className="grid grid-cols-12 gap-4 items-start">
-            <label className="col-span-3 text-sm font-medium text-gray-700 uppercase pt-2.5">
-              OFFICER ID / SERVICE NUMBER
-            </label>
-            <div className="col-span-9 relative">
-              <div className="relative">
-                <input
-                  type="text"
-                  name="serviceNumber"
-                  value={formData.serviceNumber}
-                  onChange={handleSetOfficerId}
-                  onFocus={() => {
-                    if (formData.serviceNumber && !isOfficerConfirmed) {
-                      setOpenOfficerNames(true);
-                    }
-                  }}
-                  onBlur={() => {
-                    // Delay closing to allow click on dropdown items
-                    setTimeout(() => setOpenOfficerNames(false), 200);
-                  }}
-                  placeholder="Enter service number to search"
-                  disabled={!isEdit || isLoading}
-                  className={`w-full px-3 py-2.5 border rounded-md focus:outline-none focus:ring-1 ${
-                    isOfficerConfirmed
-                      ? 'border-green-500 focus:ring-green-400 focus:border-green-400 bg-green-50'
-                      : officerFieldTouched && formData.serviceNumber && filteredArmy.length === 0
-                      ? 'border-amber-400 focus:ring-amber-400 focus:border-amber-400'
-                      : 'border-gray-300 focus:ring-gray-400 focus:border-gray-400'
-                  } ${
-                    !isEdit || isLoading
-                      ? 'bg-gray-50 text-gray-600 cursor-not-allowed'
-                      : 'placeholder-gray-400'
-                  }`}
-                />
-                {/* Confirmation checkmark */}
-                {isOfficerConfirmed && (
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                    <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path
-                        fillRule="evenodd"
-                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </div>
-                )}
-              </div>
-
-              {/* Helper text */}
-              <p
-                className={`text-xs mt-1.5 ${
-                  isOfficerConfirmed
-                    ? 'text-green-600'
-                    : officerFieldTouched && formData.serviceNumber && filteredArmy.length === 0
-                    ? 'text-amber-600'
-                    : officerFieldTouched &&
-                      formData.serviceNumber &&
-                      filteredArmy.length > 0 &&
-                      !isOfficerConfirmed
-                    ? 'text-blue-600'
-                    : 'text-gray-500'
-                }`}
-              >
-                {isOfficerConfirmed
-                  ? '✓ Officer confirmed'
-                  : officerFieldTouched && formData.serviceNumber && filteredArmy.length === 0
-                  ? 'No officer found with this service number'
-                  : officerFieldTouched && formData.serviceNumber && filteredArmy.length > 0
-                  ? 'Select an officer from the list to confirm'
-                  : "Enter the officer's service number to search"}
-              </p>
-
-              {/* Dropdown - now shows even with no results */}
-              {openOfficerNames && formData.serviceNumber !== '' && !isOfficerConfirmed && (
-                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                  {filteredArmy.length > 0 ? (
-                    filteredArmy.map((officer: any) => (
-                      <button
-                        key={officer.id}
-                        type="button"
-                        onClick={() => handleSelectOfficer(officer)}
-                        disabled={!isEdit || isLoading}
-                        className="w-full px-4 py-2.5 text-left hover:bg-teal-50 focus:bg-teal-50 focus:outline-none disabled:opacity-50 border-b border-gray-100 last:border-b-0"
+          <div className="grid grid-cols-4 gap-4">
+            <div className="flex flex-col gap-4">
+              <label className="col-span-3 text-sm font-medium text-gray-700 uppercase ">
+                OFFICER ID / SERVICE NUMBER
+              </label>
+              <div className="col-span-9 relative">
+                <div className="relative">
+                  <input
+                    type="text"
+                    name="serviceNumber"
+                    value={formData.serviceNumber}
+                    onChange={handleSetOfficerId}
+                    onFocus={() => {
+                      if (formData.serviceNumber && !isOfficerConfirmed) {
+                        setOpenOfficerNames(true);
+                      }
+                    }}
+                    onBlur={() => {
+                      // Delay closing to allow click on dropdown items
+                      setTimeout(() => setOpenOfficerNames(false), 200);
+                    }}
+                    placeholder="Enter service number to search"
+                    disabled={!isEdit || isLoading}
+                    className={`w-full px-3 py-2.5 border rounded-md focus:outline-none focus:ring-1 ${
+                      isOfficerConfirmed
+                        ? 'border-green-500 focus:ring-green-400 focus:border-green-400 bg-green-50'
+                        : officerFieldTouched && formData.serviceNumber && filteredArmy.length === 0
+                        ? 'border-amber-400 focus:ring-amber-400 focus:border-amber-400'
+                        : 'border-gray-300 focus:ring-gray-400 focus:border-gray-400'
+                    } ${
+                      !isEdit || isLoading
+                        ? 'bg-gray-50 text-gray-600 cursor-not-allowed'
+                        : 'placeholder-gray-400'
+                    }`}
+                  />
+                  {/* Confirmation checkmark */}
+                  {isOfficerConfirmed && (
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                      <svg
+                        className="w-5 h-5 text-green-600"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
                       >
-                        <div className="flex justify-between items-center">
-                          <span className="font-medium text-gray-900">{officer.name}</span>
-                          <span className="text-sm text-gray-500">{officer.serviceNumber}</span>
-                        </div>
-                      </button>
-                    ))
-                  ) : (
-                    <div className="px-4 py-4 text-center">
-                      <p className="text-sm text-gray-600 font-medium">
-                        No officer found with this service number
-                      </p>
-                      <p className="text-xs text-gray-500 mt-1">
-                        Verify the number or contact your unit administrator
-                      </p>
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
                     </div>
                   )}
                 </div>
-              )}
-            </div>
-          </div>
 
-          <div className="grid grid-cols-12 gap-4 items-center">
-            <label className="col-span-3 text-sm font-medium text-gray-700 uppercase">RANK</label>
-            <div className="col-span-9">
-              <input
-                type="text"
-                placeholder="Rank"
-                value={formData.rank}
-                onChange={(e) => handleInputChange('rank', e.target.value)}
-                disabled={!isEdit || isLoading}
-                className={`w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 ${
-                  !isEdit || isLoading
-                    ? 'bg-gray-50 text-gray-600 cursor-not-allowed'
-                    : 'placeholder-gray-400'
-                }`}
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-12 gap-4 items-center">
-            <label className="col-span-3 text-sm font-medium text-gray-700 uppercase">NAME</label>
-            <div className="col-span-9">
-              <input
-                type="text"
-                placeholder="Name"
-                value={formData.name}
-                onChange={(e) => handleInputChange('name', e.target.value)}
-                disabled={!isEdit || isLoading}
-                className={`w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 ${
-                  !isEdit || isLoading
-                    ? 'bg-gray-50 text-gray-600 cursor-not-allowed'
-                    : 'placeholder-gray-400'
-                }`}
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-12 gap-4 items-center">
-            <label className="col-span-3 text-sm font-medium text-gray-700 uppercase">UNIT</label>
-            <div className="col-span-9">
-              <input
-                type="text"
-                placeholder="Unit"
-                value={formData.unit}
-                onChange={(e) => handleInputChange('unit', e.target.value)}
-                disabled={!isEdit || isLoading}
-                className={`w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 ${
-                  !isEdit || isLoading
-                    ? 'bg-gray-50 text-gray-600 cursor-not-allowed'
-                    : 'placeholder-gray-400'
-                }`}
-              />
-            </div>
-          </div>
-
-          {/* Questions Section */}
-          <div className="space-y-6 mt-8">
-            {/* Q1 */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Q1. HAVE YOU RECEIVED A COPY OF THE CHARGE SHEET AND SUMMARY/ABSTRACT OF EVIDENCE
-                NOT LESS THAN 24 HOURS AGO?
-              </label>
-              <textarea
-                rows={3}
-                placeholder="answer"
-                value={formData.q1}
-                onChange={(e) => handleInputChange('q1', e.target.value)}
-                disabled={!isEdit || isLoading}
-                className={`w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 resize-none ${
-                  !isEdit || isLoading
-                    ? 'bg-gray-50 text-gray-600 cursor-not-allowed'
-                    : 'placeholder-gray-400'
-                }`}
-              />
-              <p className="text-xs text-gray-500 mt-1">(Read the charge (s) here)</p>
-            </div>
-
-            {/* Q2 */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Q2. HAVE YOU HEARD THE CHARGE AGAINST YOU?
-              </label>
-              <textarea
-                rows={3}
-                placeholder="answer"
-                value={formData.q2}
-                onChange={(e) => handleInputChange('q2', e.target.value)}
-                disabled={!isEdit || isLoading}
-                className={`w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 resize-none ${
-                  !isEdit || isLoading
-                    ? 'bg-gray-50 text-gray-600 cursor-not-allowed'
-                    : 'placeholder-gray-400'
-                }`}
-              />
-            </div>
-
-            {/* Q3 */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Q3. DID YOU UNDERSTAND THE CHARGE?
-              </label>
-              <textarea
-                rows={3}
-                placeholder="answer"
-                value={formData.q3}
-                onChange={(e) => handleInputChange('q3', e.target.value)}
-                disabled={!isEdit || isLoading}
-                className={`w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 resize-none ${
-                  !isEdit || isLoading
-                    ? 'bg-gray-50 text-gray-600 cursor-not-allowed'
-                    : 'placeholder-gray-400'
-                }`}
-              />
-            </div>
-
-            {/* Q4 */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Q4. HAVE YOU AGREED IN WRITING THAT THE WITNESS AGAINST YOU NEED GIVE THEIR EVIDENCE
-                IN PERSON?
-              </label>
-              <textarea
-                rows={3}
-                placeholder="answer"
-                value={formData.q4}
-                onChange={(e) => handleInputChange('q4', e.target.value)}
-                disabled={!isEdit || isLoading}
-                className={`w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 resize-none ${
-                  !isEdit || isLoading
-                    ? 'bg-gray-50 text-gray-600 cursor-not-allowed'
-                    : 'placeholder-gray-400'
-                }`}
-              />
-            </div>
-
-            {/* Q5 */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Q5. DO YOU WISH TO GIVE EVIDENCE ON OATH OR TO MAKE OR HAND IN A STATEMENT WITHOUT
-                BEING SWORN? YOUR EVIDENCE OR STATEMENT MAY DEAL WITH THE FACT OF THE CASE, WITH
-                YOUR STATEMENT AND WITH MATTERS IN MITIGATION OF PUNISHMENT.
-              </label>
-              <textarea
-                rows={3}
-                placeholder="answer"
-                value={formData.q5}
-                onChange={(e) => handleInputChange('q5', e.target.value)}
-                disabled={!isEdit || isLoading}
-                className={`w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 resize-none ${
-                  !isEdit || isLoading
-                    ? 'bg-gray-50 text-gray-600 cursor-not-allowed'
-                    : 'placeholder-gray-400'
-                }`}
-              />
-            </div>
-
-            {/* Q6 */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Q6. DO YOU WISH TO ADDUCE ANY EVIDENCE IN YOUR DEFENCE?
-              </label>
-              <textarea
-                rows={3}
-                placeholder="answer"
-                value={formData.q6}
-                onChange={(e) => handleInputChange('q6', e.target.value)}
-                disabled={!isEdit || isLoading}
-                className={`w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 resize-none ${
-                  !isEdit || isLoading
-                    ? 'bg-gray-50 text-gray-600 cursor-not-allowed'
-                    : 'placeholder-gray-400'
-                }`}
-              />
-            </div>
-
-            {/* Q7 */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Q7. WILL YOU ACCEPT MY AWARD OR DO YOU ELECT TO BE TRIED BY COURT MARTIAL? (
-                applicable to WOs and officers S.117 AFA)
-              </label>
-              <textarea
-                rows={3}
-                placeholder="answer"
-                value={formData.q7}
-                onChange={(e) => handleInputChange('q7', e.target.value)}
-                disabled={!isEdit || isLoading}
-                className={`w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 resize-none ${
-                  !isEdit || isLoading
-                    ? 'bg-gray-50 text-gray-600 cursor-not-allowed'
-                    : 'placeholder-gray-400'
-                }`}
-              />
-            </div>
-          </div>
-
-          {/* Final Section */}
-          <div className="space-y-6 mt-8">
-            <div className="grid grid-cols-12 gap-4 items-center">
-              <label className="col-span-3 text-sm font-medium text-gray-700 uppercase">
-                FINDING
-              </label>
-              <div className="col-span-9">
-                <input
-                  type="text"
-                  placeholder="finding"
-                  value={formData.finding}
-                  onChange={(e) => handleInputChange('finding', e.target.value)}
-                  disabled={!isEdit || isLoading}
-                  className={`w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 ${
-                    !isEdit || isLoading
-                      ? 'bg-gray-50 text-gray-600 cursor-not-allowed'
-                      : 'placeholder-gray-400'
+                {/* Helper text */}
+                <p
+                  className={`text-xs mt-1.5 ${
+                    isOfficerConfirmed
+                      ? 'text-green-600'
+                      : officerFieldTouched && formData.serviceNumber && filteredArmy.length === 0
+                      ? 'text-amber-600'
+                      : officerFieldTouched &&
+                        formData.serviceNumber &&
+                        filteredArmy.length > 0 &&
+                        !isOfficerConfirmed
+                      ? 'text-blue-600'
+                      : 'text-gray-500'
                   }`}
-                />
+                >
+                  {isOfficerConfirmed
+                    ? '✓ Officer confirmed'
+                    : officerFieldTouched && formData.serviceNumber && filteredArmy.length === 0
+                    ? 'No officer found with this service number'
+                    : officerFieldTouched && formData.serviceNumber && filteredArmy.length > 0
+                    ? 'Select an officer from the list to confirm'
+                    : "Enter the officer's service number to search"}
+                </p>
+
+                {/* Dropdown - now shows even with no results */}
+                {openOfficerNames && formData.serviceNumber !== '' && !isOfficerConfirmed && (
+                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                    {filteredArmy.length > 0 ? (
+                      filteredArmy.map((officer: any) => (
+                        <button
+                          key={officer.id}
+                          type="button"
+                          onClick={() => handleSelectOfficer(officer)}
+                          disabled={!isEdit || isLoading}
+                          className="w-full px-4 py-2.5 text-left hover:bg-teal-50 focus:bg-teal-50 focus:outline-none disabled:opacity-50 border-b border-gray-100 last:border-b-0"
+                        >
+                          <div className="flex justify-between items-center">
+                            <span className="font-medium text-gray-900">{officer.name}</span>
+                            <span className="text-sm text-gray-500">{officer.serviceNumber}</span>
+                          </div>
+                        </button>
+                      ))
+                    ) : (
+                      <div className="px-4 py-4 text-center">
+                        <p className="text-sm text-gray-600 font-medium">
+                          No officer found with this service number
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          Verify the number or contact your unit administrator
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 
-            <div className="grid grid-cols-12 gap-4 items-center">
-              <label className="col-span-3 text-sm font-medium text-gray-700 uppercase">
-                AWARD
-              </label>
-              <div className="col-span-9">
-                <input
-                  type="text"
-                  placeholder="award"
-                  value={formData.award}
-                  onChange={(e) => handleInputChange('award', e.target.value)}
-                  disabled={!isEdit || isLoading}
-                  className={`w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 ${
-                    !isEdit || isLoading
-                      ? 'bg-gray-50 text-gray-600 cursor-not-allowed'
-                      : 'placeholder-gray-400'
-                  }`}
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-12 gap-4 items-center">
-              <label className="col-span-3 text-sm font-medium text-gray-700 uppercase">DATE</label>
-              <div className="col-span-9">
-                <input
-                  type="date"
-                  value={formData.date}
-                  onChange={(e) => handleInputChange('date', e.target.value)}
-                  disabled={!isEdit || isLoading}
-                  className={`w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 ${
-                    !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                  }`}
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-12 gap-4 items-center">
+            <div className="flex flex-col gap-4">
               <label className="col-span-3 text-sm font-medium text-gray-700 uppercase">RANK</label>
               <div className="col-span-9">
                 <input
                   type="text"
-                  placeholder="Enter rank"
-                  value={formData.rank_officer}
-                  onChange={(e) => handleInputChange('rank_officer', e.target.value)}
+                  placeholder="Rank"
+                  value={formData.rank}
+                  onChange={(e) => handleInputChange('rank', e.target.value)}
                   disabled={!isEdit || isLoading}
                   className={`w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 ${
                     !isEdit || isLoading
@@ -640,16 +392,14 @@ export default function TrialForm({
               </div>
             </div>
 
-            <div className="grid grid-cols-12 gap-4 items-center">
-              <label className="col-span-3 text-sm font-medium text-gray-700 uppercase">
-                APPOINTMENT
-              </label>
+            <div className="flex flex-col gap-4">
+              <label className="col-span-3 text-sm font-medium text-gray-700 uppercase">NAME</label>
               <div className="col-span-9">
                 <input
                   type="text"
-                  placeholder="Appointment"
-                  value={formData.appointment}
-                  onChange={(e) => handleInputChange('appointment', e.target.value)}
+                  placeholder="Name"
+                  value={formData.name}
+                  onChange={(e) => handleInputChange('name', e.target.value)}
                   disabled={!isEdit || isLoading}
                   className={`w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 ${
                     !isEdit || isLoading
@@ -660,8 +410,273 @@ export default function TrialForm({
               </div>
             </div>
 
-            {/* File Upload */}
-            <div className="grid grid-cols-12 gap-4 items-start">
+            <div className="flex flex-col gap-4">
+              <label className="col-span-3 text-sm font-medium text-gray-700 uppercase">UNIT</label>
+              <div className="col-span-9">
+                <input
+                  type="text"
+                  placeholder="Unit"
+                  value={formData.unit}
+                  onChange={(e) => handleInputChange('unit', e.target.value)}
+                  disabled={!isEdit || isLoading}
+                  className={`w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 ${
+                    !isEdit || isLoading
+                      ? 'bg-gray-50 text-gray-600 cursor-not-allowed'
+                      : 'placeholder-gray-400'
+                  }`}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Questions Section */}
+
+          <div className="space-y-6 mt-8">
+            {/* Q1 and Q2 */}
+            <div className="grid grid-cols-4 gap-4">
+              <div className=' flex flex-col'>
+                <label className="block  text-sm font-medium text-gray-700 mb-2">
+                  Q1. HAVE YOU RECEIVED A COPY OF THE CHARGE SHEET AND SUMMARY/ABSTRACT OF EVIDENCE
+                  NOT LESS THAN 24 HOURS AGO?
+                </label>
+                <textarea
+                  rows={2}
+                  placeholder="answer"
+                  value={formData.q1}
+                  onChange={(e) => handleInputChange('q1', e.target.value)}
+                  disabled={!isEdit || isLoading}
+                  className={`w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 resize-none ${
+                    !isEdit || isLoading
+                      ? 'bg-gray-50 text-gray-600 cursor-not-allowed'
+                      : 'placeholder-gray-400'
+                  }`}
+                />
+                {/* <p className="text-xs text-gray-500 mt-1">(Read the charge (s) here)</p> */}
+              </div>
+
+              {/* Q2 */}
+              <div className='flex flex-col'>
+                <label className="flex-1   text-sm font-medium text-gray-700 mb-2">
+                  Q2. HAVE YOU HEARD THE CHARGE AGAINST YOU?
+                </label>
+                <textarea
+                  rows={2}
+                  placeholder="answer"
+                  value={formData.q2}
+                  onChange={(e) => handleInputChange('q2', e.target.value)}
+                  disabled={!isEdit || isLoading}
+                  className={`w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 resize-none ${
+                    !isEdit || isLoading
+                      ? 'bg-gray-50 text-gray-600 cursor-not-allowed'
+                      : 'placeholder-gray-400'
+                  }`}
+                />
+              </div>
+
+              <div className='flex flex-col'>
+                <label className="flex-1 text-sm font-medium text-gray-700 mb-2">
+                  Q3. DID YOU UNDERSTAND THE CHARGE?
+                </label>
+                <textarea
+                  rows={2}
+                  placeholder="answer"
+                  value={formData.q3}
+                  onChange={(e) => handleInputChange('q3', e.target.value)}
+                  disabled={!isEdit || isLoading}
+                  className={`w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 resize-none ${
+                    !isEdit || isLoading
+                      ? 'bg-gray-50 text-gray-600 cursor-not-allowed'
+                      : 'placeholder-gray-400'
+                  }`}
+                />
+              </div>
+
+              {/* Q4 */}
+              <div className='flex flex-col'>
+                <label className="flex-1 text-sm font-medium text-gray-700 mb-2">
+                  Q4. HAVE YOU AGREED IN WRITING THAT THE WITNESS AGAINST YOU NEED GIVE THEIR
+                  EVIDENCE IN PERSON?
+                </label>
+                <textarea
+                  rows={2}
+                  placeholder="answer"
+                  value={formData.q4}
+                  onChange={(e) => handleInputChange('q4', e.target.value)}
+                  disabled={!isEdit || isLoading}
+                  className={`w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 resize-none ${
+                    !isEdit || isLoading
+                      ? 'bg-gray-50 text-gray-600 cursor-not-allowed'
+                      : 'placeholder-gray-400'
+                  }`}
+                />
+              </div>
+            </div>
+
+            {/* Q5 */}
+            <div className="grid grid-cols-3 gap-4">
+              <div className='flex flex-col'>
+                <label className="flex-1 text-sm font-medium text-gray-700 mb-2">
+                  Q5. DO YOU WISH TO GIVE EVIDENCE ON OATH OR TO MAKE OR HAND IN A STATEMENT WITHOUT
+                  BEING SWORN? YOUR EVIDENCE OR STATEMENT MAY DEAL WITH THE FACT OF THE CASE, WITH
+                  YOUR STATEMENT AND WITH MATTERS IN MITIGATION OF PUNISHMENT.
+                </label>
+                <textarea
+                  rows={2}
+                  placeholder="answer"
+                  value={formData.q5}
+                  onChange={(e) => handleInputChange('q5', e.target.value)}
+                  disabled={!isEdit || isLoading}
+                  className={`w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 resize-none ${
+                    !isEdit || isLoading
+                      ? 'bg-gray-50 text-gray-600 cursor-not-allowed'
+                      : 'placeholder-gray-400'
+                  }`}
+                />
+              </div>
+
+              {/* Q6 */}
+              <div className='flex flex-col '>
+                <label className="flex-1 text-sm h-20 font-medium text-gray-700 mb-2">
+                  Q6. WILL YOU ACCEPT MY AWARD OR DO YOU ELECT TO BE TRIED BY COURT MARTIAL? (
+                  applicable to WOs and officers S.117 AFA)
+                </label>
+                <textarea
+                  rows={2}
+                  placeholder="answer"
+                  value={formData.q6}
+                  onChange={(e) => handleInputChange('q6', e.target.value)}
+                  disabled={!isEdit || isLoading}
+                  className={`w-full  px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 resize-none ${
+                    !isEdit || isLoading
+                      ? 'bg-gray-50 text-gray-600 cursor-not-allowed'
+                      : 'placeholder-gray-400'
+                  }`}
+                />
+              </div>
+              {/* Q7 */}
+              <div className='flex flex-col'>
+                <label className="flex-1 text-sm font-medium text-gray-700 mb-2">
+                  Q7. DO YOU WISH TO ADDUCE ANY EVIDENCE IN YOUR DEFENCE?
+                </label>
+                <textarea
+                  rows={2}
+                  placeholder="answer"
+                  value={formData.q7}
+                  onChange={(e) => handleInputChange('q7', e.target.value)}
+                  disabled={!isEdit || isLoading}
+                  className={`w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 resize-none ${
+                    !isEdit || isLoading
+                      ? 'bg-gray-50 text-gray-600 cursor-not-allowed'
+                      : 'placeholder-gray-400'
+                  }`}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Final Section */}
+          <div className="space-y-6 mt-4">
+            <div className="grid grid-cols-5 gap-4">
+              <div className="flex flex-col gap-4">
+                <label className="col-span-3 text-sm font-medium text-gray-700 uppercase">
+                  FINDING
+                </label>
+                <div className="col-span-9">
+                  <input
+                    type="text"
+                    placeholder="finding"
+                    value={formData.finding}
+                    onChange={(e) => handleInputChange('finding', e.target.value)}
+                    disabled={!isEdit || isLoading}
+                    className={`w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 ${
+                      !isEdit || isLoading
+                        ? 'bg-gray-50 text-gray-600 cursor-not-allowed'
+                        : 'placeholder-gray-400'
+                    }`}
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-4">
+                <label className="col-span-3 text-sm font-medium text-gray-700 uppercase">
+                  AWARD
+                </label>
+                <div className="col-span-9">
+                  <input
+                    type="text"
+                    placeholder="award"
+                    value={formData.award}
+                    onChange={(e) => handleInputChange('award', e.target.value)}
+                    disabled={!isEdit || isLoading}
+                    className={`w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 ${
+                      !isEdit || isLoading
+                        ? 'bg-gray-50 text-gray-600 cursor-not-allowed'
+                        : 'placeholder-gray-400'
+                    }`}
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-4">
+                <label className="col-span-3 text-sm font-medium text-gray-700 uppercase">
+                  DATE
+                </label>
+                <div className="col-span-9">
+                  <input
+                    type="date"
+                    value={formData.date}
+                    onChange={(e) => handleInputChange('date', e.target.value)}
+                    disabled={!isEdit || isLoading}
+                    className={`w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 ${
+                      !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                    }`}
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-4">
+                <label className="col-span-3 text-sm font-medium text-gray-700 uppercase">
+                  RANK
+                </label>
+                <div className="col-span-9">
+                  <input
+                    type="text"
+                    placeholder="Enter rank"
+                    value={formData.rank_officer}
+                    onChange={(e) => handleInputChange('rank_officer', e.target.value)}
+                    disabled={!isEdit || isLoading}
+                    className={`w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 ${
+                      !isEdit || isLoading
+                        ? 'bg-gray-50 text-gray-600 cursor-not-allowed'
+                        : 'placeholder-gray-400'
+                    }`}
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-4">
+                <label className="col-span-3 text-sm font-medium text-gray-700 uppercase">
+                  APPOINTMENT
+                </label>
+                <div className="col-span-9">
+                  <input
+                    type="text"
+                    placeholder="Appointment"
+                    value={formData.appointment}
+                    onChange={(e) => handleInputChange('appointment', e.target.value)}
+                    disabled={!isEdit || isLoading}
+                    className={`w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 ${
+                      !isEdit || isLoading
+                        ? 'bg-gray-50 text-gray-600 cursor-not-allowed'
+                        : 'placeholder-gray-400'
+                    }`}
+                  />
+                </div>
+              </div>
+
+              {/* File Upload */}
+            </div>
+            <div className="flex flex-col gap-4">
               <label className="col-span-3 text-sm font-medium text-gray-700 uppercase">
                 Signature
               </label>

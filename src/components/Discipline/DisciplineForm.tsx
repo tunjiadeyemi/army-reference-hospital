@@ -254,70 +254,51 @@ export default function DisciplineForm({
 
       <div className="space-y-8">
         {/* Section 1: The Accused */}
-        <div>
-          <h2 className="text-lg font-semibold mb-4 underline">1 THE ACCUSED</h2>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <h2 className="text-lg font-semibold mb-4 underline">1 THE ACCUSED</h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            <div className="relative">
-              <label className="block text-sm font-medium mb-2">OFFICER</label>
-              <input
-                type="text"
-                value={formData.accused_officer_number || ''}
-                onChange={(e) => handleOfficerSearch('accused_officer_id', e.target.value)}
-                placeholder="Search by name or service number"
-                disabled={!isEdit || isLoading}
-                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                }`}
-              />
-              {openOfficerDropdown === 'accused_officer_id' &&
-                formData.accused_officer_number &&
-                filteredOfficers['accused_officer_id']?.length > 0 && (
-                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                    {filteredOfficers['accused_officer_id'].map((officer: any) => (
-                      <button
-                        key={officer.id}
-                        type="button"
-                        onClick={() => handleOfficerSelect('accused_officer_id', officer)}
-                        className="w-full px-4 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
-                      >
-                        <div className="flex justify-between">
-                          <p>{officer.name}</p>
-                          <p className="text-gray-600">{officer.serviceNumber}</p>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                )}
-            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <div className="relative">
+                <label className="block text-sm font-medium mb-2">OFFICER</label>
+                <input
+                  type="text"
+                  value={formData.accused_officer_number || ''}
+                  onChange={(e) => handleOfficerSearch('accused_officer_id', e.target.value)}
+                  placeholder="Search by name or service number"
+                  disabled={!isEdit || isLoading}
+                  className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                  }`}
+                />
+                {openOfficerDropdown === 'accused_officer_id' &&
+                  formData.accused_officer_number &&
+                  filteredOfficers['accused_officer_id']?.length > 0 && (
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                      {filteredOfficers['accused_officer_id'].map((officer: any) => (
+                        <button
+                          key={officer.id}
+                          type="button"
+                          onClick={() => handleOfficerSelect('accused_officer_id', officer)}
+                          className="w-full px-4 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
+                        >
+                          <div className="flex justify-between">
+                            <p>{officer.name}</p>
+                            <p className="text-gray-600">{officer.serviceNumber}</p>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium mb-2">UNIT</label>
-              <input
-                type="text"
-                value={formData.accused_officer_unit}
-                onChange={(e) => handleInputChange('accused_officer_unit', e.target.value)}
-                placeholder="Unit"
-                disabled={!isEdit || isLoading}
-                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                }`}
-              />
-            </div>
-          </div>
-
-          <p className="mb-4">Being a person subject to military law is charge with</p>
-
-          <div className="mb-4">
-            <div className="flex items-start gap-4 mb-4">
-              <span className="font-medium">a.</span>
-              <div className="flex-1">
-                <label className="block text-sm font-medium mb-2">A STATEMENT OF OFFENCE</label>
-                <textarea
-                  value={formData.statement_of_offence}
-                  onChange={(e) => handleInputChange('statement_of_offence', e.target.value)}
-                  placeholder="write here"
-                  rows={4}
+              <div>
+                <label className="block text-sm font-medium mb-2">UNIT</label>
+                <input
+                  type="text"
+                  value={formData.accused_officer_unit}
+                  onChange={(e) => handleInputChange('accused_officer_unit', e.target.value)}
+                  placeholder="Unit"
                   disabled={!isEdit || isLoading}
                   className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                     !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
@@ -326,661 +307,694 @@ export default function DisciplineForm({
               </div>
             </div>
 
-            <div className="ml-8">
-              <label className="block text-sm font-medium mb-2">PUNISHABLE UNDER SECTION</label>
-              <input
-                type="text"
-                value={formData.punishable_under_section}
-                onChange={(e) => handleInputChange('punishable_under_section', e.target.value)}
-                placeholder="Punishable under section"
-                disabled={!isEdit || isLoading}
-                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                }`}
-              />
-            </div>
-          </div>
-
-          <div className="flex items-start gap-4">
-            <span className="font-medium">b.</span>
-            <div className="flex-1">
-              <label className="block text-sm font-medium mb-2">PARTICULARS OF OFFENCE</label>
-              <textarea
-                value={formData.particulars_of_offence}
-                onChange={(e) => handleInputChange('particulars_of_offence', e.target.value)}
-                placeholder="Write here"
-                rows={4}
-                disabled={!isEdit || isLoading}
-                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                }`}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Section 2: Offence Reported By */}
-        <div>
-          <h2 className="text-lg font-semibold mb-4 underline">2 OFFENCE REPORTED BY</h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="relative">
-              <label className="block text-sm font-medium mb-2">OFFICER</label>
-              <input
-                type="text"
-                value={formData.reporting_officer_number || ''}
-                onChange={(e) => handleOfficerSearch('reporting_officer_id', e.target.value)}
-                placeholder="Search by name or service number"
-                disabled={!isEdit || isLoading}
-                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                }`}
-              />
-              {openOfficerDropdown === 'reporting_officer_id' &&
-                formData.reporting_officer_number &&
-                filteredOfficers['reporting_officer_id']?.length > 0 && (
-                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                    {filteredOfficers['reporting_officer_id'].map((officer: any) => (
-                      <button
-                        key={officer.id}
-                        type="button"
-                        onClick={() => handleOfficerSelect('reporting_officer_id', officer)}
-                        className="w-full px-4 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
-                      >
-                        <div className="flex justify-between">
-                          <p>{officer.name}</p>
-                          <p className="text-gray-600">{officer.serviceNumber}</p>
-                        </div>
-                      </button>
-                    ))}
+            <p className="mb-4">Being a person subject to military law is charge with</p>
+            <div className="grid grid-cols-2">
+              <div className="mb-4">
+                <div className="flex items-start gap-4 mb-4">
+                  <span className="font-medium">a.</span>
+                  <div className="flex-1">
+                    <label className="block text-sm font-medium mb-2">A STATEMENT OF OFFENCE</label>
+                    <textarea
+                      value={formData.statement_of_offence}
+                      onChange={(e) => handleInputChange('statement_of_offence', e.target.value)}
+                      placeholder="write here"
+                      rows={4}
+                      disabled={!isEdit || isLoading}
+                      className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                        !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                      }`}
+                    />
                   </div>
-                )}
+                </div>
+
+                <div className="ml-8">
+                  <label className="block text-sm font-medium mb-2">PUNISHABLE UNDER SECTION</label>
+                  <input
+                    type="text"
+                    value={formData.punishable_under_section}
+                    onChange={(e) => handleInputChange('punishable_under_section', e.target.value)}
+                    placeholder="Punishable under section"
+                    disabled={!isEdit || isLoading}
+                    className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                    }`}
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4">
+                <span className="font-medium">b.</span>
+                <div className="flex-1">
+                  <label className="block text-sm font-medium mb-2">PARTICULARS OF OFFENCE</label>
+                  <textarea
+                    value={formData.particulars_of_offence}
+                    onChange={(e) => handleInputChange('particulars_of_offence', e.target.value)}
+                    placeholder="Write here"
+                    rows={4}
+                    disabled={!isEdit || isLoading}
+                    className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                    }`}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Section 2: Offence Reported By */}
+          <div className="flex flex-col space-y-4">
+            <div className="">
+              <h2 className="text-lg font-semibold mb-4 underline">2 OFFENCE REPORTED BY</h2>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="relative">
+                  <label className="block text-sm font-medium mb-2">OFFICER</label>
+                  <input
+                    type="text"
+                    value={formData.reporting_officer_number || ''}
+                    onChange={(e) => handleOfficerSearch('reporting_officer_id', e.target.value)}
+                    placeholder="Search by name or service number"
+                    disabled={!isEdit || isLoading}
+                    className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                    }`}
+                  />
+                  {openOfficerDropdown === 'reporting_officer_id' &&
+                    formData.reporting_officer_number &&
+                    filteredOfficers['reporting_officer_id']?.length > 0 && (
+                      <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                        {filteredOfficers['reporting_officer_id'].map((officer: any) => (
+                          <button
+                            key={officer.id}
+                            type="button"
+                            onClick={() => handleOfficerSelect('reporting_officer_id', officer)}
+                            className="w-full px-4 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
+                          >
+                            <div className="flex justify-between">
+                              <p>{officer.name}</p>
+                              <p className="text-gray-600">{officer.serviceNumber}</p>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2">UNIT</label>
+                  <input
+                    type="text"
+                    value={formData.reporting_officer_unit}
+                    onChange={(e) => handleInputChange('reporting_officer_unit', e.target.value)}
+                    placeholder="Unit"
+                    disabled={!isEdit || isLoading}
+                    className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                    }`}
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="flex-">
+              <h2 className="text-lg font-semibold mb-4 underline">3 WITNESS</h2>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="relative">
+                  <label className="block text-sm font-medium mb-2">OFFICER</label>
+                  <input
+                    type="text"
+                    value={formData.witnessing_officer_number || ''}
+                    onChange={(e) => handleOfficerSearch('witnessing_officer_id', e.target.value)}
+                    placeholder="Search by name or service number"
+                    disabled={!isEdit || isLoading}
+                    className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                    }`}
+                  />
+                  {openOfficerDropdown === 'witnessing_officer_id' &&
+                    formData.witnessing_officer_number &&
+                    filteredOfficers['witnessing_officer_id']?.length > 0 && (
+                      <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                        {filteredOfficers['witnessing_officer_id'].map((officer: any) => (
+                          <button
+                            key={officer.id}
+                            type="button"
+                            onClick={() => handleOfficerSelect('witnessing_officer_id', officer)}
+                            className="w-full px-4 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
+                          >
+                            <div className="flex justify-between">
+                              <p>{officer.name}</p>
+                              <p className="text-gray-600">{officer.serviceNumber}</p>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2">UNIT</label>
+                  <input
+                    type="text"
+                    value={formData.witnessing_officer_unit}
+                    onChange={(e) => handleInputChange('witnessing_officer_unit', e.target.value)}
+                    placeholder="Unit"
+                    disabled={!isEdit || isLoading}
+                    className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                    }`}
+                  />
+                </div>
+              </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium mb-2">UNIT</label>
-              <input
-                type="text"
-                value={formData.reporting_officer_unit}
-                onChange={(e) => handleInputChange('reporting_officer_unit', e.target.value)}
-                placeholder="Unit"
-                disabled={!isEdit || isLoading}
-                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                }`}
-              />
+            {/* Section 4: To Be Tried By */}
+            <div className="flex-1">
+              <h2 className="text-lg font-semibold mb-4 underline">4 TO BE TRIED BY</h2>
+              <p className="text-sm mb-4">IN CASE OF COURT MARTIAL ONLY, STATE TYPE</p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="relative">
+                  <label className="block text-sm font-medium mb-2">OFFICER</label>
+                  <input
+                    type="text"
+                    value={formData.tried_by_officer_number || ''}
+                    onChange={(e) => handleOfficerSearch('tried_by_officer_id', e.target.value)}
+                    placeholder="Search by name or service number"
+                    disabled={!isEdit || isLoading}
+                    className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                    }`}
+                  />
+                  {openOfficerDropdown === 'tried_by_officer_id' &&
+                    formData.tried_by_officer_number &&
+                    filteredOfficers['tried_by_officer_id']?.length > 0 && (
+                      <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                        {filteredOfficers['tried_by_officer_id'].map((officer: any) => (
+                          <button
+                            key={officer.id}
+                            type="button"
+                            onClick={() => handleOfficerSelect('tried_by_officer_id', officer)}
+                            className="w-full px-4 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
+                          >
+                            <div className="flex justify-between">
+                              <p>{officer.name}</p>
+                              <p className="text-gray-600">{officer.serviceNumber}</p>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2">UNIT</label>
+                  <input
+                    type="text"
+                    value={formData.tried_by_officer_unit}
+                    onChange={(e) => handleInputChange('tried_by_officer_unit', e.target.value)}
+                    placeholder="Unit"
+                    disabled={!isEdit || isLoading}
+                    className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                    }`}
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Section 3: Witness */}
-        <div>
-          <h2 className="text-lg font-semibold mb-4 underline">3 WITNESS</h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="relative">
-              <label className="block text-sm font-medium mb-2">OFFICER</label>
-              <input
-                type="text"
-                value={formData.witnessing_officer_number || ''}
-                onChange={(e) => handleOfficerSearch('witnessing_officer_id', e.target.value)}
-                placeholder="Search by name or service number"
-                disabled={!isEdit || isLoading}
-                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                }`}
-              />
-              {openOfficerDropdown === 'witnessing_officer_id' &&
-                formData.witnessing_officer_number &&
-                filteredOfficers['witnessing_officer_id']?.length > 0 && (
-                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                    {filteredOfficers['witnessing_officer_id'].map((officer: any) => (
-                      <button
-                        key={officer.id}
-                        type="button"
-                        onClick={() => handleOfficerSelect('witnessing_officer_id', officer)}
-                        className="w-full px-4 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
-                      >
-                        <div className="flex justify-between">
-                          <p>{officer.name}</p>
-                          <p className="text-gray-600">{officer.serviceNumber}</p>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">UNIT</label>
-              <input
-                type="text"
-                value={formData.witnessing_officer_unit}
-                onChange={(e) => handleInputChange('witnessing_officer_unit', e.target.value)}
-                placeholder="Unit"
-                disabled={!isEdit || isLoading}
-                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                }`}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Section 4: To Be Tried By */}
-        <div>
-          <h2 className="text-lg font-semibold mb-4 underline">4 TO BE TRIED BY</h2>
-          <p className="text-sm mb-4">IN CASE OF COURT MARTIAL ONLY, STATE TYPE</p>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="relative">
-              <label className="block text-sm font-medium mb-2">OFFICER</label>
-              <input
-                type="text"
-                value={formData.tried_by_officer_number || ''}
-                onChange={(e) => handleOfficerSearch('tried_by_officer_id', e.target.value)}
-                placeholder="Search by name or service number"
-                disabled={!isEdit || isLoading}
-                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                }`}
-              />
-              {openOfficerDropdown === 'tried_by_officer_id' &&
-                formData.tried_by_officer_number &&
-                filteredOfficers['tried_by_officer_id']?.length > 0 && (
-                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                    {filteredOfficers['tried_by_officer_id'].map((officer: any) => (
-                      <button
-                        key={officer.id}
-                        type="button"
-                        onClick={() => handleOfficerSelect('tried_by_officer_id', officer)}
-                        className="w-full px-4 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
-                      >
-                        <div className="flex justify-between">
-                          <p>{officer.name}</p>
-                          <p className="text-gray-600">{officer.serviceNumber}</p>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">UNIT</label>
-              <input
-                type="text"
-                value={formData.tried_by_officer_unit}
-                onChange={(e) => handleInputChange('tried_by_officer_unit', e.target.value)}
-                placeholder="Unit"
-                disabled={!isEdit || isLoading}
-                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                }`}
-              />
-            </div>
-          </div>
-        </div>
 
         {/* Section 5: Commander */}
-        <div>
-          <h2 className="text-lg font-semibold mb-4 underline">5 COMMANDER</h2>
 
-          <div className="space-y-4">
-            <div className="relative">
-              <label className="block text-sm font-medium mb-2">OFFICER</label>
-              <input
-                type="text"
-                value={formData.commander_officer_number || ''}
-                onChange={(e) => handleOfficerSearch('commander_officer_id', e.target.value)}
-                placeholder="Search by name or service number"
-                disabled={!isEdit || isLoading}
-                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                }`}
-              />
-              {openOfficerDropdown === 'commander_officer_id' &&
-                formData.commander_officer_number &&
-                filteredOfficers['commander_officer_id']?.length > 0 && (
-                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                    {filteredOfficers['commander_officer_id'].map((officer: any) => (
-                      <button
-                        key={officer.id}
-                        type="button"
-                        onClick={() => handleOfficerSelect('commander_officer_id', officer)}
-                        className="w-full px-4 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
-                      >
-                        <div className="flex justify-between">
-                          <p>{officer.name}</p>
-                          <p className="text-gray-600">{officer.serviceNumber}</p>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                )}
-            </div>
+        <div className="grid grid-cols-4 gap-4">
+          <div>
+            <h2 className="text-lg font-semibold mb-4 underline">5 COMMANDER</h2>
 
-            <div>
-              <label className="block text-sm font-medium mb-2">FINDINGS</label>
-              <textarea
-                value={formData.commander_findings}
-                onChange={(e) => handleInputChange('commander_findings', e.target.value)}
-                placeholder="Findings"
-                rows={3}
-                disabled={!isEdit || isLoading}
-                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                }`}
-              />
-            </div>
+            <div className="space-y-4">
+              <div className="relative">
+                <label className="block text-sm font-medium mb-2">OFFICER</label>
+                <input
+                  type="text"
+                  value={formData.commander_officer_number || ''}
+                  onChange={(e) => handleOfficerSearch('commander_officer_id', e.target.value)}
+                  placeholder="Search by name or service number"
+                  disabled={!isEdit || isLoading}
+                  className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                  }`}
+                />
+                {openOfficerDropdown === 'commander_officer_id' &&
+                  formData.commander_officer_number &&
+                  filteredOfficers['commander_officer_id']?.length > 0 && (
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                      {filteredOfficers['commander_officer_id'].map((officer: any) => (
+                        <button
+                          key={officer.id}
+                          type="button"
+                          onClick={() => handleOfficerSelect('commander_officer_id', officer)}
+                          className="w-full px-4 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
+                        >
+                          <div className="flex justify-between">
+                            <p>{officer.name}</p>
+                            <p className="text-gray-600">{officer.serviceNumber}</p>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium mb-2">AWARD</label>
-              <input
-                type="text"
-                value={formData.commander_award}
-                onChange={(e) => handleInputChange('commander_award', e.target.value)}
-                placeholder="Award"
-                disabled={!isEdit || isLoading}
-                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                }`}
-              />
-            </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">FINDINGS</label>
+                <textarea
+                  value={formData.commander_findings}
+                  onChange={(e) => handleInputChange('commander_findings', e.target.value)}
+                  placeholder="Findings"
+                  rows={3}
+                  disabled={!isEdit || isLoading}
+                  className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                  }`}
+                />
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium mb-2">RECOMMENDATIONS</label>
-              <textarea
-                value={formData.commander_recommendations}
-                onChange={(e) => handleInputChange('commander_recommendations', e.target.value)}
-                placeholder="Recommendations"
-                rows={3}
-                disabled={!isEdit || isLoading}
-                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                }`}
-              />
-            </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">AWARD</label>
+                <input
+                  type="text"
+                  value={formData.commander_award}
+                  onChange={(e) => handleInputChange('commander_award', e.target.value)}
+                  placeholder="Award"
+                  disabled={!isEdit || isLoading}
+                  className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                  }`}
+                />
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium mb-2">DATE</label>
-              <input
-                type="date"
-                value={formData.commander_date}
-                onChange={(e) => handleInputChange('commander_date', e.target.value)}
-                disabled={!isEdit || isLoading}
-                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                }`}
-              />
-            </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">RECOMMENDATIONS</label>
+                <textarea
+                  value={formData.commander_recommendations}
+                  onChange={(e) => handleInputChange('commander_recommendations', e.target.value)}
+                  placeholder="Recommendations"
+                  rows={3}
+                  disabled={!isEdit || isLoading}
+                  className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                  }`}
+                />
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium mb-2">SIGNATURE</label>
-              <input
-                type="file"
-                onChange={(e) =>
-                  handleFileChange('commander_signature', e.target.files?.[0] || null)
-                }
-                disabled={!isEdit || isLoading}
-                accept="image/*,.pdf"
-                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                }`}
-              />
-              {formData.commander_signature && (
-                <p className="text-sm text-gray-600 mt-1">
-                  Selected: {formData.commander_signature}
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">DATE</label>
+                <input
+                  type="date"
+                  value={formData.commander_date}
+                  onChange={(e) => handleInputChange('commander_date', e.target.value)}
+                  disabled={!isEdit || isLoading}
+                  className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                  }`}
+                />
+              </div>
 
-        {/* Section 6: Battalion Commander */}
-        <div>
-          <h2 className="text-lg font-semibold mb-4 underline">6 BATTALION COMMANDER</h2>
-
-          <div className="space-y-4">
-            <div className="relative">
-              <label className="block text-sm font-medium mb-2">OFFICER</label>
-              <input
-                type="text"
-                value={formData.bn_commander_officer_number || ''}
-                onChange={(e) => handleOfficerSearch('bn_commander_officer_id', e.target.value)}
-                placeholder="Search by name or service number"
-                disabled={!isEdit || isLoading}
-                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                }`}
-              />
-              {openOfficerDropdown === 'bn_commander_officer_id' &&
-                formData.bn_commander_officer_number &&
-                filteredOfficers['bn_commander_officer_id']?.length > 0 && (
-                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                    {filteredOfficers['bn_commander_officer_id'].map((officer: any) => (
-                      <button
-                        key={officer.id}
-                        type="button"
-                        onClick={() => handleOfficerSelect('bn_commander_officer_id', officer)}
-                        className="w-full px-4 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
-                      >
-                        <div className="flex justify-between">
-                          <p>{officer.name}</p>
-                          <p className="text-gray-600">{officer.serviceNumber}</p>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">FINDINGS</label>
-              <textarea
-                value={formData.bn_commander_findings}
-                onChange={(e) => handleInputChange('bn_commander_findings', e.target.value)}
-                placeholder="Findings"
-                rows={3}
-                disabled={!isEdit || isLoading}
-                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                }`}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">AWARD</label>
-              <input
-                type="text"
-                value={formData.bn_commander_award}
-                onChange={(e) => handleInputChange('bn_commander_award', e.target.value)}
-                placeholder="Award"
-                disabled={!isEdit || isLoading}
-                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                }`}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">RECOMMENDATIONS</label>
-              <textarea
-                value={formData.bn_commander_recommendations}
-                onChange={(e) => handleInputChange('bn_commander_recommendations', e.target.value)}
-                placeholder="Recommendations"
-                rows={3}
-                disabled={!isEdit || isLoading}
-                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                }`}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">DATE</label>
-              <input
-                type="date"
-                value={formData.bn_commander_date}
-                onChange={(e) => handleInputChange('bn_commander_date', e.target.value)}
-                disabled={!isEdit || isLoading}
-                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                }`}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">SIGNATURE</label>
-              <input
-                type="file"
-                onChange={(e) =>
-                  handleFileChange('bn_commander_signature', e.target.files?.[0] || null)
-                }
-                disabled={!isEdit || isLoading}
-                accept="image/*,.pdf"
-                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                }`}
-              />
-              {formData.bn_commander_signature && (
-                <p className="text-sm text-gray-600 mt-1">
-                  Selected: {formData.bn_commander_signature}
-                </p>
-              )}
+              <div>
+                <label className="block text-sm font-medium mb-2">SIGNATURE</label>
+                <input
+                  type="file"
+                  onChange={(e) =>
+                    handleFileChange('commander_signature', e.target.files?.[0] || null)
+                  }
+                  disabled={!isEdit || isLoading}
+                  accept="image/*,.pdf"
+                  className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                  }`}
+                />
+                {/* {formData.commander_signature && (
+                  <p className="text-sm text-gray-600 mt-1">
+                    Selected: {formData.commander_signature}
+                  </p>
+                )} */}
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Section 7: Brigade Commander */}
-        <div>
-          <h2 className="text-lg font-semibold mb-4 underline">7 BRIGADE COMMANDER</h2>
+          {/* Section 6: Battalion Commander */}
+          <div>
+            <h2 className="text-lg font-semibold mb-4 underline">6 BATTALION COMMANDER</h2>
 
-          <div className="space-y-4">
-            <div className="relative">
-              <label className="block text-sm font-medium mb-2">OFFICER</label>
-              <input
-                type="text"
-                value={formData.bde_commander_officer_number || ''}
-                onChange={(e) => handleOfficerSearch('bde_commander_officer_id', e.target.value)}
-                placeholder="Search by name or service number"
-                disabled={!isEdit || isLoading}
-                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                }`}
-              />
-              {openOfficerDropdown === 'bde_commander_officer_id' &&
-                formData.bde_commander_officer_number &&
-                filteredOfficers['bde_commander_officer_id']?.length > 0 && (
-                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                    {filteredOfficers['bde_commander_officer_id'].map((officer: any) => (
-                      <button
-                        key={officer.id}
-                        type="button"
-                        onClick={() => handleOfficerSelect('bde_commander_officer_id', officer)}
-                        className="w-full px-4 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
-                      >
-                        <div className="flex justify-between">
-                          <p>{officer.name}</p>
-                          <p className="text-gray-600">{officer.serviceNumber}</p>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                )}
+            <div className="space-y-4">
+              <div className="relative">
+                <label className="block text-sm font-medium mb-2">OFFICER</label>
+                <input
+                  type="text"
+                  value={formData.bn_commander_officer_number || ''}
+                  onChange={(e) => handleOfficerSearch('bn_commander_officer_id', e.target.value)}
+                  placeholder="Search by name or service number"
+                  disabled={!isEdit || isLoading}
+                  className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                  }`}
+                />
+                {openOfficerDropdown === 'bn_commander_officer_id' &&
+                  formData.bn_commander_officer_number &&
+                  filteredOfficers['bn_commander_officer_id']?.length > 0 && (
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                      {filteredOfficers['bn_commander_officer_id'].map((officer: any) => (
+                        <button
+                          key={officer.id}
+                          type="button"
+                          onClick={() => handleOfficerSelect('bn_commander_officer_id', officer)}
+                          className="w-full px-4 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
+                        >
+                          <div className="flex justify-between">
+                            <p>{officer.name}</p>
+                            <p className="text-gray-600">{officer.serviceNumber}</p>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">FINDINGS</label>
+                <textarea
+                  value={formData.bn_commander_findings}
+                  onChange={(e) => handleInputChange('bn_commander_findings', e.target.value)}
+                  placeholder="Findings"
+                  rows={3}
+                  disabled={!isEdit || isLoading}
+                  className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                  }`}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">AWARD</label>
+                <input
+                  type="text"
+                  value={formData.bn_commander_award}
+                  onChange={(e) => handleInputChange('bn_commander_award', e.target.value)}
+                  placeholder="Award"
+                  disabled={!isEdit || isLoading}
+                  className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                  }`}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">RECOMMENDATIONS</label>
+                <textarea
+                  value={formData.bn_commander_recommendations}
+                  onChange={(e) =>
+                    handleInputChange('bn_commander_recommendations', e.target.value)
+                  }
+                  placeholder="Recommendations"
+                  rows={3}
+                  disabled={!isEdit || isLoading}
+                  className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                  }`}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">DATE</label>
+                <input
+                  type="date"
+                  value={formData.bn_commander_date}
+                  onChange={(e) => handleInputChange('bn_commander_date', e.target.value)}
+                  disabled={!isEdit || isLoading}
+                  className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                  }`}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">SIGNATURE</label>
+                <input
+                  type="file"
+                  onChange={(e) =>
+                    handleFileChange('bn_commander_signature', e.target.files?.[0] || null)
+                  }
+                  disabled={!isEdit || isLoading}
+                  accept="image/*,.pdf"
+                  className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                  }`}
+                />
+                {/* {formData.bn_commander_signature && (
+                  <p className="text-sm text-gray-600 mt-1">
+                    Selected: {formData.bn_commander_signature}
+                  </p>
+                )} */}
+              </div>
             </div>
+          </div>
 
-            <div>
-              <label className="block text-sm font-medium mb-2">FINDINGS</label>
-              <textarea
-                value={formData.bde_commander_findings}
-                onChange={(e) => handleInputChange('bde_commander_findings', e.target.value)}
-                placeholder="Findings"
-                rows={3}
-                disabled={!isEdit || isLoading}
-                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                }`}
-              />
+          {/* Section 7: Brigade Commander */}
+          <div>
+            <h2 className="text-lg font-semibold mb-4 underline">7 BRIGADE COMMANDER</h2>
+
+            <div className="space-y-4">
+              <div className="relative">
+                <label className="block text-sm font-medium mb-2">OFFICER</label>
+                <input
+                  type="text"
+                  value={formData.bde_commander_officer_number || ''}
+                  onChange={(e) => handleOfficerSearch('bde_commander_officer_id', e.target.value)}
+                  placeholder="Search by name or service number"
+                  disabled={!isEdit || isLoading}
+                  className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                  }`}
+                />
+                {openOfficerDropdown === 'bde_commander_officer_id' &&
+                  formData.bde_commander_officer_number &&
+                  filteredOfficers['bde_commander_officer_id']?.length > 0 && (
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                      {filteredOfficers['bde_commander_officer_id'].map((officer: any) => (
+                        <button
+                          key={officer.id}
+                          type="button"
+                          onClick={() => handleOfficerSelect('bde_commander_officer_id', officer)}
+                          className="w-full px-4 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
+                        >
+                          <div className="flex justify-between">
+                            <p>{officer.name}</p>
+                            <p className="text-gray-600">{officer.serviceNumber}</p>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">FINDINGS</label>
+                <textarea
+                  value={formData.bde_commander_findings}
+                  onChange={(e) => handleInputChange('bde_commander_findings', e.target.value)}
+                  placeholder="Findings"
+                  rows={3}
+                  disabled={!isEdit || isLoading}
+                  className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                  }`}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">AWARD</label>
+                <input
+                  type="text"
+                  value={formData.bde_commander_award}
+                  onChange={(e) => handleInputChange('bde_commander_award', e.target.value)}
+                  placeholder="Award"
+                  disabled={!isEdit || isLoading}
+                  className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                  }`}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">RECOMMENDATIONS</label>
+                <textarea
+                  value={formData.bde_commander_recommendations}
+                  onChange={(e) =>
+                    handleInputChange('bde_commander_recommendations', e.target.value)
+                  }
+                  placeholder="Recommendations"
+                  rows={3}
+                  disabled={!isEdit || isLoading}
+                  className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                  }`}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">DATE</label>
+                <input
+                  type="date"
+                  value={formData.bde_commander_date}
+                  onChange={(e) => handleInputChange('bde_commander_date', e.target.value)}
+                  disabled={!isEdit || isLoading}
+                  className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                  }`}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">SIGNATURE</label>
+                <input
+                  type="file"
+                  onChange={(e) =>
+                    handleFileChange('bde_commander_signature', e.target.files?.[0] || null)
+                  }
+                  disabled={!isEdit || isLoading}
+                  accept="image/*,.pdf"
+                  className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                  }`}
+                />
+                {/* {formData.bde_commander_signature && (
+                  <p className="text-sm text-gray-600 mt-1">
+                    Selected: {formData.bde_commander_signature}
+                  </p>
+                )} */}
+              </div>
             </div>
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold mb-4 underline">8 GENERAL COMMANDER</h2>
 
-            <div>
-              <label className="block text-sm font-medium mb-2">AWARD</label>
-              <input
-                type="text"
-                value={formData.bde_commander_award}
-                onChange={(e) => handleInputChange('bde_commander_award', e.target.value)}
-                placeholder="Award"
-                disabled={!isEdit || isLoading}
-                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                }`}
-              />
-            </div>
+            <div className="space-y-4">
+              <div className="relative">
+                <label className="block text-sm font-medium mb-2">OFFICER</label>
+                <input
+                  type="text"
+                  value={formData.gen_commander_officer_number || ''}
+                  onChange={(e) => handleOfficerSearch('gen_commander_officer_id', e.target.value)}
+                  placeholder="Search by name or service number"
+                  disabled={!isEdit || isLoading}
+                  className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                  }`}
+                />
+                {openOfficerDropdown === 'gen_commander_officer_id' &&
+                  formData.gen_commander_officer_number &&
+                  filteredOfficers['gen_commander_officer_id']?.length > 0 && (
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                      {filteredOfficers['gen_commander_officer_id'].map((officer: any) => (
+                        <button
+                          key={officer.id}
+                          type="button"
+                          onClick={() => handleOfficerSelect('gen_commander_officer_id', officer)}
+                          className="w-full px-4 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
+                        >
+                          <div className="flex justify-between">
+                            <p>{officer.name}</p>
+                            <p className="text-gray-600">{officer.serviceNumber}</p>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium mb-2">RECOMMENDATIONS</label>
-              <textarea
-                value={formData.bde_commander_recommendations}
-                onChange={(e) => handleInputChange('bde_commander_recommendations', e.target.value)}
-                placeholder="Recommendations"
-                rows={3}
-                disabled={!isEdit || isLoading}
-                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                }`}
-              />
-            </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">FINDINGS</label>
+                <textarea
+                  value={formData.gen_commander_findings}
+                  onChange={(e) => handleInputChange('gen_commander_findings', e.target.value)}
+                  placeholder="Findings"
+                  rows={3}
+                  disabled={!isEdit || isLoading}
+                  className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                  }`}
+                />
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium mb-2">DATE</label>
-              <input
-                type="date"
-                value={formData.bde_commander_date}
-                onChange={(e) => handleInputChange('bde_commander_date', e.target.value)}
-                disabled={!isEdit || isLoading}
-                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                }`}
-              />
-            </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">AWARD</label>
+                <input
+                  type="text"
+                  value={formData.gen_commander_award}
+                  onChange={(e) => handleInputChange('gen_commander_award', e.target.value)}
+                  placeholder="Award"
+                  disabled={!isEdit || isLoading}
+                  className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                  }`}
+                />
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium mb-2">SIGNATURE</label>
-              <input
-                type="file"
-                onChange={(e) =>
-                  handleFileChange('bde_commander_signature', e.target.files?.[0] || null)
-                }
-                disabled={!isEdit || isLoading}
-                accept="image/*,.pdf"
-                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                }`}
-              />
-              {formData.bde_commander_signature && (
-                <p className="text-sm text-gray-600 mt-1">
-                  Selected: {formData.bde_commander_signature}
-                </p>
-              )}
+              <div>
+                <label className="block text-sm font-medium mb-2">RECOMMENDATIONS</label>
+                <textarea
+                  value={formData.gen_commander_recommendations}
+                  onChange={(e) =>
+                    handleInputChange('gen_commander_recommendations', e.target.value)
+                  }
+                  placeholder="Recommendations"
+                  rows={3}
+                  disabled={!isEdit || isLoading}
+                  className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                  }`}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">DATE</label>
+                <input
+                  type="date"
+                  value={formData.gen_commander_date}
+                  onChange={(e) => handleInputChange('gen_commander_date', e.target.value)}
+                  disabled={!isEdit || isLoading}
+                  className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                  }`}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">SIGNATURE</label>
+                <input
+                  type="file"
+                  onChange={(e) =>
+                    handleFileChange('gen_commander_signature', e.target.files?.[0] || null)
+                  }
+                  disabled={!isEdit || isLoading}
+                  accept="image/*,.pdf"
+                  className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
+                  }`}
+                />
+                {/* {formData.gen_commander_signature && (
+                  <p className="text-sm text-gray-600 mt-1">
+                    Selected: {formData.gen_commander_signature}
+                  </p>
+                )} */}
+              </div>
             </div>
           </div>
         </div>
 
         {/* Section 8: General Commander */}
-        <div>
-          <h2 className="text-lg font-semibold mb-4 underline">8 GENERAL COMMANDER</h2>
-
-          <div className="space-y-4">
-            <div className="relative">
-              <label className="block text-sm font-medium mb-2">OFFICER</label>
-              <input
-                type="text"
-                value={formData.gen_commander_officer_number || ''}
-                onChange={(e) => handleOfficerSearch('gen_commander_officer_id', e.target.value)}
-                placeholder="Search by name or service number"
-                disabled={!isEdit || isLoading}
-                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                }`}
-              />
-              {openOfficerDropdown === 'gen_commander_officer_id' &&
-                formData.gen_commander_officer_number &&
-                filteredOfficers['gen_commander_officer_id']?.length > 0 && (
-                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                    {filteredOfficers['gen_commander_officer_id'].map((officer: any) => (
-                      <button
-                        key={officer.id}
-                        type="button"
-                        onClick={() => handleOfficerSelect('gen_commander_officer_id', officer)}
-                        className="w-full px-4 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
-                      >
-                        <div className="flex justify-between">
-                          <p>{officer.name}</p>
-                          <p className="text-gray-600">{officer.serviceNumber}</p>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">FINDINGS</label>
-              <textarea
-                value={formData.gen_commander_findings}
-                onChange={(e) => handleInputChange('gen_commander_findings', e.target.value)}
-                placeholder="Findings"
-                rows={3}
-                disabled={!isEdit || isLoading}
-                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                }`}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">AWARD</label>
-              <input
-                type="text"
-                value={formData.gen_commander_award}
-                onChange={(e) => handleInputChange('gen_commander_award', e.target.value)}
-                placeholder="Award"
-                disabled={!isEdit || isLoading}
-                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                }`}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">RECOMMENDATIONS</label>
-              <textarea
-                value={formData.gen_commander_recommendations}
-                onChange={(e) => handleInputChange('gen_commander_recommendations', e.target.value)}
-                placeholder="Recommendations"
-                rows={3}
-                disabled={!isEdit || isLoading}
-                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                }`}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">DATE</label>
-              <input
-                type="date"
-                value={formData.gen_commander_date}
-                onChange={(e) => handleInputChange('gen_commander_date', e.target.value)}
-                disabled={!isEdit || isLoading}
-                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                }`}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">SIGNATURE</label>
-              <input
-                type="file"
-                onChange={(e) =>
-                  handleFileChange('gen_commander_signature', e.target.files?.[0] || null)
-                }
-                disabled={!isEdit || isLoading}
-                accept="image/*,.pdf"
-                className={`w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  !isEdit || isLoading ? 'bg-gray-50 text-gray-600 cursor-not-allowed' : ''
-                }`}
-              />
-              {formData.gen_commander_signature && (
-                <p className="text-sm text-gray-600 mt-1">
-                  Selected: {formData.gen_commander_signature}
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
 
         {/* Notes Section */}
         <div className="bg-gray-50 p-4 rounded">

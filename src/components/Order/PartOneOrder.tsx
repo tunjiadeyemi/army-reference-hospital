@@ -1,9 +1,15 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { useGetOfficers } from '../UnitBible/hooks/useUnitBible';
+// import { useGetOfficers } from '../../hooks/dashboardhooks/useGetOfficers';
 
 export default function PartOneOrder() {
+  const { data: officers } = useGetOfficers();
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
   const [formData, setFormData] = useState({
+    officer_id: '',
     rank: '',
-    serviceNo: '',
+    serviceNumber: '',
     name: '',
     decorations: '',
     appointment: '',
@@ -90,6 +96,64 @@ export default function PartOneOrder() {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
+  // Officer auto-complete state
+  const [openOfficerDropdown, setOpenOfficerDropdown] = useState(false);
+  const [filteredOfficers, setFilteredOfficers] = useState<typeof officers>([]);
+  const [isOfficerConfirmed, setIsOfficerConfirmed] = useState(false);
+  const [officerInputField, setOfficerInputField] = useState<'serviceNumber' | 'name' | null>(null);
+
+  // Filter officers by name or serviceNumber
+  const filterOfficers = (value: string, field: 'name' | 'serviceNumber') => {
+    if (!officers) return [];
+    return officers.filter((officer: any) =>
+      (officer[field] || '').toLowerCase().includes(value.toLowerCase())
+    );
+  };
+
+  // Handle input change for name or serviceNumber
+  const handleOfficerInputChange = (field: 'name' | 'serviceNumber', value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+      officer_id: '',
+      rank: field === 'name' ? '' : prev.rank
+    }));
+    setIsOfficerConfirmed(false);
+    setOfficerInputField(field);
+    if (value.trim() === '') {
+      setOpenOfficerDropdown(false);
+      setFilteredOfficers([]);
+      return;
+    }
+    setOpenOfficerDropdown(true);
+    setFilteredOfficers(filterOfficers(value, field));
+  };
+
+  // When an officer is selected from dropdown
+  const handleSelectOfficer = (officer: any) => {
+    setFormData((prev) => ({
+      ...prev,
+      officer_id: officer.id,
+      name: officer.name,
+      serviceNumber: officer.serviceNumber,
+      rank: officer.rank
+    }));
+    setIsOfficerConfirmed(true);
+    setOpenOfficerDropdown(false);
+  };
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    if (!openOfficerDropdown) return;
+    const handleClick = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setOpenOfficerDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [openOfficerDropdown]);
+
   return (
     <div className="mx-auto p-6 bg-white">
       {/* Header */}
@@ -104,45 +168,88 @@ export default function PartOneOrder() {
 
       {/* First Row - Personal Details */}
       <div className="grid grid-cols-2 gap-6 mb-6">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">RANK</label>
-          <div className="relative">
-            <select
-              className="w-full p-3 border border-gray-300 rounded appearance-none bg-white text-gray-400"
-              value={formData.rank}
-              onChange={(e) => handleInputChange('rank', e.target.value)}
-            >
-              <option value="">Rank</option>
-            </select>
-            <img
-              src="/chevron-down.svg"
-              alt="chevron down"
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"
-            />
-          </div>
-        </div>
-        <div>
+        <div className="relative" ref={officerInputField === 'serviceNumber' ? dropdownRef : null}>
           <label className="block text-sm font-medium text-gray-700 mb-2">SERVICE NO</label>
           <input
             type="text"
             placeholder="Service No"
             className="w-full p-3 border border-gray-300 rounded text-gray-400 placeholder-gray-400"
-            value={formData.serviceNo}
-            onChange={(e) => handleInputChange('serviceNo', e.target.value)}
+            value={formData.serviceNumber}
+            onChange={(e) => handleOfficerInputChange('serviceNumber', e.target.value)}
+            onFocus={() => {
+              if (formData.serviceNumber && !isOfficerConfirmed) {
+                setOfficerInputField('serviceNumber');
+                setOpenOfficerDropdown(true);
+                setFilteredOfficers(filterOfficers(formData.serviceNumber, 'serviceNumber'));
+              }
+            }}
+            autoComplete="off"
           />
+          {openOfficerDropdown && officerInputField === 'serviceNumber' && (
+            <ul className="absolute z-10 bg-white border border-gray-300 rounded w-full mt-1 max-h-48 overflow-y-auto">
+              {filteredOfficers.length > 0 ? (
+                filteredOfficers.map((officer: any) => (
+                  <li
+                    key={officer.id}
+                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                    onMouseDown={() => handleSelectOfficer(officer)}
+                  >
+                    {officer.serviceNumber} - {officer.rank} {officer.name}
+                  </li>
+                ))
+              ) : (
+                <li className="px-4 py-2 text-gray-500">No officer found</li>
+              )}
+            </ul>
+          )}
         </div>
-      </div>
-
-      {/* Second Row */}
-      <div className="grid grid-cols-2 gap-6 mb-6">
-        <div>
+        <div className="relative" ref={officerInputField === 'name' ? dropdownRef : null}>
           <label className="block text-sm font-medium text-gray-700 mb-2">NAME</label>
           <input
             type="text"
             placeholder="Full Name"
             className="w-full p-3 border border-gray-300 rounded text-gray-400 placeholder-gray-400"
             value={formData.name}
-            onChange={(e) => handleInputChange('name', e.target.value)}
+            onChange={(e) => handleOfficerInputChange('name', e.target.value)}
+            onFocus={() => {
+              if (formData.name && !isOfficerConfirmed) {
+                setOfficerInputField('name');
+                setOpenOfficerDropdown(true);
+                setFilteredOfficers(filterOfficers(formData.name, 'name'));
+              }
+            }}
+            autoComplete="off"
+          />
+          {openOfficerDropdown && officerInputField === 'name' && (
+            <ul className="absolute z-10 bg-white border border-gray-300 rounded w-full mt-1 max-h-48 overflow-y-auto">
+              {filteredOfficers.length > 0 ? (
+                filteredOfficers.map((officer: any) => (
+                  <li
+                    key={officer.id}
+                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                    onMouseDown={() => handleSelectOfficer(officer)}
+                  >
+                    {officer.serviceNumber} - {officer.rank} {officer.name}
+                  </li>
+                ))
+              ) : (
+                <li className="px-4 py-2 text-gray-500">No officer found</li>
+              )}
+            </ul>
+          )}
+        </div>
+      </div>
+
+      {/* Second Row */}
+      <div className="grid grid-cols-2 gap-6 mb-6">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">RANK</label>
+          <input
+            type="text"
+            placeholder="Rank"
+            className="w-full p-3 border border-gray-300 rounded text-gray-400 placeholder-gray-400"
+            value={formData.rank}
+            disabled
           />
         </div>
         <div>
@@ -152,7 +259,7 @@ export default function PartOneOrder() {
             placeholder="Decoration"
             className="w-full p-3 border border-gray-300 rounded text-gray-400 placeholder-gray-400"
             value={formData.decorations}
-            onChange={(e) => handleInputChange('decorations', e.target.value)}
+            onChange={(e) => setFormData((prev) => ({ ...prev, decorations: e.target.value }))}
           />
         </div>
       </div>
@@ -269,7 +376,6 @@ export default function PartOneOrder() {
               </div>
             </div>
           ))}
-
           <div className="p-3">
             <button
               type="button"

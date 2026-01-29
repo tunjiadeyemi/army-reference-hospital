@@ -38,7 +38,7 @@ const MainTable = <T extends Record<string, any>>({
 
   // Filter data based on search term and filterable
   const filteredData = useMemo(() => {
-    let filtered = data;
+    let filtered = data || [];
     if (filterable && filterable.value) {
       filtered = filtered.filter((item) => String(item[filterable.filterKey]) === filterable.value);
     }
@@ -53,7 +53,7 @@ const MainTable = <T extends Record<string, any>>({
   }, [data, searchTerm, filterable && filterable.value]);
 
   // Pagination calculations
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const totalPages = Math.ceil((filteredData?.length || 0) / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedData = filteredData.slice(startIndex, startIndex + itemsPerPage);
 
@@ -227,7 +227,7 @@ const MainTable = <T extends Record<string, any>>({
                 <td colSpan={columns.length} className="px-6 py-20 text-center">
                   <div className="flex flex-col items-center justify-center">
                     <EmptyStateIcon />
-            
+
                     <p className="text-gray-500 text-lg font-medium">No records found</p>
                     <p className="text-gray-400 text-sm mt-2">There are no records to display</p>
                   </div>

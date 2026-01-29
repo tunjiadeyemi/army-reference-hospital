@@ -1,7 +1,7 @@
 import { RiEyeCloseLine } from 'react-icons/ri';
 import { RiEyeLine } from 'react-icons/ri';
 import useToggle from '../../hooks/useToggle';
-import {  useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import useFormChangeHandler from '../../hooks/useFormChangeHandler';
 import { useSignIn } from './hooks/useAuth';
 import Loader from '../../components/ui/Loader';
@@ -11,17 +11,15 @@ import { useQueryClient } from '@tanstack/react-query';
 import { getOverview, prefetchAllData } from '../../services/dashboardApi/dashboardServices';
 const Login = () => {
   const [isPasswordVisible, togglePassword] = useToggle();
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [formData, setFormData] = useFormChangeHandler({
     email: '',
     password: ''
   });
- 
- 
 
   const { mutate: signIn, isPending } = useSignIn();
- 
+
   const handleSignUp = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -30,16 +28,14 @@ const Login = () => {
         showSuccess(data.message || 'Login Successful');
 
         await queryClient.prefetchQuery({
-          queryKey: ["getOverview"],
+          queryKey: ['getOverview'],
           queryFn: getOverview
-          
-        })
+        });
 
         // Prefetch all data immediately after login
         await prefetchAllData();
 
         navigate('/home');
-
       },
       onError: (err: any) => {
         showError(err.message);
@@ -54,7 +50,7 @@ const Login = () => {
       <div className="flex items-center justify-center w-full h-full overflow-y-auto bg-black/40 py-30 ">
         <div className="my-3 lg:w-[43%] w-[90%] h-auto flex flex-col items-center  bg-white py-7  sm:px-5 rounded-xl shadow-lg">
           <img className="2xl:w-60 w-30 sm:w-40 " src="/logo.svg" alt="Logo" />
-          <div className='px-5 w-full '>
+          <div className="px-5 w-full ">
             <h2 className="font-extrabold  text-center text-[#2D403D] text-xl md:text-2xl uppercase md:mt-5 mb-4.5 lg:mb-9">
               44 Nigerian Army Reference Hospital
             </h2>

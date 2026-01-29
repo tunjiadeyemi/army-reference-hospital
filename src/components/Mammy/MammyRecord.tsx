@@ -42,7 +42,7 @@ const MammyRecord = () => {
     },
     {
       key: 'allocation_date',
-      header: 'Nature of Business',
+      header: 'Date of Renewal',
       className: 'w-[25%]'
     }
   ];

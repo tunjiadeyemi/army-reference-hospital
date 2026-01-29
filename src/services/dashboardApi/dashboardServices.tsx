@@ -4,6 +4,7 @@ import api from '../api';
 
 // Prefetch all data on successful login
 export const prefetchAllData = async () => {
+  localStorage.clear()
   try {
     const promises = [
       getUsers(),
@@ -702,7 +703,8 @@ export const createGuardRoom = async (payload: any) => {
 export const updateGuardRoom = async (payload: any) => {
   const { officer_id, ...data } = payload;
 
-  const res = await api.patch(`/v1/guard-room/edit/${officer_id}`, data);
+  const res = await api.post(`/v1/guard-room/create`, data);
+  // const res = await api.patch(`/v1/guard-room/edit/${officer_id}`, data);
   return res.data;
 };
 
