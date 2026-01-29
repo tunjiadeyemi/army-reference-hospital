@@ -1,12 +1,75 @@
 import { useState, useRef, useEffect } from 'react';
 import { useGetOfficers } from '../UnitBible/hooks/useUnitBible';
-// import { useGetOfficers } from '../../hooks/dashboardhooks/useGetOfficers';
+import { useCreatePartOneOrder } from '../../hooks/dashboardhooks/useCreatePartOneOrder';
+import type { CreatePartOneOrderPayload } from '../../services/dashboardApi/partOneOrderService';
+import toast from 'react-hot-toast';
+
+// Helper type for officer (should match your officer API shape)
+type Officer = {
+  id: number | string;
+  name: string;
+  serviceNumber: string;
+  rank: string;
+  // ...add other fields if needed
+};
 
 export default function PartOneOrder() {
-  const { data: officers } = useGetOfficers();
+  const { data: officers = [] } = useGetOfficers();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const [formData, setFormData] = useState({
+  // State for officer auto-complete
+  const [openOfficerDropdown, setOpenOfficerDropdown] = useState(false);
+  const [filteredOfficers, setFilteredOfficers] = useState<Officer[]>([]);
+  const [isOfficerConfirmed, setIsOfficerConfirmed] = useState(false);
+  const [officerInputField, setOfficerInputField] = useState<'serviceNumber' | 'name' | null>(null);
+
+  // State for duty officer auto-complete
+  const [openDutyOfficerDropdown, setOpenDutyOfficerDropdown] = useState(false);
+  const [filteredDutyOfficers, setFilteredDutyOfficers] = useState<Officer[]>([]);
+  const [isDutyOfficerConfirmed, setIsDutyOfficerConfirmed] = useState(false);
+  const [dutyOfficerInputField, setDutyOfficerInputField] = useState<
+    'dutyServiceNo' | 'dutyName' | null
+  >(null);
+
+  // State for guard officer auto-complete
+  const [openGuardOfficerDropdown, setOpenGuardOfficerDropdown] = useState(false);
+  const [filteredGuardOfficers, setFilteredGuardOfficers] = useState<Officer[]>([]);
+  const [isGuardOfficerConfirmed, setIsGuardOfficerConfirmed] = useState(false);
+  const [guardOfficerInputField, setGuardOfficerInputField] = useState<
+    'fireServiceNo' | 'fireName' | null
+  >(null);
+
+  // Form state
+  const [formData, setFormData] = useState<
+    Omit<CreatePartOneOrderPayload, 'routineActivities'> & {
+      rank: string;
+      serviceNumber: string;
+      name: string;
+      dutyRank: string;
+      dutyServiceNo: string;
+      dutyName: string;
+      fireDuration: string;
+      fireLocation: string;
+      fireServiceNo: string;
+      fireName: string;
+      timeOut: string;
+      timeOutName: string;
+      timeOutRank: string;
+      timeOutAppt: string;
+      decorations: string;
+      appointment: string;
+      unit: string;
+      issueNo: string;
+      date: string;
+      subject: string;
+      comment: string;
+      dutyDepartment: string;
+      dutyDate: string;
+      officer_id: number | string;
+      duty_officer_id: number | string;
+      guard_officer_id: number | string;
+    }
+  >({
     officer_id: '',
     rank: '',
     serviceNumber: '',
@@ -30,7 +93,9 @@ export default function PartOneOrder() {
     timeOut: '',
     timeOutName: '',
     timeOutRank: '',
-    timeOutAppt: ''
+    timeOutAppt: '',
+    duty_officer_id: '',
+    guard_officer_id: ''
   });
 
   const departmentOptions = [
@@ -96,63 +161,206 @@ export default function PartOneOrder() {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  // Officer auto-complete state
-  const [openOfficerDropdown, setOpenOfficerDropdown] = useState(false);
-  const [filteredOfficers, setFilteredOfficers] = useState<typeof officers>([]);
-  const [isOfficerConfirmed, setIsOfficerConfirmed] = useState(false);
-  const [officerInputField, setOfficerInputField] = useState<'serviceNumber' | 'name' | null>(null);
+  // --- Generic Input Handler ---
+  const handleFieldChange = <K extends keyof typeof formData>(
+    key: K,
+    value: (typeof formData)[K]
+  ) => {
+    setFormData((prev) => ({ ...prev, [key]: value }));
+  };
 
-  // Filter officers by name or serviceNumber
-  const filterOfficers = (value: string, field: 'name' | 'serviceNumber') => {
+  // --- Generic Officer Auto-complete Handler ---
+  type OfficerContext = {
+    officerKeys: {
+      id: keyof typeof formData;
+      name: keyof typeof formData;
+      serviceNumber: keyof typeof formData;
+      rank: keyof typeof formData;
+    };
+    dropdown: {
+      open: boolean;
+      setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+      filtered: Officer[];
+      setFiltered: React.Dispatch<React.SetStateAction<Officer[]>>;
+      confirmed: boolean;
+      setConfirmed: React.Dispatch<React.SetStateAction<boolean>>;
+      inputField: string | null;
+      setInputField: React.Dispatch<React.SetStateAction<string | null>>;
+    };
+  };
+
+  // Filtering logic (shared)
+  const filterOfficers = (value: string, field: 'name' | 'serviceNumber'): Officer[] => {
     if (!officers) return [];
-    return officers.filter((officer: any) =>
+    return officers.filter((officer: Officer) =>
       (officer[field] || '').toLowerCase().includes(value.toLowerCase())
     );
   };
 
-  // Handle input change for name or serviceNumber
-  const handleOfficerInputChange = (field: 'name' | 'serviceNumber', value: string) => {
+  // Generic handler for officer input change
+  const handleOfficerAutoCompleteInput = (
+    context: OfficerContext,
+    field: 'name' | 'serviceNumber',
+    value: string
+  ) => {
     setFormData((prev) => ({
       ...prev,
-      [field]: value,
-      officer_id: '',
-      rank: field === 'name' ? '' : prev.rank
+      [context.officerKeys.id]: '',
+      [context.officerKeys.name]: field === 'name' ? value : prev[context.officerKeys.name],
+      [context.officerKeys.serviceNumber]:
+        field === 'serviceNumber' ? value : prev[context.officerKeys.serviceNumber],
+      [context.officerKeys.rank]: field === 'name' ? '' : prev[context.officerKeys.rank]
     }));
-    setIsOfficerConfirmed(false);
-    setOfficerInputField(field);
+    context.dropdown.setConfirmed(false);
+    context.dropdown.setInputField(field);
     if (value.trim() === '') {
-      setOpenOfficerDropdown(false);
-      setFilteredOfficers([]);
+      context.dropdown.setOpen(false);
+      context.dropdown.setFiltered([]);
       return;
     }
-    setOpenOfficerDropdown(true);
-    setFilteredOfficers(filterOfficers(value, field));
+    context.dropdown.setOpen(true);
+    context.dropdown.setFiltered(filterOfficers(value, field));
   };
 
-  // When an officer is selected from dropdown
-  const handleSelectOfficer = (officer: any) => {
+  // Generic handler for officer selection from dropdown
+  const handleOfficerAutoCompleteSelect = (context: OfficerContext, officer: Officer) => {
     setFormData((prev) => ({
       ...prev,
-      officer_id: officer.id,
-      name: officer.name,
-      serviceNumber: officer.serviceNumber,
-      rank: officer.rank
+      [context.officerKeys.id]: officer.id,
+      [context.officerKeys.name]: officer.name,
+      [context.officerKeys.serviceNumber]: officer.serviceNumber,
+      [context.officerKeys.rank]: officer.rank
     }));
-    setIsOfficerConfirmed(true);
-    setOpenOfficerDropdown(false);
+    context.dropdown.setConfirmed(true);
+    context.dropdown.setOpen(false);
   };
 
-  // Close dropdown on click outside
-  useEffect(() => {
-    if (!openOfficerDropdown) return;
-    const handleClick = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setOpenOfficerDropdown(false);
-      }
+  // --- Contexts for main officer and duty officer ---
+  const mainOfficerContext: OfficerContext = {
+    officerKeys: {
+      id: 'officer_id',
+      name: 'name',
+      serviceNumber: 'serviceNumber',
+      rank: 'rank'
+    },
+    dropdown: {
+      open: openOfficerDropdown,
+      setOpen: setOpenOfficerDropdown,
+      filtered: filteredOfficers,
+      setFiltered: setFilteredOfficers,
+      confirmed: isOfficerConfirmed,
+      setConfirmed: setIsOfficerConfirmed,
+      inputField: officerInputField,
+      setInputField: setOfficerInputField
+    }
+  };
+
+  const dutyOfficerContext: OfficerContext = {
+    officerKeys: {
+      id: 'duty_officer_id',
+      name: 'dutyName',
+      serviceNumber: 'dutyServiceNo',
+      rank: 'dutyRank'
+    },
+    dropdown: {
+      open: openDutyOfficerDropdown,
+      setOpen: setOpenDutyOfficerDropdown,
+      filtered: filteredDutyOfficers,
+      setFiltered: setFilteredDutyOfficers,
+      confirmed: isDutyOfficerConfirmed,
+      setConfirmed: setIsDutyOfficerConfirmed,
+      inputField: dutyOfficerInputField,
+      setInputField: setDutyOfficerInputField
+    }
+  };
+
+  // Guard officer context for auto-complete
+  const guardOfficerContext: OfficerContext = {
+    officerKeys: {
+      id: 'guard_officer_id',
+      name: 'fireName',
+      serviceNumber: 'fireServiceNo',
+      rank: 'fireRank' // If you want to show rank, add fireRank to formData, otherwise use ''
+    },
+    dropdown: {
+      open: openGuardOfficerDropdown,
+      setOpen: setOpenGuardOfficerDropdown,
+      filtered: filteredGuardOfficers,
+      setFiltered: setFilteredGuardOfficers,
+      confirmed: isGuardOfficerConfirmed,
+      setConfirmed: setIsGuardOfficerConfirmed,
+      inputField: guardOfficerInputField,
+      setInputField: setGuardOfficerInputField
+    }
+  };
+
+  // --- Remove duplicated handlers ---
+  // Remove handleDutyOfficerInputChange and filterDutyOfficers, use generic handler below
+
+  // Example usage in inputs:
+  // Main officer SERVICE NO:
+  // onChange={e => handleOfficerAutoCompleteInput(mainOfficerContext, 'serviceNumber', e.target.value)}
+  // Main officer NAME:
+  // onChange={e => handleOfficerAutoCompleteInput(mainOfficerContext, 'name', e.target.value)}
+  // Duty officer SERVICE NO:
+  // onChange={e => handleOfficerAutoCompleteInput(dutyOfficerContext, 'serviceNumber', e.target.value)}
+  // Duty officer NAME:
+  // onChange={e => handleOfficerAutoCompleteInput(dutyOfficerContext, 'name', e.target.value)}
+
+  // Dropdown selection:
+  // onMouseDown={() => handleOfficerAutoCompleteSelect(mainOfficerContext, officer)}
+  // onMouseDown={() => handleOfficerAutoCompleteSelect(dutyOfficerContext, officer)}
+
+  // --- End of handler refactor ---
+
+  const { mutate, isLoading } = useCreatePartOneOrder();
+
+  // Helper: Convert routineActivities to API shape (days as string[])
+  const getRoutineActivitiesPayload = () =>
+    routineActivities.map((item) => ({
+      time: item.time,
+      activity: item.activity,
+      days:
+        typeof item.days === 'string'
+          ? item.days.split('/').map((d: string) => d.trim())
+          : item.days
+    }));
+
+  // Save handler
+  const handleSave = () => {
+    const payload: CreatePartOneOrderPayload = {
+      officer_id: Number(formData.officer_id) || 0,
+      appointment: formData.appointment,
+      decorations: formData.decorations,
+      unit: formData.unit,
+      issueNo: formData.issueNo,
+      date: formData.date,
+      routineActivities: getRoutineActivitiesPayload(),
+      dutyDepartment: formData.dutyDepartment,
+      dutyDate: formData.dutyDate,
+      duty_officer_id: Number(formData.duty_officer_id) || 0,
+      dutyDurationHours: Number(formData.fireDuration) || 0,
+      dutyLocation: formData.fireLocation,
+      guard_officer_id: Number(formData.guard_officer_id) || 0,
+      subject: formData.subject,
+      comment: formData.comment,
+      timeOut: formData.timeOut,
+      signedName: formData.timeOutName,
+      signedRank: formData.timeOutRank,
+      signedAppt: formData.timeOutAppt
     };
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
-  }, [openOfficerDropdown]);
+
+    console.log('my payload:', payload);
+
+    mutate(payload, {
+      onSuccess: () => {
+        toast.success('Order created successfully');
+      },
+      onError: (error: Error) => {
+        toast.error(error.message || 'Failed to create order');
+      }
+    });
+  };
 
   return (
     <div className="mx-auto p-6 bg-white">
@@ -175,7 +383,9 @@ export default function PartOneOrder() {
             placeholder="Service No"
             className="w-full p-3 border border-gray-300 rounded text-gray-400 placeholder-gray-400"
             value={formData.serviceNumber}
-            onChange={(e) => handleOfficerInputChange('serviceNumber', e.target.value)}
+            onChange={(e) =>
+              handleOfficerAutoCompleteInput(mainOfficerContext, 'serviceNumber', e.target.value)
+            }
             onFocus={() => {
               if (formData.serviceNumber && !isOfficerConfirmed) {
                 setOfficerInputField('serviceNumber');
@@ -188,11 +398,11 @@ export default function PartOneOrder() {
           {openOfficerDropdown && officerInputField === 'serviceNumber' && (
             <ul className="absolute z-10 bg-white border border-gray-300 rounded w-full mt-1 max-h-48 overflow-y-auto">
               {filteredOfficers.length > 0 ? (
-                filteredOfficers.map((officer: any) => (
+                filteredOfficers.map((officer: Officer) => (
                   <li
                     key={officer.id}
                     className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                    onMouseDown={() => handleSelectOfficer(officer)}
+                    onClick={() => handleOfficerAutoCompleteSelect(mainOfficerContext, officer)}
                   >
                     {officer.serviceNumber} - {officer.rank} {officer.name}
                   </li>
@@ -210,7 +420,9 @@ export default function PartOneOrder() {
             placeholder="Full Name"
             className="w-full p-3 border border-gray-300 rounded text-gray-400 placeholder-gray-400"
             value={formData.name}
-            onChange={(e) => handleOfficerInputChange('name', e.target.value)}
+            onChange={(e) =>
+              handleOfficerAutoCompleteInput(mainOfficerContext, 'name', e.target.value)
+            }
             onFocus={() => {
               if (formData.name && !isOfficerConfirmed) {
                 setOfficerInputField('name');
@@ -223,11 +435,11 @@ export default function PartOneOrder() {
           {openOfficerDropdown && officerInputField === 'name' && (
             <ul className="absolute z-10 bg-white border border-gray-300 rounded w-full mt-1 max-h-48 overflow-y-auto">
               {filteredOfficers.length > 0 ? (
-                filteredOfficers.map((officer: any) => (
+                filteredOfficers.map((officer: Officer) => (
                   <li
                     key={officer.id}
                     className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                    onMouseDown={() => handleSelectOfficer(officer)}
+                    onClick={() => handleOfficerAutoCompleteSelect(mainOfficerContext, officer)}
                   >
                     {officer.serviceNumber} - {officer.rank} {officer.name}
                   </li>
@@ -303,7 +515,7 @@ export default function PartOneOrder() {
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">DATE</label>
           <input
-            type="text"
+            type="date"
             placeholder="Date"
             className="w-full p-3 border border-gray-300 rounded text-gray-400 placeholder-gray-400"
             value={formData.date}
@@ -335,7 +547,7 @@ export default function PartOneOrder() {
                   activity.time
                 ) : (
                   <input
-                    type="text"
+                    type="time"
                     className="w-full px-2 py-1  rounded text-sm"
                     placeholder="Time"
                     value={activity.time}
@@ -414,7 +626,7 @@ export default function PartOneOrder() {
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">DATE(DAY:DD/MM/YR)</label>
           <input
-            type="text"
+            type="datetime-local"
             placeholder="dd/mm/yy"
             className="w-full p-3 border border-gray-300 rounded text-gray-400 placeholder-gray-400"
             value={formData.dutyDate}
@@ -424,41 +636,115 @@ export default function PartOneOrder() {
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">RANK</label>
           <div className="relative">
-            <select
-              className="w-full p-3 border border-gray-300 rounded appearance-none bg-white text-gray-400"
+            <input
+              type="text"
+              placeholder="Rank"
+              className="w-full p-3 border border-gray-300 rounded text-gray-400 placeholder-gray-400"
               value={formData.dutyRank}
-              onChange={(e) => handleInputChange('dutyRank', e.target.value)}
-            >
-              <option value="">Rank</option>
-            </select>
-            <img
-              src="/chevron-down.svg"
-              alt="chevron down"
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"
+              disabled
             />
           </div>
         </div>
-        <div>
+        <div
+          className="relative"
+          ref={dutyOfficerInputField === 'dutyServiceNo' ? dropdownRef : null}
+        >
           <label className="block text-sm font-medium text-gray-700 mb-2">SERVICE NO</label>
           <input
             type="text"
             placeholder="Service No."
             className="w-full p-3 border border-gray-300 rounded text-gray-400 placeholder-gray-400"
             value={formData.dutyServiceNo}
-            onChange={(e) => handleInputChange('dutyServiceNo', e.target.value)}
+            onChange={(e) => {
+              handleOfficerAutoCompleteInput(dutyOfficerContext, 'serviceNumber', e.target.value);
+
+              if (formData.dutyServiceNo && !isDutyOfficerConfirmed) {
+                setDutyOfficerInputField('dutyServiceNo');
+                setOpenDutyOfficerDropdown(true);
+                setFilteredDutyOfficers(filterOfficers(formData.dutyServiceNo, 'serviceNumber'));
+              }
+            }}
+            autoComplete="off"
           />
+          {openDutyOfficerDropdown && dutyOfficerInputField === 'dutyServiceNo' && (
+            <ul className="absolute z-10 bg-white border border-gray-300 rounded w-full mt-1 max-h-48 overflow-y-auto">
+              {filteredDutyOfficers.length > 0 ? (
+                filteredDutyOfficers.map((officer: Officer) => (
+                  <li
+                    key={officer.id}
+                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                    onClick={() => {
+                      // Set all duty officer fields and duty_officer_id
+                      setFormData((prev) => ({
+                        ...prev,
+                        duty_officer_id: officer.id,
+                        dutyName: officer.name,
+                        dutyServiceNo: officer.serviceNumber,
+                        dutyRank: officer.rank
+                      }));
+                      setIsDutyOfficerConfirmed(true);
+                      setOpenDutyOfficerDropdown(false);
+                    }}
+                  >
+                    {officer.serviceNumber} - {officer.rank} {officer.name}
+                  </li>
+                ))
+              ) : (
+                <li className="px-4 py-2 text-gray-500">No officer found</li>
+              )}
+            </ul>
+          )}
         </div>
       </div>
 
-      <div className="mb-8">
+      <div
+        className="mb-8 relative"
+        ref={dutyOfficerInputField === 'dutyName' ? dropdownRef : null}
+      >
         <label className="block text-sm font-medium text-gray-700 mb-2">NAME</label>
         <input
           type="text"
           placeholder="Name"
           className="w-full p-3 border border-gray-300 rounded text-gray-400 placeholder-gray-400"
           value={formData.dutyName}
-          onChange={(e) => handleInputChange('dutyName', e.target.value)}
+          onChange={(e) => {
+            handleOfficerAutoCompleteInput(dutyOfficerContext, 'name', e.target.value);
+
+            if (formData.dutyName && !isDutyOfficerConfirmed) {
+              setDutyOfficerInputField('dutyName');
+              setOpenDutyOfficerDropdown(true);
+              setFilteredDutyOfficers(filterOfficers(formData.dutyName, 'name'));
+            }
+          }}
+          autoComplete="off"
         />
+        {openDutyOfficerDropdown && dutyOfficerInputField === 'dutyName' && (
+          <ul className="absolute z-10 bg-white border border-gray-300 rounded w-full mt-1 max-h-48 overflow-y-auto">
+            {filteredDutyOfficers.length > 0 ? (
+              filteredDutyOfficers.map((officer: Officer) => (
+                <li
+                  key={officer.id}
+                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                  onMouseDown={() => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      duty_officer_id: officer.id,
+                      dutyName: officer.name,
+                      dutyServiceNo: officer.serviceNumber,
+                      dutyRank: officer.rank
+                    }));
+                    setIsDutyOfficerConfirmed(true);
+                    setOpenDutyOfficerDropdown(false);
+                  }}
+                >
+                  {officer.serviceNumber} - {officer.rank} {officer.name}
+                </li>
+              ))
+            ) : (
+              <li className="px-4 py-2 text-gray-500">No officer found</li>
+            )}
+          </ul>
+        )}
       </div>
 
       {/* Fire Piquet and Guard Duty Section */}
@@ -497,25 +783,101 @@ export default function PartOneOrder() {
               />
             </div>
           </div>
-          <div>
+          {/* --- GUARD OFFICER SERVICE NO AUTOCOMPLETE --- */}
+          <div
+            className="relative"
+            ref={guardOfficerInputField === 'fireServiceNo' ? dropdownRef : null}
+          >
             <label className="block text-sm font-medium text-gray-700 mb-2">SERVICE NO</label>
             <input
               type="text"
               placeholder="Service No"
               className="w-full p-3 border border-gray-300 rounded text-gray-400 placeholder-gray-400"
               value={formData.fireServiceNo}
-              onChange={(e) => handleInputChange('fireServiceNo', e.target.value)}
+              onChange={(e) => {
+                handleOfficerAutoCompleteInput(
+                  guardOfficerContext,
+                  'serviceNumber',
+                  e.target.value
+                );
+                setGuardOfficerInputField('fireServiceNo');
+                setOpenGuardOfficerDropdown(true);
+                setFilteredGuardOfficers(filterOfficers(e.target.value, 'serviceNumber'));
+              }}
+              autoComplete="off"
             />
+            {openGuardOfficerDropdown && guardOfficerInputField === 'fireServiceNo' && (
+              <ul className="absolute z-10 bg-white border border-gray-300 rounded w-full mt-1 max-h-48 overflow-y-auto">
+                {filteredGuardOfficers.length > 0 ? (
+                  filteredGuardOfficers.map((officer: Officer) => (
+                    <li
+                      key={officer.id}
+                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                      onMouseDown={() => {
+                        setFormData((prev) => ({
+                          ...prev,
+                          guard_officer_id: officer.id,
+                          fireName: officer.name,
+                          fireServiceNo: officer.serviceNumber
+                        }));
+                        setIsGuardOfficerConfirmed(true);
+                        setOpenGuardOfficerDropdown(false);
+                      }}
+                    >
+                      {officer.serviceNumber} - {officer.rank} {officer.name}
+                    </li>
+                  ))
+                ) : (
+                  <li className="px-4 py-2 text-gray-500">No officer found</li>
+                )}
+              </ul>
+            )}
           </div>
-          <div>
+          {/* --- GUARD OFFICER NAME AUTOCOMPLETE --- */}
+          <div
+            className="relative"
+            ref={guardOfficerInputField === 'fireName' ? dropdownRef : null}
+          >
             <label className="block text-sm font-medium text-gray-700 mb-2">NAME</label>
             <input
               type="text"
               placeholder="full Name"
               className="w-full p-3 border border-gray-300 rounded text-gray-400 placeholder-gray-400"
               value={formData.fireName}
-              onChange={(e) => handleInputChange('fireName', e.target.value)}
+              onChange={(e) => {
+                handleOfficerAutoCompleteInput(guardOfficerContext, 'name', e.target.value);
+                setGuardOfficerInputField('fireName');
+                setOpenGuardOfficerDropdown(true);
+                setFilteredGuardOfficers(filterOfficers(e.target.value, 'name'));
+              }}
+              autoComplete="off"
             />
+            {openGuardOfficerDropdown && guardOfficerInputField === 'fireName' && (
+              <ul className="absolute z-10 bg-white border border-gray-300 rounded w-full mt-1 max-h-48 overflow-y-auto">
+                {filteredGuardOfficers.length > 0 ? (
+                  filteredGuardOfficers.map((officer: Officer) => (
+                    <li
+                      key={officer.id}
+                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                      onMouseDown={() => {
+                        setFormData((prev) => ({
+                          ...prev,
+                          guard_officer_id: officer.id,
+                          fireName: officer.name,
+                          fireServiceNo: officer.serviceNumber
+                        }));
+                        setIsGuardOfficerConfirmed(true);
+                        setOpenGuardOfficerDropdown(false);
+                      }}
+                    >
+                      {officer.serviceNumber} - {officer.rank} {officer.name}
+                    </li>
+                  ))
+                ) : (
+                  <li className="px-4 py-2 text-gray-500">No officer found</li>
+                )}
+              </ul>
+            )}
           </div>
         </div>
       </div>
@@ -594,8 +956,12 @@ export default function PartOneOrder() {
 
       {/* Save Button */}
       <div className="flex justify-center">
-        <button className="bg-teal-600 hover:bg-teal-700 text-white px-8 py-3 rounded font-medium">
-          Save
+        <button
+          className="bg-teal-600 hover:bg-teal-700 text-white px-8 py-3 rounded font-medium"
+          onClick={handleSave}
+          disabled={isLoading}
+        >
+          {isLoading ? 'Saving...' : 'Save'}
         </button>
       </div>
     </div>
