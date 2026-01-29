@@ -17,13 +17,13 @@ export interface CreatePartOneOrderPayload {
   fireLocation?: string;
   fireServiceNo?: string;
   fireName?: string;
-  timeOutName: string;
+  timeOutName?: string;
   //   timeOutName: string,
-  timeOutRank: string;
-  timeOutAppt: string;
-  dutyRank: string;
-  dutyServiceNo: string;
-  dutyName: string;
+  timeOutRank?: string;
+  timeOutAppt?: string;
+  dutyRank?: string;
+  dutyServiceNo?: string;
+  dutyName?: string;
   unit: string;
   issueNo: string;
   date: string;

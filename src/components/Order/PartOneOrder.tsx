@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { useGetOfficers } from '../UnitBible/hooks/useUnitBible';
 import { useCreatePartOneOrder } from '../../hooks/dashboardhooks/useCreatePartOneOrder';
 import type { CreatePartOneOrderPayload } from '../../services/dashboardApi/partOneOrderService';
@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 
 // Helper type for officer (should match your officer API shape)
 type Officer = {
-  id: number | string;
+  id: number;
   name: string;
   serviceNumber: string;
   rank: string;
@@ -21,14 +21,14 @@ export default function PartOneOrder() {
   const [openOfficerDropdown, setOpenOfficerDropdown] = useState(false);
   const [filteredOfficers, setFilteredOfficers] = useState<Officer[]>([]);
   const [isOfficerConfirmed, setIsOfficerConfirmed] = useState(false);
-  const [officerInputField, setOfficerInputField] = useState<'serviceNumber' | 'name' | null>(null);
+  const [officerInputField, setOfficerInputField] = useState< string | null>(null);
 
   // State for duty officer auto-complete
   const [openDutyOfficerDropdown, setOpenDutyOfficerDropdown] = useState(false);
   const [filteredDutyOfficers, setFilteredDutyOfficers] = useState<Officer[]>([]);
   const [isDutyOfficerConfirmed, setIsDutyOfficerConfirmed] = useState(false);
   const [dutyOfficerInputField, setDutyOfficerInputField] = useState<
-    'dutyServiceNo' | 'dutyName' | null
+    string |  null
   >(null);
 
   // State for guard officer auto-complete
@@ -36,41 +36,40 @@ export default function PartOneOrder() {
   const [filteredGuardOfficers, setFilteredGuardOfficers] = useState<Officer[]>([]);
   const [isGuardOfficerConfirmed, setIsGuardOfficerConfirmed] = useState(false);
   const [guardOfficerInputField, setGuardOfficerInputField] = useState<
-    'fireServiceNo' | 'fireName' | null
+    string | null
   >(null);
 
   // Form state
-  const [formData, setFormData] = useState<
-    Omit<CreatePartOneOrderPayload, 'routineActivities'> & {
-      rank: string;
-      serviceNumber: string;
-      name: string;
-      dutyRank: string;
-      dutyServiceNo: string;
-      dutyName: string;
-      fireDuration: string;
-      fireLocation: string;
-      fireServiceNo: string;
-      fireName: string;
-      timeOut: string;
-      timeOutName: string;
-      timeOutRank: string;
-      timeOutAppt: string;
-      decorations: string;
-      appointment: string;
-      unit: string;
-      issueNo: string;
-      date: string;
-      subject: string;
-      comment: string;
-      dutyDepartment: string;
-      dutyDate: string;
-      officer_id: number | string;
-      duty_officer_id: number | string;
-      guard_officer_id: number | string;
-    }
-  >({
-    officer_id: '',
+  const [formData, setFormData] = useState<{
+    officer_id: number | '';
+    rank: string;
+    serviceNumber: string;
+    name: string;
+    decorations: string;
+    appointment: string;
+    unit: string;
+    issueNo: string;
+    date: string;
+    dutyDepartment: string;
+    dutyDate: string;
+    dutyRank: string;
+    dutyServiceNo: string;
+    dutyName: string;
+    fireRank: string;
+    fireDuration: string;
+    fireLocation: string;
+    fireServiceNo: string;
+    fireName: string;
+    subject: string;
+    comment: string;
+    timeOut: string;
+    timeOutName: string;
+    timeOutRank: string;
+    timeOutAppt: string;
+    duty_officer_id: number | '';
+    guard_officer_id: number | '';
+  }>({
+    officer_id: '' as number | '',
     rank: '',
     serviceNumber: '',
     name: '',
@@ -82,11 +81,13 @@ export default function PartOneOrder() {
     dutyDepartment: 'Radiologist on call',
     dutyDate: '',
     dutyRank: '',
+
     dutyServiceNo: '',
     dutyName: '',
     fireDuration: '',
     fireLocation: '',
     fireServiceNo: '',
+    fireRank: '',
     fireName: '',
     subject: '',
     comment: '',
@@ -94,8 +95,8 @@ export default function PartOneOrder() {
     timeOutName: '',
     timeOutRank: '',
     timeOutAppt: '',
-    duty_officer_id: '',
-    guard_officer_id: ''
+    duty_officer_id: '' as number | '',
+    guard_officer_id: '' as number | ''
   });
 
   const departmentOptions = [
@@ -158,16 +159,19 @@ export default function PartOneOrder() {
   };
 
   const handleInputChange = (field: keyof typeof formData, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
   // --- Generic Input Handler ---
-  const handleFieldChange = <K extends keyof typeof formData>(
-    key: K,
-    value: (typeof formData)[K]
-  ) => {
-    setFormData((prev) => ({ ...prev, [key]: value }));
-  };
+  // const handleFieldChange = <K extends keyof typeof formData>(
+  //   key: K,
+  //   value: (typeof formData)[K]
+  // ) => {
+  //   setFormData((prev) => ({ ...prev, [key]: value }));
+  // };
 
   // --- Generic Officer Auto-complete Handler ---
   type OfficerContext = {
@@ -280,7 +284,8 @@ export default function PartOneOrder() {
       id: 'guard_officer_id',
       name: 'fireName',
       serviceNumber: 'fireServiceNo',
-      rank: 'fireRank' // If you want to show rank, add fireRank to formData, otherwise use ''
+      rank: 'fireRank' 
+      // If you want to show rank, add fireRank to formData, otherwise use ''
     },
     dropdown: {
       open: openGuardOfficerDropdown,
@@ -313,7 +318,7 @@ export default function PartOneOrder() {
 
   // --- End of handler refactor ---
 
-  const { mutate, isLoading } = useCreatePartOneOrder();
+  const { mutate, isPending: isCreating } = useCreatePartOneOrder();
 
   // Helper: Convert routineActivities to API shape (days as string[])
   const getRoutineActivitiesPayload = () =>
@@ -329,7 +334,7 @@ export default function PartOneOrder() {
   // Save handler
   const handleSave = () => {
     const payload: CreatePartOneOrderPayload = {
-      officer_id: Number(formData.officer_id) || 0,
+      officer_id: formData.officer_id !== '' ? Number(formData.officer_id) : 0,
       appointment: formData.appointment,
       decorations: formData.decorations,
       unit: formData.unit,
@@ -338,10 +343,10 @@ export default function PartOneOrder() {
       routineActivities: getRoutineActivitiesPayload(),
       dutyDepartment: formData.dutyDepartment,
       dutyDate: formData.dutyDate,
-      duty_officer_id: Number(formData.duty_officer_id) || 0,
+      duty_officer_id: formData.duty_officer_id !== '' ? Number(formData.duty_officer_id) : 0,
       dutyDurationHours: Number(formData.fireDuration) || 0,
       dutyLocation: formData.fireLocation,
-      guard_officer_id: Number(formData.guard_officer_id) || 0,
+      guard_officer_id: formData.guard_officer_id !== '' ? Number(formData.guard_officer_id) : 0,
       subject: formData.subject,
       comment: formData.comment,
       timeOut: formData.timeOut,
@@ -350,7 +355,7 @@ export default function PartOneOrder() {
       signedAppt: formData.timeOutAppt
     };
 
-    console.log('my payload:', payload);
+    console.log('my payload:', payload, isCreating);
 
     mutate(payload, {
       onSuccess: () => {
@@ -959,9 +964,9 @@ export default function PartOneOrder() {
         <button
           className="bg-teal-600 hover:bg-teal-700 text-white px-8 py-3 rounded font-medium"
           onClick={handleSave}
-          disabled={isLoading}
+          disabled={isCreating}
         >
-          {isLoading ? 'Saving...' : 'Save'}
+          {isCreating ? 'Saving...' : 'Save'}
         </button>
       </div>
     </div>
