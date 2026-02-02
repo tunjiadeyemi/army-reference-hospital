@@ -6,7 +6,6 @@ import Role from '../../components/User/Role';
 import EditUser from '../../components/User/EditUser';
 import AddUser from '../../components/User/AddUser';
 import Layout from '../../components/Layout';
-import { sampleUserData } from '../../utils/constants';
 import { AppContext } from '../../context/AppContext';
 import { useGetUsers } from '../../hooks/dashboardhooks/useDasboardData';
 // import { useAxiosInstance } from '../../hooks/axios';
@@ -71,7 +70,7 @@ const User = () => {
   ];
 
   // const paginatedData = users.slice((currentPage - 1) * pageSize, currentPage * pageSize);
-  const paginatedData = users.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const paginatedData = (users || []).slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -188,7 +187,7 @@ const User = () => {
                 </section>
 
                 {/* <Pagination totalItems={users.length} onPageChange={handlePageChange} /> */}
-                <Pagination totalItems={sampleUserData.length} onPageChange={handlePageChange} />
+                <Pagination totalItems={(users || []).length} onPageChange={handlePageChange} />
               </>
             )}
 
