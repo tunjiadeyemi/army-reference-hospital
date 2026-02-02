@@ -51,7 +51,7 @@ const RecordModal = () => {
     setEditDraft(orderData);
     setEditMode(false);
   };
-
+ console.log('selectedRecord:', selectedRecord);
   return (
     <Modal>
       <div className="bg-white w-[85%] h-[90vh] rounded-md shadow-md overflow-y-scroll overflow-hidden">
@@ -66,7 +66,7 @@ const RecordModal = () => {
               <img src="/department/chevron-left.svg" alt="chevron-left" />
             </button>
 
-            <h1>{selectedRecord}</h1>
+            <h1>{selectedRecord.name}</h1>
           </div>
 
           <button
@@ -120,9 +120,9 @@ const RecordModal = () => {
           </div>
 
           {/* Personal Details Grid */}
-          <div className="mb-8">
-            <div className="grid grid-cols-6 gap-4 text-sm">
-              <div className="flex">
+          <div className="w-full  mb-8">
+            <div className="flex justify-between text-sm mt-4">
+             <div className="flex items-center">
                 <span className="font-medium text-gray-800 mr-2">RANK:</span>
                 {editMode ? (
                   <input
@@ -131,10 +131,10 @@ const RecordModal = () => {
                     onChange={(e) => handleEditChange('personalDetails', 'rank', e.target.value)}
                   />
                 ) : (
-                  <span className="text-gray-700">{orderData.personalDetails.rank}</span>
+                  <span className="text-gray-700">{selectedRecord.rank}</span>
                 )}
               </div>
-              <div className="flex">
+             <div className="flex items-center">
                 <span className="font-medium text-gray-800 mr-2">NAME:</span>
                 {editMode ? (
                   <input
@@ -143,10 +143,10 @@ const RecordModal = () => {
                     onChange={(e) => handleEditChange('personalDetails', 'name', e.target.value)}
                   />
                 ) : (
-                  <span className="text-gray-700">{orderData.personalDetails.name}</span>
+                  <span className="text-gray-700">{selectedRecord.name}</span>
                 )}
               </div>
-              <div className="flex">
+             <div className="flex items-center">
                 <span className="font-medium text-gray-800 mr-2">SERVICE NO.:</span>
                 {editMode ? (
                   <input
@@ -157,10 +157,10 @@ const RecordModal = () => {
                     }
                   />
                 ) : (
-                  <span className="text-gray-700">{orderData.personalDetails.serviceNo}</span>
+                  <span className="text-gray-700">{selectedRecord.serviceNumber}</span>
                 )}
               </div>
-              <div className="flex">
+             <div className="flex items-center">
                 <span className="font-medium text-gray-800 mr-2">DECORATIONS:</span>
                 {editMode ? (
                   <input
@@ -171,17 +171,17 @@ const RecordModal = () => {
                     }
                   />
                 ) : (
-                  <span className="text-gray-700">{orderData.personalDetails.decorations}</span>
+                  <span className="text-gray-700">{selectedRecord.decorations}</span>
                 )}
               </div>
             </div>
 
-            <div className="grid grid-cols-6 gap-4 text-sm mt-4">
-              <div className="flex">
+            <div className="flex justify-between text-sm mt-4">
+              <div className="flex items-center">
                 <span className="font-medium text-gray-800 mr-2">ISSUE NO:</span>
-                <span className="text-gray-700">{orderData.personalDetails.issueNo}</span>
+                <span className="text-gray-700">{selectedRecord.issueNo}</span>
               </div>
-              <div className="flex">
+              <div className="flex items-center">
                 <span className="font-medium text-gray-800 mr-2">UNIT:</span>
                 {editMode ? (
                   <input
@@ -190,11 +190,11 @@ const RecordModal = () => {
                     onChange={(e) => handleEditChange('personalDetails', 'unit', e.target.value)}
                   />
                 ) : (
-                  <span className="text-gray-700">{orderData.personalDetails.unit}</span>
+                  <span className="text-gray-700">{selectedRecord.unit}</span>
                 )}
               </div>
-              <div className="flex">
-                <span className="font-medium text-gray-800 mr-2">APPOINTMENT:</span>
+              <div className="flex items-center">
+                <span className="font-medium text-gray-800 ">APPOINTMENT:</span>
                 {editMode ? (
                   <input
                     className="text-gray-700 border border-gray-200 rounded px-2 py-1 text-sm"
@@ -204,11 +204,11 @@ const RecordModal = () => {
                     }
                   />
                 ) : (
-                  <span className="text-gray-700">{orderData.personalDetails.appointment}</span>
+                  <span className="text-gray-700">{selectedRecord.appointment}</span>
                 )}
               </div>
-              <div className="flex">
-                <span className="font-medium text-gray-800 mr-2">DATE:</span>
+              <div className="flex items-center">
+                <span className="font-medium text-gray-800">DATE:</span>
                 {editMode ? (
                   <input
                     className="text-gray-700 border border-gray-200 rounded px-2 py-1 text-sm"
@@ -216,7 +216,7 @@ const RecordModal = () => {
                     onChange={(e) => handleEditChange('personalDetails', 'date', e.target.value)}
                   />
                 ) : (
-                  <span className="text-gray-700">{orderData.personalDetails.date}</span>
+                  <span className="text-gray-700">{selectedRecord.date}</span>
                 )}
               </div>
             </div>
@@ -242,11 +242,11 @@ const RecordModal = () => {
                 </div>
               </div>
 
-              {orderData.routineActivities.map((activity, index) => (
+              {selectedRecord.routineActivities.map((activity: { time: string; activity: string; days: string[] }, index: number) => (
                 <div key={index} className="grid grid-cols-3 gap-8 py-2 text-sm">
                   <div className="text-center text-gray-700">{activity.time}</div>
                   <div className="text-center text-gray-700">{activity.activity}</div>
-                  <div className="text-center text-gray-700">{activity.days}</div>
+                  <div className="text-center text-gray-700">{activity.days.join(', ')}</div>
                 </div>
               ))}
             </div>
@@ -257,26 +257,26 @@ const RecordModal = () => {
             <div className="grid grid-cols-4 gap-4 text-sm mb-4">
               <div className="flex">
                 <span className="font-medium text-gray-800 mr-2">DUTY/DEPARTMENT:</span>
-                <span className="text-gray-700">{orderData.dutyDepartment.department}</span>
+                <span className="text-gray-700">{selectedRecord.dutyDepartment}</span>
               </div>
               <div className="flex">
                 <span className="font-medium text-gray-800 mr-2">DATE:</span>
-                <span className="text-gray-700">{orderData.dutyDepartment.date}</span>
+                <span className="text-gray-700">{selectedRecord.dutyDate}</span>
               </div>
               <div className="flex">
                 <span className="font-medium text-gray-800 mr-2">RANK:</span>
-                <span className="text-gray-700">{orderData.dutyDepartment.rank}</span>
+                <span className="text-gray-700">{selectedRecord.duty_officer_rank}</span>
               </div>
               <div className="flex">
                 <span className="font-medium text-gray-800 mr-2">SERVICE NO:</span>
-                <span className="text-gray-700">{orderData.dutyDepartment.serviceNo}</span>
+                <span className="text-gray-700">{selectedRecord.duty_officer_number}</span>
               </div>
             </div>
 
             <div className="text-sm">
               <div className="flex">
                 <span className="font-medium text-gray-800 mr-2">NAME:</span>
-                <span className="text-gray-700">{orderData.dutyDepartment.name}</span>
+                <span className="text-gray-700">{selectedRecord.duty_officer_name}</span>
               </div>
             </div>
           </div>
@@ -291,19 +291,19 @@ const RecordModal = () => {
             <div className="grid grid-cols-4 gap-4 text-sm">
               <div className="flex">
                 <span className="font-medium text-gray-800 mr-2">DUTY DURATION:</span>
-                <span className="text-gray-700">{orderData.firePicketGuardDuty.dutyDuration}</span>
+                <span className="text-gray-700">{selectedRecord.time}</span>
               </div>
               <div className="flex">
                 <span className="font-medium text-gray-800 mr-2">LOCATION:</span>
-                <span className="text-gray-700">{orderData.firePicketGuardDuty.location}</span>
+                <span className="text-gray-700">{selectedRecord.location}</span>
               </div>
               <div className="flex">
                 <span className="font-medium text-gray-800 mr-2">SERVICE NO.:</span>
-                <span className="text-gray-700">{orderData.firePicketGuardDuty.serviceNo}</span>
+                <span className="text-gray-700">{selectedRecord.guard_officer_number}</span>
               </div>
               <div className="flex">
                 <span className="font-medium text-gray-800 mr-2">NAME:</span>
-                <span className="text-gray-700">{orderData.firePicketGuardDuty.name}</span>
+                <span className="text-gray-700">{selectedRecord.guard_officer_name}</span>
               </div>
             </div>
           </div>
@@ -318,11 +318,11 @@ const RecordModal = () => {
             <div className="grid grid-cols-2 gap-8 mb-4 text-sm">
               <div className="flex">
                 <span className="font-medium text-gray-800 mr-2">SUBJECT:</span>
-                <span className="text-gray-700">{orderData.noticeBoardInfo.subject}</span>
+                <span className="text-gray-700">{selectedRecord.subject}</span>
               </div>
               <div className="flex">
                 <span className="font-medium text-gray-800 mr-2">TIME OUT:</span>
-                <span className="text-gray-700">{orderData.noticeBoardInfo.timeOut}</span>
+                <span className="text-gray-700">{selectedRecord.timeOut}</span>
               </div>
             </div>
 
@@ -330,7 +330,7 @@ const RecordModal = () => {
               <div className="flex flex-col">
                 <span className="font-medium text-gray-800 mb-2">COMMENT:</span>
                 <span className="text-gray-700 leading-relaxed">
-                  {orderData.noticeBoardInfo.comment}
+                  {selectedRecord.comment}
                 </span>
               </div>
             </div>
@@ -340,16 +340,16 @@ const RecordModal = () => {
               <div className="text-right text-sm space-y-2">
                 <div className="flex">
                   <span className="font-medium text-gray-800 mr-4">NAME:</span>
-                  <span className="text-gray-700">{orderData.noticeBoardInfo.signatory.name}</span>
+                  <span className="text-gray-700">{selectedRecord.signedName}</span>
                 </div>
                 <div className="flex">
                   <span className="font-medium text-gray-800 mr-4">RANK:</span>
-                  <span className="text-gray-700">{orderData.noticeBoardInfo.signatory.rank}</span>
+                  <span className="text-gray-700">{selectedRecord.signedRank}</span>
                 </div>
                 <div className="flex">
                   <span className="font-medium text-gray-800 mr-4">APPT:</span>
                   <span className="text-gray-700">
-                    {orderData.noticeBoardInfo.signatory.appointment}
+                    {selectedRecord.signedAppt}
                   </span>
                 </div>
               </div>

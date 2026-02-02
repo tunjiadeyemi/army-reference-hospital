@@ -11,6 +11,9 @@ const RecordModalTwo = () => {
 
   const { setShowRecordModalTwo, selectedRecordTwo } = useContext(AppContext);
 
+  // Use selectedRecordTwo data if available, otherwise use mock data
+  const currentData = selectedRecordTwo || mockPartTwoOrderData;
+
   const handleEditClick = () => {
     setEditDraft(orderData);
     setEditMode(true);
@@ -40,7 +43,7 @@ const RecordModalTwo = () => {
               <img src="/department/chevron-left.svg" alt="chevron-left" />
             </button>
 
-            <h1>{selectedRecordTwo}</h1>
+            <h1>{selectedRecordTwo?.officer || 'Part 2 Order'}</h1>
           </div>
 
           <button
@@ -84,7 +87,7 @@ const RecordModalTwo = () => {
         </div>
 
         {/* body */}
-        <PartTwoOrder isEdit={editMode} mockData={mockPartTwoOrderData} />
+        <PartTwoOrder isEdit={editMode} mockData={currentData} />
       </div>
     </Modal>
   );

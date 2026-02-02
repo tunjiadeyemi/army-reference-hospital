@@ -23,7 +23,7 @@ const Order = () => {
         )
     },
     {
-      title: 'Part 1 Order List',
+      title: 'Part  1 Order List',
       slug: 'part-1-order-list',
       icon:
         activeTab === 'part-1-order-list' ? (
@@ -43,7 +43,7 @@ const Order = () => {
         )
     },
     {
-      title: 'Part 1 Order List',
+      title: 'Part 2 Order List',
       slug: 'part-2-order-list',
       icon:
         activeTab === 'part-2-order-list' ? (
@@ -55,7 +55,7 @@ const Order = () => {
   ];
 
   useEffect(() => {
-    if (active === 'part-1-order-list') {
+    if (active === 'part-1x-order-list') {
       setActiveTab('part-1-order-list');
     } else if (active === 'part-2-order-list') {
       setActiveTab('part-2-order-list');
