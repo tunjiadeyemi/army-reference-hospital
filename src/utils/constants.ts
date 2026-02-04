@@ -27,6 +27,10 @@ import type { FormData } from './types/dutyReport';
 import TrialIcon from '../assets/navIcons/TrialIcon';
 import DisciplineIcon from '../assets/navIcons/DisciplineIcon';
 import OrdersIcon from '../assets/navIcons/OrdersIcon';
+import SignalIcon from '../assets/navIcons/SignalIcon';
+import MammyIcon from '../assets/navIcons/MammyIcon';
+import MailIcon from '../assets/navIcons/MailIcon';
+import ArmsIcon from '../assets/navIcons/ArmsIcon';
 
 export const navigationItems: NavigationItem[] = [
   {
@@ -118,16 +122,16 @@ export const navigationItems: NavigationItem[] = [
       { label: 'Discipline/Charge Sheets list', action: 'list', rout: '/discipline/list' }
     ]
   },
-  // {
-  //   id: 'Signal Form',
-  //   label: 'Signal Form',
-  //   icon: SignalIcon,
-  //   hasSubmenu: true,
-  //   submenuItems: [
-  //     { label: 'Add new', action: 'add', rout: '/signal/add' },
-  //     { label: 'Signal Form list', action: 'list', rout: '/signal/list' }
-  //   ]
-  // },
+  {
+    id: 'Signal Form',
+    label: 'Signal Form',
+    icon: SignalIcon,
+    hasSubmenu: true,
+    submenuItems: [
+      { label: 'Add new', action: 'add', rout: '/signal/add' },
+      { label: 'Signal Form list', action: 'list', rout: '/signal/list' }
+    ]
+  },
   {
     id: 'Guard Room/Mess',
     label: 'Guard Room/Mess',
@@ -148,16 +152,16 @@ export const navigationItems: NavigationItem[] = [
       { label: 'Staff Nominal Roll list', action: 'list', rout: '/staff/list' }
     ]
   },
-  // {
-  //   id: 'Mail Archiving system',
-  //   label: 'Mail Archiving system',
-  //   icon: MailIcon,
-  //   hasSubmenu: true,
-  //   submenuItems: [
-  //     { label: 'Add new', action: 'add', rout: '/mail/add' },
-  //     { label: 'Mail list', action: 'list', rout: '/mail/list' }
-  //   ]
-  // },
+  {
+    id: 'Mail Archiving system',
+    label: 'Mail Archiving system',
+    icon: MailIcon,
+    hasSubmenu: true,
+    submenuItems: [
+      { label: 'Add new', action: 'add', rout: '/mail/add' },
+      { label: 'Mail list', action: 'list', rout: '/mail/list' }
+    ]
+  },
 
   {
     id: 'Accommodation',
@@ -169,16 +173,16 @@ export const navigationItems: NavigationItem[] = [
       { label: 'Accommodation list', action: 'list', rout: '/accommodation/list' }
     ]
   },
-  // {
-  //   id: 'Mammy Market',
-  //   label: 'Mammy Market',
-  //   icon: MammyIcon,
-  //   hasSubmenu: true,
-  //   submenuItems: [
-  //     { label: 'Add new', action: 'add', rout: '/mammy/add' },
-  //     { label: 'Shops list', action: 'list', rout: '/mammy/list' }
-  //   ]
-  // },
+  {
+    id: 'Mammy Market',
+    label: 'Mammy Market',
+    icon: MammyIcon,
+    hasSubmenu: true,
+    submenuItems: [
+      { label: 'Add new', action: 'add', rout: '/mammy/add' },
+      { label: 'Shops list', action: 'list', rout: '/mammy/list' }
+    ]
+  },
   {
     id: 'Library/NA Books',
     label: 'Library/NA Books',
@@ -209,26 +213,26 @@ export const navigationItems: NavigationItem[] = [
       { label: 'Vehicles list', action: 'list', rout: '/vehicle/list' }
     ]
   },
-  // {
-  //   id: 'Unit Arms', // unit-holding-arms
-  //   label: 'Unit Arms',
-  //   icon: ArmsIcon,
-  //   hasSubmenu: true,
-  //   submenuItems: [
-  //     { label: 'Add new', action: 'add', rout: '/unit-holding-arms/add' },
-  //     { label: 'Arms list', action: 'list', rout: '/unit-holding-arms/list' }
-  //   ]
-  // },
-  // {
-  //   id: 'Ammunitions', //ammunitions
-  //   label: 'Ammunitions',
-  //   icon: ArmsIcon,
-  //   hasSubmenu: true,
-  //   submenuItems: [
-  //     { label: 'Add new', action: 'add', rout: '/ammunitions/add' },
-  //     { label: 'Ammunition list', action: 'list', rout: '/ammunitions/list' }
-  //   ]
-  // },
+  {
+    id: 'Unit Arms', // unit-holding-arms
+    label: 'Unit Arms',
+    icon: ArmsIcon,
+    hasSubmenu: true,
+    submenuItems: [
+      { label: 'Add new', action: 'add', rout: '/unit-holding-arms/add' },
+      { label: 'Arms list', action: 'list', rout: '/unit-holding-arms/list' }
+    ]
+  },
+  {
+    id: 'Ammunitions', //ammunitions
+    label: 'Ammunitions',
+    icon: ArmsIcon,
+    hasSubmenu: true,
+    submenuItems: [
+      { label: 'Add new', action: 'add', rout: '/ammunitions/add' },
+      { label: 'Ammunition list', action: 'list', rout: '/ammunitions/list' }
+    ]
+  },
  
   {
     id: 'Users/Admins',
