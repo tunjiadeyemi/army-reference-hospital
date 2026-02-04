@@ -23,8 +23,8 @@ const User = () => {
   const [loading, setLoading] = useState(false);
 
   const { setShowAdminDetails, setAdminDetails } = useContext(AppContext);
-   
-  const {data: users} = useGetUsers()
+
+  const { data: users } = useGetUsers();
 
   // const axiosInstance = useAxiosInstance();
   // const baseUrl = import.meta.env.VITE_BASE_URL;
@@ -86,17 +86,14 @@ const User = () => {
 
   const handleSaveRole = async (updatedRole: any, isEdit: any) => {
     console.log('Saving role:', updatedRole, isEdit);
-   
   };
 
   const handleDeleteRole = async (index: number) => {
     console.log('Deleting role with index:', index);
-    
   };
 
   const handleDeleteUser = async (index: number) => {
     console.log('Deleting user with index:', index);
-   
   };
 
   return (
